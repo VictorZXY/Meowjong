@@ -1,3 +1,5 @@
 # meowjong
 
-Cambridge Computer Science Tripos - Part II Project
+University of Cambridge
+
+Computer Science Tripos - Part II Project
