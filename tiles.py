@@ -5,14 +5,18 @@ from tile_constants import ONE_MAN, FIVE_MAN, ONE_PIN, FIVE_PIN, ONE_SOU, \
 class TilesConverter(object):
     @staticmethod
     def array_to_one_line_string(tiles):
-        # Array representation:
-        # manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
-        # red dora count as 4;
-        # One-line string representaion:
-        # manzu = m, pinzu = p, souzu = s, honours = z, red dora = 0,
-        # east = 1, south = 2, west = 3, north = 4,
-        # haku = 5, hatsu = 6, chun = 7.
+        """
+        Array representation:
+        manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
+        red dora count as 4;
+
+        One-line string representaion:
+        manzu = m, pinzu = p, souzu = s, honours = z, red dora = 0,
+        east = 1, south = 2, west = 3, north = 4,
+        haku = 5, hatsu = 6, chun = 7.
+        """
         result = ""
+
         # manzu
         man = ""
         for i in range(1, 10):
@@ -23,6 +27,7 @@ class TilesConverter(object):
                 man += tiles[ONE_MAN + i - 1] * str(i)
         if man != "":
             result += man + 'm'
+
         # pinzu
         pin = ""
         for i in range(1, 10):
@@ -33,6 +38,7 @@ class TilesConverter(object):
                 pin += tiles[ONE_PIN + i - 1] * str(i)
         if pin != "":
             result += pin + 'p'
+
         # souzu
         sou = ""
         for i in range(1, 10):
@@ -43,46 +49,62 @@ class TilesConverter(object):
                 sou += tiles[ONE_SOU + i - 1] * str(i)
         if sou != "":
             result += sou + 's'
+
         # honours
         honours = ""
         for i in range(1, 8):
             honours += tiles[EAST + i - 1] * str(i)
         if honours != "":
             result += honours + 'z'
+
         return result
 
     @staticmethod
     def string_to_34_array(man=None, pin=None, sou=None, honours=None):
-        # String representation:
-        # east = 1, south = 2, west = 3, north = 4,
-        # haku = 5, hatsu = 6, chun = 7, red dora = 0;
-        # Array representation:
-        # manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
-        # red dora count as 4;
+        """
+        String representation:
+        east = 1, south = 2, west = 3, north = 4,
+        haku = 5, hatsu = 6, chun = 7, red dora = 0;
+
+        Array representation:
+        manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
+        red dora count as 4;
+        """
         result = [0] * 34
+
+        # manzu
         for i in man:
             if i == '0':
                 result[FIVE_MAN] += RED_DORA_COUNT
             else:
                 result[ONE_MAN + int(i) - 1] += 1
+
+        # pinzu
         for i in pin:
             if i == '0':
                 result[FIVE_PIN] += RED_DORA_COUNT
             else:
                 result[ONE_PIN + int(i) - 1] += 1
+
+        # souzu
         for i in sou:
             if i == '0':
                 result[FIVE_SOU] += RED_DORA_COUNT
             else:
                 result[ONE_SOU + int(i) - 1] += 1
+
+        # honours
         for i in honours:
             result[EAST + int(i) - 1] += 1
+
         return result
 
     @staticmethod
     def one_line_string_to_34_array(string):
-        # One-line string representaion:
-        # manzu = m, pinzu = p, souzu = s, honours = z, red dora = 0.
+        """
+        One-line string representaion:
+        manzu = m, pinzu = p, souzu = s, honours = z, red dora = 0.
+        """
         man = ""
         pin = ""
         sou = ""
