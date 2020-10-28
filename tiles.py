@@ -4,6 +4,16 @@ from tile_constants import ONE_MAN, FIVE_MAN, ONE_PIN, FIVE_PIN, ONE_SOU, \
 
 class TilesConverter(object):
     @staticmethod
+    def tiles_count(tiles):
+        count = 0
+        for index, num in enumerate(tiles):
+            if index == FIVE_MAN or index == FIVE_PIN or index == FIVE_SOU:
+                count += (num // RED_DORA_COUNT) + (num % RED_DORA_COUNT)
+            else:
+                count += num
+        return count
+
+    @staticmethod
     def array_to_one_line_string(tiles):
         """
         Array representation:
