@@ -1,8 +1,9 @@
-from tile_constants import ONE_MAN, FIVE_MAN, ONE_PIN, FIVE_PIN, ONE_SOU, \
+from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, ONE_PIN, \
+    FIVE_PIN, ONE_SOU, \
     FIVE_SOU, EAST, RED_DORA_COUNT
 
 
-class TilesConverter(object):
+class Tiles:
     @staticmethod
     def tiles_count(tiles):
         count = 0
@@ -14,17 +15,44 @@ class TilesConverter(object):
         return count
 
     @staticmethod
-    def array_to_one_line_string(tiles):
+    def array_to_indices(tiles, start_index=0, end_index=33):
         """
-        Array representation:
-        manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
-        red dora count as 4;
+        Convert a 34-array tiles into a list of array indices, counting only
+        within the specified interval.
+        :param tiles: Input tiles represented by a 34-array
+        :param start_index: Start index of the interval (inclusive)
+        :param end_index: End index of the interval (inclusive)
+        :return: A list of integer array indices
+        """
+        indices = []
+        for index in range(start_index, end_index + 1):
+            if tiles[index] > 0:
+                if index == FIVE_MAN or index == FIVE_PIN or index == FIVE_SOU:
+                    indices.extend([index] * (tiles[index] // RED_DORA_COUNT
+                                              + tiles[index] % RED_DORA_COUNT))
+                else:
+                    indices.extend([index] * tiles[index])
+        return indices
 
-        One-line string representaion:
-        manzu = m, pinzu = p, souzu = s, honours = z, red dora = 0,
-        east = 1, south = 2, west = 3, north = 4,
-        haku = 5, hatsu = 6, chun = 7.
-        """
+    @staticmethod
+    def indices_to_array(indices):
+        # Array representation:
+        # manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
+        # red dora is not taken into count in this method.
+        result = [0] * 34
+        for index in indices:
+            result[index] += 1
+        return result
+
+    @staticmethod
+    def array_to_one_line_string(tiles):
+        # Array representation:
+        # manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
+        # red dora count as 4;
+        # One-line string representaion:
+        # manzu = m, pinzu = p, souzu = s, honours = z, red dora = 0,
+        # east = 1, south = 2, west = 3, north = 4,
+        # haku = 5, hatsu = 6, chun = 7.
         result = ""
 
         # manzu
@@ -70,16 +98,13 @@ class TilesConverter(object):
         return result
 
     @staticmethod
-    def string_to_34_array(man=None, pin=None, sou=None, honours=None):
-        """
-        String representation:
-        east = 1, south = 2, west = 3, north = 4,
-        haku = 5, hatsu = 6, chun = 7, red dora = 0;
-
-        Array representation:
-        manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
-        red dora count as 4;
-        """
+    def string_to_array(man=None, pin=None, sou=None, honours=None):
+        # String representation:
+        # east = 1, south = 2, west = 3, north = 4,
+        # haku = 5, hatsu = 6, chun = 7, red dora = 0;
+        # Array representation:
+        # manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
+        # red dora count as 4.
         result = [0] * 34
 
         # manzu
@@ -110,11 +135,9 @@ class TilesConverter(object):
         return result
 
     @staticmethod
-    def one_line_string_to_34_array(string):
-        """
-        One-line string representaion:
-        manzu = m, pinzu = p, souzu = s, honours = z, red dora = 0.
-        """
+    def one_line_string_to_array(string):
+        # One-line string representaion:
+        # manzu = m, pinzu = p, souzu = s, honours = z, red dora = 0.
         man = ""
         pin = ""
         sou = ""
@@ -136,7 +159,7 @@ class TilesConverter(object):
                 honors += string[split_start: index]
                 split_start = index + 1
 
-        return TilesConverter.string_to_34_array(man, pin, sou, honors)
+        return Tiles.string_to_array(man, pin, sou, honors)
 
 
 # Tests
@@ -144,15 +167,15 @@ if __name__ == "__main__":
     print("Test 1:")
     initial_string = "1m2p3s37m0s84p5s41z9s34z"
     correct_string = "137m248p3059s1344z"
-    tiles = TilesConverter.one_line_string_to_34_array(initial_string)
-    output_string = TilesConverter.array_to_one_line_string(tiles)
+    tiles = Tiles.one_line_string_to_array(initial_string)
+    output_string = Tiles.array_to_one_line_string(tiles)
     print("output string:  " + output_string)
     print("correct string: " + correct_string)
 
     print("Test 2:")
     initial_string = "1m3s37m0s5s41z9s34z"
     correct_string = "137m3059s1344z"
-    tiles = TilesConverter.one_line_string_to_34_array(initial_string)
-    output_string = TilesConverter.array_to_one_line_string(tiles)
+    tiles = Tiles.one_line_string_to_array(initial_string)
+    output_string = Tiles.array_to_one_line_string(tiles)
     print("output string:  " + output_string)
     print("correct string: " + correct_string)
