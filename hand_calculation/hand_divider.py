@@ -19,7 +19,7 @@ class HandDivider:
 
         pair_indices = self.find_pairs(private_tiles)
 
-        # case of chii-toi-tsu
+        # case of chiitoitsu
         if len(pair_indices) == 7:
             hand = []
             for index in pair_indices:

@@ -54,7 +54,7 @@ WINDS = [EAST, SOUTH, WEST, NORTH]
 DRAGONS = [HAKU, HATSU, CHUN]
 HONOURS = WINDS + DRAGONS
 
-# yao-chuu-hai: terminals and honours
+# yaochuuhai: terminals and honours
 YAO_CHUU = TERMINALS + HONOURS
 
 # red dora count

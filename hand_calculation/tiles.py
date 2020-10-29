@@ -1,6 +1,5 @@
 from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, ONE_PIN, \
-    FIVE_PIN, ONE_SOU, \
-    FIVE_SOU, EAST, RED_DORA_COUNT
+    FIVE_PIN, ONE_SOU, FIVE_SOU, EAST, RED_DORA_COUNT
 
 
 class Tiles:
