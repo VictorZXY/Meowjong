@@ -55,7 +55,7 @@ DRAGONS = [HAKU, HATSU, CHUN]
 HONOURS = WINDS + DRAGONS
 
 # yaochuuhai: terminals and honours
-YAO_CHUU = TERMINALS + HONOURS
+YAOCHUUHAI = TERMINALS + HONOURS
 
 # red dora count
 RED_DORA_COUNT = 4

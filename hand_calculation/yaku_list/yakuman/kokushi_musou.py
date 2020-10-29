@@ -1,5 +1,5 @@
 from math import prod
-from hand_calculation.tile_constants import YAO_CHUU
+from hand_calculation.tile_constants import YAOCHUUHAI
 from hand_calculation.tiles import Tiles
 from typing import List
 from hand_calculation.yaku import Yaku
@@ -27,7 +27,7 @@ class KokushiMusou(Yaku):
 
     def is_condition_met(self, hand: List[int], *args):
         if Tiles.tiles_count(hand) == 14 \
-                and prod([hand[i] for i in YAO_CHUU]) == 2:
+                and prod([hand[i] for i in YAOCHUUHAI]) == 2:
             return True
         else:
             return False
