@@ -97,7 +97,7 @@ class Tiles:
         return result
 
     @staticmethod
-    def string_to_array(man=None, pin=None, sou=None, honours=None):
+    def string_to_array(man="", pin="", sou="", honours=""):
         # String representation:
         # east = 1, south = 2, west = 3, north = 4,
         # haku = 5, hatsu = 6, chun = 7, red dora = 0;
@@ -159,22 +159,3 @@ class Tiles:
                 split_start = index + 1
 
         return Tiles.string_to_array(man, pin, sou, honors)
-
-
-# Tests
-if __name__ == "__main__":
-    print("Test 1:")
-    initial_string = "1m2p3s37m0s84p5s41z9s34z"
-    correct_string = "137m248p3059s1344z"
-    tiles = Tiles.one_line_string_to_array(initial_string)
-    output_string = Tiles.array_to_one_line_string(tiles)
-    print("output string:  " + output_string)
-    print("correct string: " + correct_string)
-
-    print("Test 2:")
-    initial_string = "1m3s37m0s5s41z9s34z"
-    correct_string = "137m3059s1344z"
-    tiles = Tiles.one_line_string_to_array(initial_string)
-    output_string = Tiles.array_to_one_line_string(tiles)
-    print("output string:  " + output_string)
-    print("correct string: " + correct_string)

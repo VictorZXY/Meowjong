@@ -26,7 +26,7 @@ class HandDivider:
             hand = []
             for index in pair_indices:
                 hand.append([2 if i == index else 0 for i in range(34)])
-            hands.append(sorted(hand))
+            hands.append(sorted(hand, reverse=True))
 
         # find all possible standard, 4 mentsu + 1 pair division
         for pair_index in pair_indices:
@@ -76,12 +76,12 @@ class HandDivider:
                     hand_array = []
                     for item in hand_indices:
                         hand_array.append(Tiles.indices_to_array(item))
-                    hand_array = sorted(hand_array)
+                    hand_array = sorted(hand_array, reverse=True)
                     if hand_array not in hands:
                         hands.append(hand_array)
 
         if hands:
-            return sorted(hands)
+            return sorted(hands, reverse=True)
         else:
             full_hand = private_tiles[:]
             for meld in melds:
@@ -124,24 +124,15 @@ class HandDivider:
         combinations = []
 
         prolog = Prolog()
-        prolog.consult("hand_divider.pl")
+        # prolog.consult("hand_divider.pl")
+        prolog.consult("C:/Users/Victor/Desktop/To-Do List/_CST/Part II"
+                       + "/Part II Project/Source Code/meowjong"
+                       + "/hand_calculation/hand_divider.pl")
         for solution in prolog.query(
                 "mentsu_combination(" + str(indices) + ", Combination)"):
             combination = sorted(solution["Combination"])
             if combination not in combinations:
                 combinations.append(combination)
+        prolog.retractall("traversed(_)")
 
         return combinations
-
-
-if __name__ == "__main__":
-    hd = HandDivider()
-    hands = hd.divide_hand(Tiles.one_line_string_to_array("13579m2468s1357p"))
-    if isinstance(hands[0], list):
-        for item_list in hands:
-            indices_list = []
-            for item in item_list:
-                indices_list.append(Tiles.array_to_indices(item))
-            print(indices_list)
-    else:
-        print(hands)

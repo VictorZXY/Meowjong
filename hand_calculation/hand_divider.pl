@@ -40,5 +40,3 @@ mentsu_combination(Hand, [Triplet | Rest]) :-
     mentsu_combination(Rem, Rest),
     not(traversed([Triplet | Rest])),
     assertz(traversed([Triplet | Rest])).
-
-
