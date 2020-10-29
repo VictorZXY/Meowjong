@@ -1,0 +1,1 @@
+from hand_calculation.yaku_list.chiitoitsu import Chiitoitsu

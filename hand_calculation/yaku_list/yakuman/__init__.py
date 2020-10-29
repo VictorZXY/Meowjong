@@ -1,0 +1,1 @@
+from hand_calculation.yaku_list.yakuman.kokushi_musou import KokushiMusou
