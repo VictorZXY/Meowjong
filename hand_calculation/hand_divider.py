@@ -8,7 +8,9 @@ from pyswip import Prolog
 class HandDivider:
     def divide_hand(self, private_tiles, melds=None):
         """
-        Return a list of possible divisions of a given hand.
+        Return a list of possible divisions of a given hand, if there is no
+        possible division, return the full original hand (private tiles and
+        melds combined).
         :param private_tiles: Private tiles represented by a 34-array
         :param melds: Melds represented by a list of 34-arrays
         :return: A list of lists of 34-arrays
@@ -78,7 +80,13 @@ class HandDivider:
                     if hand_array not in hands:
                         hands.append(hand_array)
 
-        return sorted(hands)
+        if hands:
+            return sorted(hands)
+        else:
+            full_hand = private_tiles[:]
+            for meld in melds:
+                full_hand = [x + y for x, y in zip(full_hand, meld)]
+            return full_hand
 
     def find_pairs(self, tiles):
         """
@@ -128,9 +136,12 @@ class HandDivider:
 
 if __name__ == "__main__":
     hd = HandDivider()
-    hands = hd.divide_hand(Tiles.one_line_string_to_array("11223344556677m"))
-    for item_list in hands:
-        indices_list = []
-        for item in item_list:
-            indices_list.append(Tiles.array_to_indices(item))
-        print(indices_list)
+    hands = hd.divide_hand(Tiles.one_line_string_to_array("13579m2468s1357p"))
+    if isinstance(hands[0], list):
+        for item_list in hands:
+            indices_list = []
+            for item in item_list:
+                indices_list.append(Tiles.array_to_indices(item))
+            print(indices_list)
+    else:
+        print(hands)
