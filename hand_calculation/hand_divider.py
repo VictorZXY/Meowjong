@@ -88,7 +88,8 @@ class HandDivider:
                 full_hand = [x + y for x, y in zip(full_hand, meld)]
             return full_hand
 
-    def find_pairs(self, tiles):
+    @staticmethod
+    def find_pairs(tiles):
         """
         Find all possible pairs in the hand return their tile indices.
         :param tiles: Input tiles represented by a 34-array
@@ -105,7 +106,8 @@ class HandDivider:
 
         return pair_indices
 
-    def find_mentsu_combinations(self, tiles, start_index, end_index):
+    @staticmethod
+    def find_mentsu_combinations(tiles, start_index, end_index):
         """
         Find all possible mentsu combinations between the given interval in the
         hand and return their tile indices.

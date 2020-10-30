@@ -52,52 +52,52 @@ class Tiles:
         # manzu = m, pinzu = p, souzu = s, honours = z, red dora = 0,
         # east = 1, south = 2, west = 3, north = 4,
         # haku = 5, hatsu = 6, chun = 7.
-        result = ""
+        result = ''
 
         # manzu
-        man = ""
+        man = ''
         for i in range(1, 10):
             if i == 5:
                 man += (tiles[FIVE_MAN] // RED_DORA_COUNT) * '0'
                 man += (tiles[FIVE_MAN] % RED_DORA_COUNT) * '5'
             else:
                 man += tiles[ONE_MAN + i - 1] * str(i)
-        if man != "":
+        if man != '':
             result += man + 'm'
 
         # pinzu
-        pin = ""
+        pin = ''
         for i in range(1, 10):
             if i == 5:
                 pin += (tiles[FIVE_PIN] // RED_DORA_COUNT) * '0'
                 pin += (tiles[FIVE_PIN] % RED_DORA_COUNT) * '5'
             else:
                 pin += tiles[ONE_PIN + i - 1] * str(i)
-        if pin != "":
+        if pin != '':
             result += pin + 'p'
 
         # souzu
-        sou = ""
+        sou = ''
         for i in range(1, 10):
             if i == 5:
                 sou += (tiles[FIVE_SOU] // RED_DORA_COUNT) * '0'
                 sou += (tiles[FIVE_SOU] % RED_DORA_COUNT) * '5'
             else:
                 sou += tiles[ONE_SOU + i - 1] * str(i)
-        if sou != "":
+        if sou != '':
             result += sou + 's'
 
         # honours
-        honours = ""
+        honours = ''
         for i in range(1, 8):
             honours += tiles[EAST + i - 1] * str(i)
-        if honours != "":
+        if honours != '':
             result += honours + 'z'
 
         return result
 
     @staticmethod
-    def string_to_array(man="", pin="", sou="", honours=""):
+    def string_to_array(man='', pin='', sou='', honours=''):
         # String representation:
         # east = 1, south = 2, west = 3, north = 4,
         # haku = 5, hatsu = 6, chun = 7, red dora = 0;
@@ -137,10 +137,10 @@ class Tiles:
     def one_line_string_to_array(string):
         # One-line string representaion:
         # manzu = m, pinzu = p, souzu = s, honours = z, red dora = 0.
-        man = ""
-        pin = ""
-        sou = ""
-        honors = ""
+        man = ''
+        pin = ''
+        sou = ''
+        honors = ''
 
         split_start = 0
 
