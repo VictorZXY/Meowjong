@@ -1,6 +1,7 @@
 import unittest
 
 from hand_calculation.hand_divider import HandDivider
+from hand_calculation.meld import Meld
 from hand_calculation.tiles import Tiles
 
 
@@ -64,8 +65,8 @@ class HandDividerTestCase(unittest.TestCase):
         hand_divider = HandDivider()
         private_tiles = Tiles.string_to_array(pin='778899', honours='22')
         melds = [
-            Tiles.string_to_array(pin='789'),
-            Tiles.string_to_array(pin='234'),
+            Meld(Meld.CHII, tiles='789p'),
+            Meld(Meld.CHII, tiles='234p')
         ]
         result = hand_divider.divide_hand(private_tiles, melds)
         self.assertEqual(len(result), 1)
@@ -88,13 +89,15 @@ class HandDividerTestCase(unittest.TestCase):
             ['123m', '123m', '99p', '456s', '456s']
         )
 
-    def test_hand_with_kan_division(self):
+    def test_hand_with_kan_and_kita_division(self):
         hand_divider = HandDivider()
         private_tiles = Tiles.string_to_array(man='55', honours='222')
         melds = [
-            Tiles.string_to_array(man='6666'),
-            Tiles.string_to_array(pin='111'),
-            Tiles.string_to_array(man='777')
+            Meld(Meld.KAN, tiles='6666m', is_open=False),
+            Meld(Meld.PON, tiles='111p'),
+            Meld(Meld.KITA, tiles='4z'),
+            Meld(Meld.PON, tiles='777m'),
+            Meld(Meld.KITA, tiles='444z')
         ]
         result = hand_divider.divide_hand(private_tiles, melds)
         self.assertEqual(len(result), 1)

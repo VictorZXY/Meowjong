@@ -1,3 +1,4 @@
+from hand_calculation.meld import Meld
 from hand_calculation.tile_constants import ONE_MAN, NINE_MAN, ONE_PIN, \
     NINE_PIN, ONE_SOU, NINE_SOU, HONOURS
 from hand_calculation.tiles import Tiles
@@ -12,11 +13,13 @@ class HandDivider:
         possible division, return the full original hand (private tiles and
         melds combined).
         :param private_tiles: Private tiles represented by a 34-array
-        :param melds: Melds represented by a list of 34-arrays
+        :param melds: Melds represented by a list of Meld objects
         :return: A list of lists of 34-arrays
         """
         if melds is None:
             melds = []
+        else:
+            melds = self.convert_melds_to_list(melds)
         hands = []
 
         pair_indices = self.find_pairs(private_tiles)
@@ -87,6 +90,15 @@ class HandDivider:
             for meld in melds:
                 full_hand = [x + y for x, y in zip(full_hand, meld)]
             return full_hand
+
+    @staticmethod
+    def convert_melds_to_list(melds):
+        melds_list = []
+        for meld in melds:
+            # exclude kita from hand division
+            if meld.type != Meld.KITA:
+                melds_list.append(meld.tiles)
+        return melds_list
 
     @staticmethod
     def find_pairs(tiles):
