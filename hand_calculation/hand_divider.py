@@ -12,7 +12,8 @@ class HandDivider:
         Return a list of possible divisions of a given hand, if there is no
         possible division, return the full original hand (private tiles and
         melds combined).
-        :param private_tiles: Private tiles represented by a 34-array
+        :param private_tiles: Private tiles (winning tile included) represented
+        by a 34-array
         :param melds: Melds represented by a list of Meld objects
         :return: A list of lists of 34-arrays
         """
@@ -20,16 +21,16 @@ class HandDivider:
             melds = []
         else:
             melds = self.convert_melds_to_list(melds)
-        hands = []
+        divisions = []
 
         pair_indices = self.find_pairs(private_tiles)
 
         # case of chiitoitsu
         if len(pair_indices) == 7:
-            hand = []
+            division = []
             for index in pair_indices:
-                hand.append([2 if i == index else 0 for i in range(34)])
-            hands.append(sorted(hand, reverse=True))
+                division.append([2 if i == index else 0 for i in range(34)])
+            divisions.append(sorted(division, reverse=True))
 
         # find all possible standard, 4 mentsu + 1 pair division
         for pair_index in pair_indices:
@@ -67,24 +68,24 @@ class HandDivider:
                 combination_sets.append([meld_indices])
 
             for combination in product(*combination_sets):
-                hand_indices = []
+                division_indices = []
                 for item in list(combination):
                     if isinstance(item[0], list):
                         for x in item:
-                            hand_indices.append(x)
+                            division_indices.append(x)
                     else:
-                        hand_indices.append(item)
+                        division_indices.append(item)
 
-                if len(hand_indices) == 5:
-                    hand_array = []
-                    for item in hand_indices:
-                        hand_array.append(Tiles.indices_to_array(item))
-                    hand_array = sorted(hand_array, reverse=True)
-                    if hand_array not in hands:
-                        hands.append(hand_array)
+                if len(division_indices) == 5:
+                    division_array = []
+                    for item in division_indices:
+                        division_array.append(Tiles.indices_to_array(item))
+                    division_array = sorted(division_array, reverse=True)
+                    if division_array not in divisions:
+                        divisions.append(division_array)
 
-        if hands:
-            return sorted(hands, reverse=True)
+        if divisions:
+            return sorted(divisions, reverse=True)
         else:
             full_hand = private_tiles[:]
             for meld in melds:
