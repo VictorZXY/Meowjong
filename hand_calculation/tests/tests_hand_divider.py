@@ -106,6 +106,27 @@ class HandDividerTestCase(unittest.TestCase):
             ['55m', '6666m', '777m', '111p', '222z']
         )
 
+    def test_kokushi_musou_division(self):
+        hand_divider = HandDivider()
+        private_tiles = Tiles.one_line_string_to_array("19m19p19s12345677z")
+        result = hand_divider.divide_hand(private_tiles)
+        self.assertEqual(len(result), 34)
+        self.assertEqual(
+            Tiles.array_to_one_line_string(result),
+            '19m19p19s12345677z'
+        )
+
+    def test_incomplete_hand_division(self):
+        hand_divider = HandDivider()
+        private_tiles = Tiles.string_to_array(man='147', pin='258', sou='369',
+                                              honours='1234')
+        result = hand_divider.divide_hand(private_tiles)
+        self.assertEqual(len(result), 34)
+        self.assertEqual(
+            Tiles.array_to_one_line_string(result),
+            '147m258p369s1234z'
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
