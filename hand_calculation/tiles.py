@@ -57,6 +57,19 @@ class Tiles:
         return False
 
     @staticmethod
+    def is_pair(tiles):
+        """
+        Determine whether the given tiles form a pair.
+        :param tiles: a 34-array
+        :return: Boolean
+        """
+        if Tiles.tiles_count(tiles) == 2:
+            indices = Tiles.array_to_indices(tiles)
+            if len(indices) == 2:
+                return indices[0] == indices[1]
+        return False
+
+    @staticmethod
     def array_to_indices(tiles, start_index=0, end_index=33):
         """
         Convert a 34-array tiles into a list of array indices, counting only

@@ -20,4 +20,16 @@ from hand_calculation.yaku_list.pinfu import Pinfu
 # 2 fan yaku
 from hand_calculation.yaku_list.chanta import Chanta
 from hand_calculation.yaku_list.ikkitsuukan import Ikkitsuukan
+from hand_calculation.yaku_list.sanshoku_doujun import SanshokuDoujun
+from hand_calculation.yaku_list.sanshoku_doukou import SanshokuDoukou
+from hand_calculation.yaku_list.double_riichi import DoubleRiichi
+from hand_calculation.yaku_list.toitoi import Toitoihou
+from hand_calculation.yaku_list.sankantsu import Sankantsu
+from hand_calculation.yaku_list.sanankou import Sanankou
+from hand_calculation.yaku_list.shousangen import Shousangen
+from hand_calculation.yaku_list.honroutou import Honroutou
 from hand_calculation.yaku_list.chiitoitsu import Chiitoitsu
+
+# 3 fan yaku
+
+# 6 fan yaku

@@ -8,7 +8,8 @@ class HandConfig:
     """
     yaku = None
 
-    is_menzen_tsumo = False
+    is_menzen = False
+    is_tsumo = False
     is_riichi = False
     is_ippatsu = False
     is_rinshan = False
@@ -25,7 +26,8 @@ class HandConfig:
     is_dealer = False
 
     def __init__(self,
-                 is_menzen_tsumo=False,
+                 is_menzen=False,
+                 is_tsumo=False,
                  is_riichi=False,
                  is_ippatsu=False,
                  is_rinshan=False,
@@ -40,7 +42,8 @@ class HandConfig:
                  round_wind=None):
         self.yaku = YakuConfig()
 
-        self.is_menzen_tsumo = is_menzen_tsumo
+        self.is_menzen = is_menzen
+        self.is_tsumo = is_tsumo
         self.is_riichi = is_riichi
         self.is_ippatsu = is_ippatsu
         self.is_rinshan = is_rinshan

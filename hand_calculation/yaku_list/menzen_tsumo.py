@@ -22,4 +22,4 @@ class MenzenTsumo(Yaku):
         self.is_yakuman = False
 
     def is_condition_met(self, hand: HandConfig, *args):
-        return hand.is_menzen_tsumo
+        return hand.is_menzen and hand.is_tsumo
