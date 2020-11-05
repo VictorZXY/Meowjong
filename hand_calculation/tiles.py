@@ -1,5 +1,6 @@
-from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, ONE_PIN, \
-    FIVE_PIN, ONE_SOU, FIVE_SOU, EAST, RED_DORA_COUNT
+from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, SEVEN_MAN, \
+    ONE_PIN, FIVE_PIN, SEVEN_PIN, ONE_SOU, FIVE_SOU, SEVEN_SOU, EAST, \
+    RED_DORA_COUNT
 
 
 class Tiles:
@@ -12,6 +13,48 @@ class Tiles:
             else:
                 count += num
         return count
+
+    @staticmethod
+    def is_shuntsu(tiles):
+        """
+        Determine whether the given tiles form a shuntsu.
+        :param tiles: a 34-array
+        :return: Boolean
+        """
+        if Tiles.tiles_count(tiles) == 3:
+            indices = Tiles.array_to_indices(tiles)
+            if len(indices) == 3 \
+                    and (ONE_MAN <= indices[0] <= SEVEN_MAN
+                         or ONE_PIN <= indices[0] <= SEVEN_PIN
+                         or ONE_SOU <= indices[0] <= SEVEN_SOU):
+                return indices[0] == indices[1] - 1 == indices[2] - 2
+        return False
+
+    @staticmethod
+    def is_koutsu(tiles):
+        """
+        Determine whether the given tiles form a koutsu.
+        :param tiles: a 34-array
+        :return: Boolean
+        """
+        if Tiles.tiles_count(tiles) == 3:
+            indices = Tiles.array_to_indices(tiles)
+            if len(indices) == 3:
+                return indices[0] == indices[1] == indices[2]
+        return False
+
+    @staticmethod
+    def is_kantsu(tiles):
+        """
+        Determine whether the given tiles form a kantsu.
+        :param tiles: a 34-array
+        :return: Boolean
+        """
+        if Tiles.tiles_count(tiles) == 4:
+            indices = Tiles.array_to_indices(tiles)
+            if len(indices) == 4:
+                return indices[0] == indices[1] == indices[2] == indices[3]
+        return False
 
     @staticmethod
     def array_to_indices(tiles, start_index=0, end_index=33):

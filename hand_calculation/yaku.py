@@ -21,8 +21,11 @@ class Yaku:
         """
         Check whether this yaku exists in the given hand, with the specified
         division.
-        :param hand: The hand (winning tile included) represented by a list of
-                     34-arrays (a single 34-array in the case of kokushi musou)
+        :param hand: The hand (winning tile included) represented by either:
+        - a list of 34-arrays
+        - a single 34-array in the case of kokushi musou
+        - a HandConfig object in the cases of which the yaku are related to the
+          hand config
         :param args: Some yaku may require additional attributes
         :return: Boolean
         """
