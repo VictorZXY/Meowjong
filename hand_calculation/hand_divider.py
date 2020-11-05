@@ -1,9 +1,10 @@
+from itertools import product
+from pyswip import Prolog
+
 from hand_calculation.meld import Meld
 from hand_calculation.tile_constants import ONE_MAN, NINE_MAN, ONE_PIN, \
     NINE_PIN, ONE_SOU, NINE_SOU, HONOURS
 from hand_calculation.tiles import Tiles
-from itertools import product
-from pyswip import Prolog
 
 
 class HandDivider:

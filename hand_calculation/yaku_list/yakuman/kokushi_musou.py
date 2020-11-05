@@ -1,7 +1,8 @@
 from math import prod
+from typing import List
+
 from hand_calculation.tile_constants import YAOCHUUHAI
 from hand_calculation.tiles import Tiles
-from typing import List
 from hand_calculation.yaku import Yaku
 
 
