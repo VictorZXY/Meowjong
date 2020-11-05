@@ -37,3 +37,6 @@ from hand_calculation.yaku_list.ryanpeikou import Ryanpeikou
 
 # 6 fan yaku
 from hand_calculation.yaku_list.chinitsu import Chinitsu
+
+# Nagashi mangan
+from hand_calculation.yaku_list.nagashi_mangan import NagashiMangan

@@ -2,8 +2,9 @@ from hand_calculation.yaku_list import MenzenTsumo, Riichi, Ippatsu, Chankan, \
     RinshanKaihou, HaiteiRaoyue, HouteiRaoyui, East, South, West, North, Haku, \
     Hatsu, Chun, Tanyao, Iipeikou, Pinfu, Chanta, Ikkitsuukan, SanshokuDoujun, \
     SanshokuDoukou, DoubleRiichi, Toitoihou, Sankantsu, Sanankou, Shousangen, \
-    Honroutou, Chiitoitsu, Junchan, Honitsu, Ryanpeikou, Chinitsu
-from hand_calculation.yaku_list.yakuman import KokushiMusou
+    Honroutou, Chiitoitsu, Junchan, Honitsu, Ryanpeikou, Chinitsu, NagashiMangan
+from hand_calculation.yaku_list.yakuman import Tenhou, Chiihou, Daisangen, \
+    Suuankou, KokushiMusou
 
 
 class YakuConfig:
@@ -48,5 +49,12 @@ class YakuConfig:
         # 6 fan yaku
         self.chinitsu = Chinitsu()
 
+        # Nagashi mangan
+        self.nagashi_mangan = NagashiMangan()
+
         # Yakuman
+        self.tenhou = Tenhou()
+        self.chiihou = Chiihou()
+        self.daisangen = Daisangen()
+        self.suuankou = Suuankou()
         self.kokushi_musou = KokushiMusou()
