@@ -25,11 +25,17 @@ class Shousangen(Yaku):
         self.is_yakuman = False
 
     def is_condition_met(self, hand: List[List[int]], *args):
-        shousangen_count = 0
+        dragon_koutsu_count = 0
+        dragon_pair_count = 0
+
         for item in hand:
-            if Tiles.is_koutsu(item) or Tiles.is_kantsu(item) \
-                    or Tiles.is_pair(item):
+            if Tiles.is_koutsu(item) or Tiles.is_kantsu(item):
                 indices = Tiles.array_to_indices(item)
                 if indices[0] in DRAGONS:
-                    shousangen_count += 1
-        return shousangen_count == 3
+                    dragon_koutsu_count += 1
+            elif Tiles.is_pair(item):
+                indices = Tiles.array_to_indices(item)
+                if indices[0] in DRAGONS:
+                    dragon_pair_count += 1
+
+        return dragon_koutsu_count == 2 and dragon_pair_count == 1
