@@ -31,5 +31,9 @@ from hand_calculation.yaku_list.honroutou import Honroutou
 from hand_calculation.yaku_list.chiitoitsu import Chiitoitsu
 
 # 3 fan yaku
+from hand_calculation.yaku_list.junchan import Junchan
+from hand_calculation.yaku_list.honitsu import Honitsu
+from hand_calculation.yaku_list.ryanpeikou import Ryanpeikou
 
 # 6 fan yaku
+from hand_calculation.yaku_list.chinitsu import Chinitsu

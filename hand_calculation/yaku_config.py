@@ -2,7 +2,7 @@ from hand_calculation.yaku_list import MenzenTsumo, Riichi, Ippatsu, Chankan, \
     RinshanKaihou, HaiteiRaoyue, HouteiRaoyui, East, South, West, North, Haku, \
     Hatsu, Chun, Tanyao, Iipeikou, Pinfu, Chanta, Ikkitsuukan, SanshokuDoujun, \
     SanshokuDoukou, DoubleRiichi, Toitoihou, Sankantsu, Sanankou, Shousangen, \
-    Honroutou, Chiitoitsu
+    Honroutou, Chiitoitsu, Junchan, Honitsu, Ryanpeikou, Chinitsu
 from hand_calculation.yaku_list.yakuman import KokushiMusou
 
 
@@ -41,8 +41,12 @@ class YakuConfig:
         self.chiitoitsu = Chiitoitsu()
 
         # 3 fan yaku
+        self.junchan = Junchan()
+        self.honitsu = Honitsu()
+        self.ryanpeikou = Ryanpeikou()
 
         # 6 fan yaku
+        self.chinitsu = Chinitsu()
 
         # Yakuman
         self.kokushi_musou = KokushiMusou()
