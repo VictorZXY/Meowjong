@@ -4,7 +4,9 @@ from hand_calculation.yaku_list import MenzenTsumo, Riichi, Ippatsu, Chankan, \
     SanshokuDoukou, DoubleRiichi, Toitoihou, Sankantsu, Sanankou, Shousangen, \
     Honroutou, Chiitoitsu, Junchan, Honitsu, Ryanpeikou, Chinitsu, NagashiMangan
 from hand_calculation.yaku_list.yakuman import Tenhou, Chiihou, Daisangen, \
-    Suuankou, KokushiMusou
+    Suuankou, SuuankouTanki, Tsuuiisou, Ryuuiisou, Chinroutou, KokushiMusou, \
+    KokushiMusou13Men, Shousuushii, Daisuushii, Suukantsu, ChuurenPoutou, \
+    JunseiChuurenPoutou
 
 
 class YakuConfig:
@@ -57,4 +59,14 @@ class YakuConfig:
         self.chiihou = Chiihou()
         self.daisangen = Daisangen()
         self.suuankou = Suuankou()
+        self.suuankou_tanki = SuuankouTanki()
+        self.tsuuiisou = Tsuuiisou()
+        self.ryuuiisou = Ryuuiisou()
+        self.chinroutou = Chinroutou()
         self.kokushi_musou = KokushiMusou()
+        self.kokushi_musou_13_men = KokushiMusou13Men()
+        self.shousuushii = Shousuushii()
+        self.daisuushii = Daisuushii()
+        self.suukantsu = Suukantsu()
+        self.chuuren_poutou = ChuurenPoutou()
+        self.junsei_chuuren_poutou = JunseiChuurenPoutou()

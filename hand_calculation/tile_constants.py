@@ -60,5 +60,8 @@ HONOURS = WINDS + DRAGONS
 # yaochuuhai: terminals and honours
 YAOCHUUHAI = TERMINALS + HONOURS
 
+# green tiles: for determining ryuuiisou
+GREEN_TILES = [TWO_SOU, THREE_SOU, FOUR_SOU, SIX_SOU, EIGHT_SOU, HATSU]
+
 # red dora count
 RED_DORA_COUNT = 4
