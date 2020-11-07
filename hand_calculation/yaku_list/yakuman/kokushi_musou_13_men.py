@@ -28,6 +28,11 @@ class KokushiMusou13Men(Yaku):
         self.is_yakuman = True
 
     def is_condition_met(self, hand: List[int], win_tile, *args):
+        """
+        :param hand: List of 34-arrays
+        :param win_tile: Integer index
+        :return: Boolean
+        """
         if Tiles.tiles_count(hand) == 14:
             hand[win_tile] -= 1
             return prod([hand[i] for i in YAOCHUUHAI]) == 1

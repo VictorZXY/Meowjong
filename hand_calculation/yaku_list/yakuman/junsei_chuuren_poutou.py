@@ -30,6 +30,12 @@ class JunseiChuurenPoutou(Yaku):
 
     def is_condition_met(self, hand: List[List[int]], win_tile,
                          hand_config: HandConfig, *args):
+        """
+        :param hand: List of 34-arrays
+        :param win_tile: Integer index
+        :param hand_config: HandConfig object
+        :return: Boolean
+        """
         if not hand_config.is_menzen:
             return False
 

@@ -30,6 +30,11 @@ class ChuurenPoutou(Yaku):
 
     def is_condition_met(self, hand: List[List[int]], hand_config: HandConfig,
                          *args):
+        """
+        :param hand: List of 34-arrays
+        :param hand_config: HandConfig object
+        :return: Boolean
+        """
         if not hand_config.is_menzen:
             return False
 
