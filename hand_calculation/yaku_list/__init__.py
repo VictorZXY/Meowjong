@@ -1,4 +1,4 @@
-# 1 fan yaku
+# 1 han yaku
 from hand_calculation.yaku_list.menzen_tsumo import MenzenTsumo
 from hand_calculation.yaku_list.riichi import Riichi
 from hand_calculation.yaku_list.ippatsu import Ippatsu
@@ -17,7 +17,7 @@ from hand_calculation.yaku_list.tanyao import Tanyao
 from hand_calculation.yaku_list.iipeikou import Iipeikou
 from hand_calculation.yaku_list.pinfu import Pinfu
 
-# 2 fan yaku
+# 2 han yaku
 from hand_calculation.yaku_list.chanta import Chanta
 from hand_calculation.yaku_list.ikkitsuukan import Ikkitsuukan
 from hand_calculation.yaku_list.sanshoku_doujun import SanshokuDoujun
@@ -30,12 +30,12 @@ from hand_calculation.yaku_list.shousangen import Shousangen
 from hand_calculation.yaku_list.honroutou import Honroutou
 from hand_calculation.yaku_list.chiitoitsu import Chiitoitsu
 
-# 3 fan yaku
+# 3 han yaku
 from hand_calculation.yaku_list.junchan import Junchan
 from hand_calculation.yaku_list.honitsu import Honitsu
 from hand_calculation.yaku_list.ryanpeikou import Ryanpeikou
 
-# 6 fan yaku
+# 6 han yaku
 from hand_calculation.yaku_list.chinitsu import Chinitsu
 
 # Nagashi mangan

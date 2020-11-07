@@ -108,7 +108,7 @@ class HandDividerTestCase(unittest.TestCase):
 
     def test_kokushi_musou_division(self):
         hand_divider = HandDivider()
-        private_tiles = Tiles.one_line_string_to_array("19m19p19s12345677z")
+        private_tiles = Tiles.one_line_string_to_array('19m19p19s12345677z')
         result = hand_divider.divide_hand(private_tiles)
         self.assertEqual(len(result), 34)
         self.assertEqual(

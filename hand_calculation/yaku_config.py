@@ -11,7 +11,7 @@ from hand_calculation.yaku_list.yakuman import Tenhou, Chiihou, Daisangen, \
 
 class YakuConfig:
     def __init__(self):
-        # 1 fan yaku
+        # 1 han yaku
         self.menzen_tsumo = MenzenTsumo()
         self.riichi = Riichi()
         self.ippatsu = Ippatsu()
@@ -30,7 +30,7 @@ class YakuConfig:
         self.iipeikou = Iipeikou()
         self.pinfu = Pinfu()
 
-        # 2 fan yaku
+        # 2 han yaku
         self.chanta = Chanta()
         self.ikkitsuukan = Ikkitsuukan()
         self.sanshoku_doujun = SanshokuDoujun()
@@ -43,12 +43,12 @@ class YakuConfig:
         self.honroutou = Honroutou()
         self.chiitoitsu = Chiitoitsu()
 
-        # 3 fan yaku
+        # 3 han yaku
         self.junchan = Junchan()
         self.honitsu = Honitsu()
         self.ryanpeikou = Ryanpeikou()
 
-        # 6 fan yaku
+        # 6 han yaku
         self.chinitsu = Chinitsu()
 
         # Nagashi mangan

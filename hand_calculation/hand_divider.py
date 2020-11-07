@@ -140,15 +140,15 @@ class HandDivider:
         combinations = []
 
         prolog = Prolog()
-        # prolog.consult("hand_divider.pl")
-        prolog.consult("C:/Users/Victor/Desktop/To-Do List/_CST/Part II"
-                       + "/Part II Project/Source Code/meowjong"
-                       + "/hand_calculation/hand_divider.pl")
+        # prolog.consult('hand_divider.pl')
+        prolog.consult('C:/Users/Victor/Desktop/To-Do List/_CST/Part II'
+                       + '/Part II Project/Source Code/meowjong'
+                       + '/hand_calculation/hand_divider.pl')
         for solution in prolog.query(
-                "mentsu_combination(" + str(indices) + ", Combination)"):
-            combination = sorted(solution["Combination"])
+                'mentsu_combination(' + str(indices) + ', Combination)'):
+            combination = sorted(solution['Combination'])
             if combination not in combinations:
                 combinations.append(combination)
-        prolog.retractall("traversed(_)")
+        prolog.retractall('traversed(_)')
 
         return combinations

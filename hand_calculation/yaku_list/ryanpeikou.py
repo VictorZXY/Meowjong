@@ -7,7 +7,7 @@ from hand_calculation.yaku import Yaku
 class Ryanpeikou(Yaku):
     """
     Concealed hand with four shuntsu which two and two form Iipeikou.
-    No additional fan for Iipeikou is counted.
+    No additional han for Iipeikou is counted.
     """
 
     def __init__(self):
