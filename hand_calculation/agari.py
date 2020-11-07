@@ -4,7 +4,7 @@ from hand_calculation.yaku_list.yakuman import KokushiMusou
 
 class Agari:
     @staticmethod
-    def is_agari_simple(private_tiles, melds=None):
+    def is_agari(private_tiles, melds=None):
         """
         Determine whether a given hand is complete. Yaku are not counted.
         :param private_tiles: Private tiles (winning tile included) represented
