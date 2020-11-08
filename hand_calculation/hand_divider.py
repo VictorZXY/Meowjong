@@ -21,20 +21,29 @@ class HandDivider:
         :param melds: Melds represented by a list of Meld objects
         :return: A list of lists of 34-arrays
         """
+        # remove dora from all tiles
         if win_tile is not None:
             if win_tile == RED_FIVE_MAN:
-                private_tiles[FIVE_MAN] += RED_DORA_COUNT
+                private_tiles[FIVE_MAN] += 1
             elif win_tile == RED_FIVE_PIN:
-                private_tiles[FIVE_PIN] += RED_DORA_COUNT
+                private_tiles[FIVE_PIN] += 1
             elif win_tile == RED_FIVE_SOU:
-                private_tiles[FIVE_SOU] += RED_DORA_COUNT
+                private_tiles[FIVE_SOU] += 1
             else:
                 private_tiles[win_tile] += 1
+        for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
+            if private_tiles[index] >= RED_DORA_COUNT:
+                private_tiles[index] = private_tiles[index] % RED_DORA_COUNT + 1
 
         if melds is None:
             melds = []
         else:
             melds = self.convert_melds_to_list(melds)
+            for meld in melds:
+                for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
+                    if meld[index] >= RED_DORA_COUNT:
+                        meld[index] = meld[index] % RED_DORA_COUNT + 1
+
         divisions = []
 
         pair_indices = self.find_pairs(private_tiles)

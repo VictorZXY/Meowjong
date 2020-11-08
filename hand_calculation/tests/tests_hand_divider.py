@@ -68,7 +68,7 @@ class HandDividerTestCase(unittest.TestCase):
             Meld(Meld.CHII, tiles='789p'),
             Meld(Meld.CHII, tiles='234p')
         ]
-        result = hand_divider.divide_hand(private_tiles, melds)
+        result = hand_divider.divide_hand(private_tiles, melds=melds)
         self.assertEqual(len(result), 1)
         self.assertEqual(
             [Tiles.array_to_one_line_string(item) for item in result[0]],
@@ -99,11 +99,28 @@ class HandDividerTestCase(unittest.TestCase):
             Meld(Meld.PON, tiles='777m'),
             Meld(Meld.KITA, tiles='444z')
         ]
-        result = hand_divider.divide_hand(private_tiles, melds)
+        result = hand_divider.divide_hand(private_tiles, melds=melds)
         self.assertEqual(len(result), 1)
         self.assertEqual(
             [Tiles.array_to_one_line_string(item) for item in result[0]],
             ['55m', '6666m', '777m', '111p', '222z']
+        )
+
+    def test_hand_with_dora_division(self):
+        hand_divider = HandDivider()
+        private_tiles = Tiles.string_to_array(man='50', sou='055')
+        melds = [
+            Meld(Meld.KAN, tiles='6666m', is_open=False),
+            Meld(Meld.CHII, tiles='406p'),
+            Meld(Meld.KITA, tiles='4z'),
+            Meld(Meld.PON, tiles='777m'),
+            Meld(Meld.KITA, tiles='444z')
+        ]
+        result = hand_divider.divide_hand(private_tiles, melds=melds)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(
+            [Tiles.array_to_one_line_string(item) for item in result[0]],
+            ['55m', '6666m', '777m', '456p', '555s']
         )
 
     def test_kokushi_musou_division(self):
