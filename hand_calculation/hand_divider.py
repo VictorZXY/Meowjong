@@ -4,7 +4,7 @@ from pyswip import Prolog
 from hand_calculation.meld import Meld
 from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, NINE_MAN, \
     ONE_PIN, FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, RED_FIVE_MAN, \
-    RED_FIVE_PIN, RED_FIVE_SOU, HONOURS, RED_DORA_COUNT
+    RED_FIVE_PIN, RED_FIVE_SOU, HONOURS, RED_DORA_VALUE
 from hand_calculation.tiles import Tiles
 
 
@@ -32,8 +32,9 @@ class HandDivider:
             else:
                 private_tiles[win_tile] += 1
         for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
-            if private_tiles[index] >= RED_DORA_COUNT:
-                private_tiles[index] = private_tiles[index] % RED_DORA_COUNT + 1
+            if private_tiles[index] >= RED_DORA_VALUE:
+                private_tiles[index] = private_tiles[index] // RED_DORA_VALUE \
+                                       + private_tiles[index] % RED_DORA_VALUE
 
         if melds is None:
             melds = []
@@ -41,8 +42,9 @@ class HandDivider:
             melds = self.convert_melds_to_list(melds)
             for meld in melds:
                 for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
-                    if meld[index] >= RED_DORA_COUNT:
-                        meld[index] = meld[index] % RED_DORA_COUNT + 1
+                    if meld[index] >= RED_DORA_VALUE:
+                        meld[index] = meld[index] // RED_DORA_VALUE \
+                                      + meld[index] % RED_DORA_VALUE
 
         divisions = []
 

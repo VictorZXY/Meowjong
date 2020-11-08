@@ -1,6 +1,6 @@
 from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, SEVEN_MAN, \
     ONE_PIN, FIVE_PIN, SEVEN_PIN, ONE_SOU, FIVE_SOU, SEVEN_SOU, EAST, \
-    RED_DORA_COUNT
+    RED_DORA_VALUE
 
 
 class Tiles:
@@ -9,7 +9,7 @@ class Tiles:
         count = 0
         for index, num in enumerate(tiles):
             if index == FIVE_MAN or index == FIVE_PIN or index == FIVE_SOU:
-                count += (num // RED_DORA_COUNT) + (num % RED_DORA_COUNT)
+                count += (num // RED_DORA_VALUE) + (num % RED_DORA_VALUE)
             else:
                 count += num
         return count
@@ -83,8 +83,8 @@ class Tiles:
         for index in range(start_index, end_index + 1):
             if tiles[index] > 0:
                 if index == FIVE_MAN or index == FIVE_PIN or index == FIVE_SOU:
-                    indices.extend([index] * (tiles[index] // RED_DORA_COUNT
-                                              + tiles[index] % RED_DORA_COUNT))
+                    indices.extend([index] * (tiles[index] // RED_DORA_VALUE
+                                              + tiles[index] % RED_DORA_VALUE))
                 else:
                     indices.extend([index] * tiles[index])
         return indices
@@ -114,8 +114,8 @@ class Tiles:
         man = ''
         for i in range(1, 10):
             if i == 5:
-                man += (tiles[FIVE_MAN] // RED_DORA_COUNT) * '0'
-                man += (tiles[FIVE_MAN] % RED_DORA_COUNT) * '5'
+                man += (tiles[FIVE_MAN] // RED_DORA_VALUE) * '0'
+                man += (tiles[FIVE_MAN] % RED_DORA_VALUE) * '5'
             else:
                 man += tiles[ONE_MAN + i - 1] * str(i)
         if man != '':
@@ -125,8 +125,8 @@ class Tiles:
         pin = ''
         for i in range(1, 10):
             if i == 5:
-                pin += (tiles[FIVE_PIN] // RED_DORA_COUNT) * '0'
-                pin += (tiles[FIVE_PIN] % RED_DORA_COUNT) * '5'
+                pin += (tiles[FIVE_PIN] // RED_DORA_VALUE) * '0'
+                pin += (tiles[FIVE_PIN] % RED_DORA_VALUE) * '5'
             else:
                 pin += tiles[ONE_PIN + i - 1] * str(i)
         if pin != '':
@@ -136,8 +136,8 @@ class Tiles:
         sou = ''
         for i in range(1, 10):
             if i == 5:
-                sou += (tiles[FIVE_SOU] // RED_DORA_COUNT) * '0'
-                sou += (tiles[FIVE_SOU] % RED_DORA_COUNT) * '5'
+                sou += (tiles[FIVE_SOU] // RED_DORA_VALUE) * '0'
+                sou += (tiles[FIVE_SOU] % RED_DORA_VALUE) * '5'
             else:
                 sou += tiles[ONE_SOU + i - 1] * str(i)
         if sou != '':
@@ -165,21 +165,21 @@ class Tiles:
         # manzu
         for i in man:
             if i == '0':
-                result[FIVE_MAN] += RED_DORA_COUNT
+                result[FIVE_MAN] += RED_DORA_VALUE
             else:
                 result[ONE_MAN + int(i) - 1] += 1
 
         # pinzu
         for i in pin:
             if i == '0':
-                result[FIVE_PIN] += RED_DORA_COUNT
+                result[FIVE_PIN] += RED_DORA_VALUE
             else:
                 result[ONE_PIN + int(i) - 1] += 1
 
         # souzu
         for i in sou:
             if i == '0':
-                result[FIVE_SOU] += RED_DORA_COUNT
+                result[FIVE_SOU] += RED_DORA_VALUE
             else:
                 result[ONE_SOU + int(i) - 1] += 1
 
