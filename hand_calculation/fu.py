@@ -16,8 +16,8 @@ class Fu:
     TSUMO = 'Tsumo'
     OPEN_PINFU = 'Open pinfu'
 
-    PLAYER_WIND_PAIR = 'Seat wind pair'
-    ROUND_WIND_PAIR = 'Prevalent wind pair'
+    SEAT_WIND_PAIR = 'Seat wind pair'
+    PREVALENT_WIND_PAIR = 'Prevalent wind pair'
     DRAGON_PAIR = 'Dragon pair'
 
     OPEN_KOUTSU = 'Open koutsu'
@@ -116,12 +116,12 @@ class Fu:
         assert pair_index != -1, 'Pair not found in hand'
 
         # detect seat wind pair
-        if pair_index == hand_config.player_wind:
-            fu_details.append({'fu': 2, 'reason': Fu.PLAYER_WIND_PAIR})
+        if pair_index == hand_config.seat_wind:
+            fu_details.append({'fu': 2, 'reason': Fu.SEAT_WIND_PAIR})
 
         # detect prevalent wind pair:
-        if pair_index == hand_config.round_wind:
-            fu_details.append({'fu': 2, 'reason': Fu.ROUND_WIND_PAIR})
+        if pair_index == hand_config.prevalent_wind:
+            fu_details.append({'fu': 2, 'reason': Fu.PREVALENT_WIND_PAIR})
 
         # detect dragon wind pair:
         if pair_index in DRAGONS:

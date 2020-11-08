@@ -22,9 +22,7 @@ class FuTestCase(unittest.TestCase):
                     is_open=is_open)
 
     def __make_hand(self, private_tiles, win_tile, melds=None):
-        private_tiles[win_tile] += 1
-        hand_divider = HandDivider()
-        return hand_divider.divide_hand(private_tiles, melds)[0]
+        return HandDivider.divide_hand(private_tiles, win_tile, melds)[0]
 
     def test_chiitoitsu_fu(self):
         fu_calculator = Fu()
@@ -207,9 +205,9 @@ class FuTestCase(unittest.TestCase):
         self.assertEqual(fu, 40)
 
     def test_valued_pair_fu(self):
-        # player wind pair
+        # seat wind pair
         fu_calculator = Fu()
-        hand_config = HandConfig(player_wind=tile_constants.EAST)
+        hand_config = HandConfig(seat_wind=tile_constants.EAST)
 
         private_tiles = Tiles.string_to_array(man="123456", sou="12378",
                                               honours="11")
@@ -221,31 +219,32 @@ class FuTestCase(unittest.TestCase):
         self.assertEqual(3, len(fu_details))
         self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
         self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.PLAYER_WIND_PAIR} in fu_details)
+        self.assertTrue({"fu": 2, "reason": Fu.SEAT_WIND_PAIR} in fu_details)
         self.assertEqual(fu, 40)
 
-        # round wind pair
-        hand_config = HandConfig(round_wind=tile_constants.EAST)
+        # prevalent wind pair
+        hand_config = HandConfig(prevalent_wind=tile_constants.EAST)
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
         self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
         self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON}
                         in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.ROUND_WIND_PAIR}
+        self.assertTrue({"fu": 2, "reason": Fu.PREVALENT_WIND_PAIR}
                         in fu_details)
         self.assertEqual(fu, 40)
 
         # double wind pair
-        hand_config = HandConfig(player_wind=tile_constants.EAST,
-                                 round_wind=tile_constants.EAST)
+        hand_config = HandConfig(seat_wind=tile_constants.EAST,
+                                 prevalent_wind=tile_constants.EAST)
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(4, len(fu_details))
         self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
         self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.PLAYER_WIND_PAIR} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.ROUND_WIND_PAIR} in fu_details)
+        self.assertTrue({"fu": 2, "reason": Fu.SEAT_WIND_PAIR} in fu_details)
+        self.assertTrue(
+            {"fu": 2, "reason": Fu.PREVALENT_WIND_PAIR} in fu_details)
         self.assertEqual(fu, 40)
 
         # dragon pair

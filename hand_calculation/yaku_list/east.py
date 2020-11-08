@@ -23,18 +23,18 @@ class East(Yaku):
 
         self.is_yakuman = False
 
-    def is_condition_met(self, hand: List[List[int]], player_wind, round_wind,
+    def is_condition_met(self, hand: List[List[int]], seat_wind, prevalent_wind,
                          *args):
         if len(hand) == 5 \
                 and len([item for item in hand
-                         if item[player_wind] == 3
-                            or item[player_wind] == 4]) == 1 \
-                and player_wind == EAST:
+                         if item[seat_wind] == 3
+                            or item[seat_wind] == 4]) == 1 \
+                and seat_wind == EAST:
             return True
         elif len(hand) == 5 \
                 and len([item for item in hand if
-                         item[round_wind] == 3 or item[round_wind] == 4]) == 1 \
-                and round_wind == EAST:
+                         item[prevalent_wind] == 3 or item[prevalent_wind] == 4]) == 1 \
+                and prevalent_wind == EAST:
             return True
         else:
             return False

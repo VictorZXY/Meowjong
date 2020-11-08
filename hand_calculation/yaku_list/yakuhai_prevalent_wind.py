@@ -4,7 +4,7 @@ from hand_calculation.tile_constants import EAST, SOUTH, WEST, NORTH
 from hand_calculation.yaku import Yaku
 
 
-class YakuhaiRoundWind(Yaku):
+class YakuhaiPrevalentWind(Yaku):
     """
     Pon/kan of east in player's seat wind or in the prevalent wind.
     """
@@ -25,20 +25,20 @@ class YakuhaiRoundWind(Yaku):
 
     def is_condition_met(self, hand: List[List[int]], hand_config, *args):
         if hand_config.yaku.east.is_condition_met(
-                hand, hand_config.player_wind, hand_config.round_wind) \
-                and hand_config.round_wind == EAST:
+                hand, hand_config.seat_wind, hand_config.prevalent_wind) \
+                and hand_config.prevalent_wind == EAST:
             return True
         elif hand_config.yaku.south.is_condition_met(
-                hand, hand_config.player_wind, hand_config.round_wind) \
-                and hand_config.round_wind == SOUTH:
+                hand, hand_config.seat_wind, hand_config.prevalent_wind) \
+                and hand_config.prevalent_wind == SOUTH:
             return True
         elif hand_config.yaku.west.is_condition_met(
-                hand, hand_config.player_wind, hand_config.round_wind) \
-                and hand_config.round_wind == WEST:
+                hand, hand_config.seat_wind, hand_config.prevalent_wind) \
+                and hand_config.prevalent_wind == WEST:
             return True
         elif hand_config.yaku.north.is_condition_met(
-                hand, hand_config.player_wind, hand_config.round_wind) \
-                and hand_config.round_wind == NORTH:
+                hand, hand_config.seat_wind, hand_config.prevalent_wind) \
+                and hand_config.prevalent_wind == NORTH:
             return True
         else:
             return False

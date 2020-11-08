@@ -22,8 +22,8 @@ class HandConfig:
     is_chiihou = False
 
     is_sanma = False
-    player_wind = None
-    round_wind = None
+    seat_wind = None
+    prevalent_wind = None
     is_dealer = False
 
     deposit_number = 0  # 1000-point
@@ -43,8 +43,8 @@ class HandConfig:
                  is_tenhou=False,
                  is_chiihou=False,
                  is_sanma=False,
-                 player_wind=None,
-                 round_wind=None,
+                 seat_wind=None,
+                 prevalent_wind=None,
                  deposit_number=0,
                  honba_number=0):
         self.yaku = YakuConfig()
@@ -63,9 +63,9 @@ class HandConfig:
         self.is_chiihou = is_chiihou
 
         self.is_sanma = is_sanma
-        self.player_wind = player_wind
-        self.round_wind = round_wind
-        self.is_dealer = (player_wind == EAST)
+        self.seat_wind = seat_wind
+        self.prevalent_wind = prevalent_wind
+        self.is_dealer = (seat_wind == EAST)
 
         self.deposit_number = deposit_number
         self.honba_number = honba_number

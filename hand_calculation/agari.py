@@ -12,8 +12,7 @@ class Agari:
         :param melds: Melds represented by a list of Meld objects
         :return: Boolean
         """
-        hand_divider = HandDivider()
-        divisions = hand_divider.divide_hand(private_tiles, melds)
+        divisions = HandDivider.divide_hand(private_tiles, melds=melds)
 
         # case of kokushi musou
         if isinstance(divisions[0], int):
