@@ -5,7 +5,7 @@ from hand_calculation.meld import Meld
 from hand_calculation.tiles import Tiles
 
 
-class AgariSimpleTestCase(unittest.TestCase):
+class AgariTestCase(unittest.TestCase):
     def test_is_agari(self):
         agari = Agari()
 

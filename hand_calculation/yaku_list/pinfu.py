@@ -1,5 +1,6 @@
 from typing import List
 
+from hand_calculation.fu import FuCalculator
 from hand_calculation.yaku import Yaku
 
 
@@ -26,12 +27,19 @@ class Pinfu(Yaku):
 
         self.is_yakuman = False
 
-    def is_condition_met(self, hand: List[List[int]], win_tile, win_tiles,
+    def is_condition_met(self, hand: List[List[int]], win_tile, win_group,
                          hand_config, valued_tiles=None, melds=None, *args):
-        # TODO: Implement fu calculation
-        # fu_calculator = FuCalculator()
-        # fu_details = fu_calculator.calculate_fu_details(hand, win_tile,
-        #                                                 win_tiles, hand_config,
-        #                                                 valued_tiles, melds)
-        # return len(hand) == 5 and len(fu_details) == 1 and (melds is None or [])
-        return True
+        """
+        :param hand: List of 34-arrays
+        :param win_tile: Integer index
+        :param win_group: List of integer indices
+        :param hand_config: HandConfig object
+        :param valued_tiles: List of integer indices
+        :param melds: Meld object
+        :return: Boolean
+        """
+        fu_calculator = FuCalculator()
+        fu_details = fu_calculator.calculate_fu(hand, win_tile, win_group,
+                                                hand_config, valued_tiles,
+                                                melds)
+        return len(hand) == 5 and len(fu_details) == 1 and (melds is None or [])

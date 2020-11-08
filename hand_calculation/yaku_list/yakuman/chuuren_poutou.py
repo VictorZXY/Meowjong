@@ -1,7 +1,7 @@
 from functools import reduce
 from typing import List
 
-from hand_calculation.hand_config import HandConfig
+
 from hand_calculation.tile_constants import ONE_MAN, ONE_PIN, ONE_SOU, MANZU, \
     PINZU, SOUZU, HONOURS
 from hand_calculation.tiles import Tiles
@@ -28,8 +28,7 @@ class ChuurenPoutou(Yaku):
 
         self.is_yakuman = True
 
-    def is_condition_met(self, hand: List[List[int]], hand_config: HandConfig,
-                         *args):
+    def is_condition_met(self, hand: List[List[int]], hand_config, *args):
         """
         :param hand: List of 34-arrays
         :param hand_config: HandConfig object

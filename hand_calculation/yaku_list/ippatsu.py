@@ -1,4 +1,4 @@
-from hand_calculation.hand_config import HandConfig
+
 from hand_calculation.yaku import Yaku
 
 
@@ -24,5 +24,5 @@ class Ippatsu(Yaku):
 
         self.is_yakuman = False
 
-    def is_condition_met(self, hand: HandConfig, *args):
+    def is_condition_met(self, hand, *args):
         return hand.is_ippatsu

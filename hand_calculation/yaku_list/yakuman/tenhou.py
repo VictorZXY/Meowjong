@@ -1,4 +1,3 @@
-from hand_calculation.hand_config import HandConfig
 from hand_calculation.yaku import Yaku
 
 
@@ -21,5 +20,5 @@ class Tenhou(Yaku):
 
         self.is_yakuman = True
 
-    def is_condition_met(self, hand: HandConfig, *args):
+    def is_condition_met(self, hand, *args):
         return hand.is_tenhou
