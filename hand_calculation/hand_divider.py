@@ -2,22 +2,35 @@ from itertools import product
 from pyswip import Prolog
 
 from hand_calculation.meld import Meld
-from hand_calculation.tile_constants import ONE_MAN, NINE_MAN, ONE_PIN, \
-    NINE_PIN, ONE_SOU, NINE_SOU, HONOURS
+from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, NINE_MAN, \
+    ONE_PIN, FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, RED_FIVE_MAN, \
+    RED_FIVE_PIN, RED_FIVE_SOU, HONOURS, RED_DORA_COUNT
 from hand_calculation.tiles import Tiles
 
 
 class HandDivider:
-    def divide_hand(self, private_tiles, melds=None):
+    def divide_hand(self, private_tiles, win_tile=None, melds=None):
         """
         Return a list of possible divisions of a given hand, if there is no
         possible division, return the full original hand (private tiles and
         melds combined).
-        :param private_tiles: Private tiles (winning tile included) represented
-        by a 34-array
+        :param private_tiles: Private tiles (winning tile may be included or
+        not), represented by a 34-array
+        :param win_tile: Integer index, only specified when it is not included
+        in private_tiles
         :param melds: Melds represented by a list of Meld objects
         :return: A list of lists of 34-arrays
         """
+        if win_tile is not None:
+            if win_tile == RED_FIVE_MAN:
+                private_tiles[FIVE_MAN] += RED_DORA_COUNT
+            elif win_tile == RED_FIVE_PIN:
+                private_tiles[FIVE_PIN] += RED_DORA_COUNT
+            elif win_tile == RED_FIVE_SOU:
+                private_tiles[FIVE_SOU] += RED_DORA_COUNT
+            else:
+                private_tiles[win_tile] += 1
+
         if melds is None:
             melds = []
         else:
