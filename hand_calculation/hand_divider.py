@@ -9,7 +9,8 @@ from hand_calculation.tiles import Tiles
 
 
 class HandDivider:
-    def divide_hand(self, private_tiles, win_tile=None, melds=None):
+    @staticmethod
+    def divide_hand(private_tiles, win_tile=None, melds=None):
         """
         Return a list of possible divisions of a given hand, if there is no
         possible division, return the full original hand (private tiles and
@@ -39,7 +40,7 @@ class HandDivider:
         if melds is None:
             melds = []
         else:
-            melds = self.convert_melds_to_list(melds)
+            melds = HandDivider.convert_melds_to_list(melds)
             for meld in melds:
                 for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
                     if meld[index] >= RED_DORA_VALUE:
@@ -48,7 +49,7 @@ class HandDivider:
 
         divisions = []
 
-        pair_indices = self.find_pairs(private_tiles)
+        pair_indices = HandDivider.find_pairs(private_tiles)
 
         # case of chiitoitsu
         if len(pair_indices) == 7:
@@ -63,14 +64,14 @@ class HandDivider:
             private_tiles_copy[pair_index] -= 2
 
             # manzu mentsu
-            man = self.find_mentsu_combinations(private_tiles_copy, ONE_MAN,
-                                                NINE_MAN)
+            man = HandDivider.find_mentsu_combinations(
+                private_tiles_copy, ONE_MAN, NINE_MAN)
             # pinzu mentsu
-            pin = self.find_mentsu_combinations(private_tiles_copy, ONE_PIN,
-                                                NINE_PIN)
+            pin = HandDivider.find_mentsu_combinations(
+                private_tiles_copy, ONE_PIN, NINE_PIN)
             # souzu mentsu
-            sou = self.find_mentsu_combinations(private_tiles_copy, ONE_SOU,
-                                                NINE_SOU)
+            sou = HandDivider.find_mentsu_combinations(
+                private_tiles_copy, ONE_SOU, NINE_SOU)
             # honours (koutsu only)
             honours = []
             for index in HONOURS:
