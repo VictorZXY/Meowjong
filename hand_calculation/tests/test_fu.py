@@ -8,7 +8,7 @@ from hand_calculation.meld import Meld
 from hand_calculation.tiles import Tiles
 
 
-class FuCalculationTestCase(unittest.TestCase):
+class FuTestCase(unittest.TestCase):
     def __get_win_groups(self, hand, win_tile):
         return [item for item in hand if item[win_tile] > 0]
 
