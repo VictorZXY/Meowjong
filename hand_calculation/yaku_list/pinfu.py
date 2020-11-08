@@ -1,6 +1,6 @@
 from typing import List
 
-from hand_calculation.fu import FuCalculator
+from hand_calculation.fu import Fu
 from hand_calculation.yaku import Yaku
 
 
@@ -37,7 +37,7 @@ class Pinfu(Yaku):
         :param melds: Meld object
         :return: Boolean
         """
-        fu_calculator = FuCalculator()
+        fu_calculator = Fu()
         fu_details = fu_calculator.calculate_fu(hand, win_tile, win_group,
                                                 hand_config, melds)
         return len(hand) == 5 and len(fu_details) == 1 and (melds is None or [])

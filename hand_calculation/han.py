@@ -6,7 +6,7 @@ from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, NINE_MAN, \
 from hand_calculation.tiles import Tiles
 
 
-class HanCalculator:
+class Han:
     DORA = 'Dora from dora indicators'
     RED_DORA = 'Red dora'
     NUKI_DORA = 'Nuki-dora'
@@ -37,7 +37,7 @@ class HanCalculator:
                                if meld.type == Meld.KITA])
         if nuki_dora_count > 0:
             dora_details.append({'han': nuki_dora_count,
-                                 'reason': HanCalculator.NUKI_DORA})
+                                 'reason': Han.NUKI_DORA})
 
         # count red dora
         red_dora_count = 0
@@ -56,8 +56,7 @@ class HanCalculator:
                     red_dora_count += meld[index] // RED_DORA_VALUE
 
         if red_dora_count > 0:
-            dora_details.append({'han': red_dora_count,
-                                 'reason': HanCalculator.RED_DORA})
+            dora_details.append({'han': red_dora_count, 'reason': Han.RED_DORA})
 
         # count dora from dora indicators
         dora_list = []
@@ -127,8 +126,7 @@ class HanCalculator:
                     dora_count += meld.tiles[index]
 
         if dora_count > 0:
-            dora_details.append({'han': dora_count,
-                                 'reason': HanCalculator.DORA})
+            dora_details.append({'han': dora_count, 'reason': Han.DORA})
 
         return dora_details, dora_count + red_dora_count + nuki_dora_count
 

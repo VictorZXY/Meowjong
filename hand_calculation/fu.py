@@ -5,7 +5,7 @@ from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, NINE_MAN, \
 from hand_calculation.tiles import Tiles
 
 
-class FuCalculator:
+class Fu:
     BASE = 'Base'
     MENZEN_RON = 'Menzen ron'
     CHIITOITSU = 'Chiitoitsu'
@@ -62,7 +62,7 @@ class FuCalculator:
 
         # case of chiitoitsu
         if len(hand) == 7:
-            return [{'fu': 25, 'reason': FuCalculator.CHIITOITSU}], 25
+            return [{'fu': 25, 'reason': Fu.CHIITOITSU}], 25
 
         fu_details = []
 
@@ -94,21 +94,19 @@ class FuCalculator:
                 # 12 in hand, waiting for 3
                 if win_tile_index == 2 \
                         and win_group_indices.index(win_tile) == 2:
-                    fu_details.append({'fu': 2,
-                                       'reason': FuCalculator.EDGE_WAIT})
+                    fu_details.append({'fu': 2, 'reason': Fu.EDGE_WAIT})
                 # 89 in hand, waiting for 7
                 elif win_tile_index == 6 \
                         and win_group_indices.index(win_tile) == 0:
-                    fu_details.append({'fu': 2,
-                                       'reason': FuCalculator.EDGE_WAIT})
+                    fu_details.append({'fu': 2, 'reason': Fu.EDGE_WAIT})
 
             # closed wait
             if win_group_indices.index(win_tile) == 1:
-                fu_details.append({'fu': 2, 'reason': FuCalculator.CLOSED_WAIT})
+                fu_details.append({'fu': 2, 'reason': Fu.CLOSED_WAIT})
 
         # detect pair wait
         if Tiles.is_pair(win_group):
-            fu_details.append({'fu': 2, 'reason': FuCalculator.PAIR_WAIT})
+            fu_details.append({'fu': 2, 'reason': Fu.PAIR_WAIT})
 
         pair_index = -1
         for item in hand:
@@ -119,17 +117,15 @@ class FuCalculator:
 
         # detect seat wind pair
         if pair_index == hand_config.player_wind:
-            fu_details.append({'fu': 2,
-                               'reason': FuCalculator.PLAYER_WIND_PAIR})
+            fu_details.append({'fu': 2, 'reason': Fu.PLAYER_WIND_PAIR})
 
         # detect prevalent wind pair:
         if pair_index == hand_config.round_wind:
-            fu_details.append({'fu': 2,
-                               'reason': FuCalculator.ROUND_WIND_PAIR})
+            fu_details.append({'fu': 2, 'reason': Fu.ROUND_WIND_PAIR})
 
         # detect dragon wind pair:
         if pair_index in DRAGONS:
-            fu_details.append({'fu': 2, 'reason': FuCalculator.DRAGON_PAIR})
+            fu_details.append({'fu': 2, 'reason': Fu.DRAGON_PAIR})
 
         open_melds = [item.tiles for item in melds if item.is_open]
         if not hand_config.is_tsumo:
@@ -141,26 +137,16 @@ class FuCalculator:
             koutsu_index = Tiles.array_to_indices(koutsu)[0]
             if koutsu in open_melds:
                 if koutsu_index in YAOCHUUHAI:
-                    fu_details.append({
-                        'fu': 4,
-                        'reason': FuCalculator.OPEN_YAOCHUU_KOUTSU
-                    })
+                    fu_details.append({'fu': 4,
+                                       'reason': Fu.OPEN_YAOCHUU_KOUTSU})
                 else:
-                    fu_details.append({
-                        'fu': 2,
-                        'reason': FuCalculator.OPEN_KOUTSU
-                    })
+                    fu_details.append({'fu': 2, 'reason': Fu.OPEN_KOUTSU})
             else:
                 if koutsu_index in YAOCHUUHAI:
-                    fu_details.append({
-                        'fu': 8,
-                        'reason': FuCalculator.CLOSED_YAOCHUU_KOUTSU
-                    })
+                    fu_details.append({'fu': 8,
+                                       'reason': Fu.CLOSED_YAOCHUU_KOUTSU})
                 else:
-                    fu_details.append({
-                        'fu': 4,
-                        'reason': FuCalculator.CLOSED_KOUTSU
-                    })
+                    fu_details.append({'fu': 4, 'reason': Fu.CLOSED_KOUTSU})
 
         # detect kantsu
         kantsu_set = [item for item in hand if Tiles.is_kantsu(item)]
@@ -168,41 +154,31 @@ class FuCalculator:
             kantsu_index = Tiles.array_to_indices(kantsu)[0]
             if kantsu in open_melds:
                 if kantsu_index in YAOCHUUHAI:
-                    fu_details.append({
-                        'fu': 16,
-                        'reason': FuCalculator.OPEN_YAOCHUU_KANTSU
-                    })
+                    fu_details.append({'fu': 16,
+                                       'reason': Fu.OPEN_YAOCHUU_KANTSU})
                 else:
-                    fu_details.append({
-                        'fu': 8,
-                        'reason': FuCalculator.OPEN_KANTSU
-                    })
+                    fu_details.append({'fu': 8, 'reason': Fu.OPEN_KANTSU})
             else:
                 if kantsu_index in YAOCHUUHAI:
-                    fu_details.append({
-                        'fu': 32,
-                        'reason': FuCalculator.CLOSED_YAOCHUU_KANTSU
-                    })
+                    fu_details.append({'fu': 32,
+                                       'reason': Fu.CLOSED_YAOCHUU_KANTSU})
                 else:
-                    fu_details.append({
-                        'fu': 16,
-                        'reason': FuCalculator.CLOSED_KANTSU
-                    })
+                    fu_details.append({'fu': 16, 'reason': Fu.CLOSED_KANTSU})
 
         # 2 fu for tsumo (except in the case of pinfu)
         if hand_config.is_tsumo and fu_details:
-            fu_details.append({'fu': 2, 'reason': FuCalculator.TSUMO})
+            fu_details.append({'fu': 2, 'reason': Fu.TSUMO})
 
         is_open_hand = any([item.is_open for item in melds])
 
         # 2 fu for open pinfu
         if is_open_hand and (not fu_details):
-            fu_details.append({'fu': 2, 'reason': FuCalculator.OPEN_PINFU})
+            fu_details.append({'fu': 2, 'reason': Fu.OPEN_PINFU})
 
         # add base fu and fu by menzen-ron
-        fu_details.append({'fu': 20, 'reason': FuCalculator.BASE})
+        fu_details.append({'fu': 20, 'reason': Fu.BASE})
         if (not is_open_hand) and (not hand_config.is_tsumo):
-            fu_details.append({'fu': 10, 'reason': FuCalculator.MENZEN_RON})
+            fu_details.append({'fu': 10, 'reason': Fu.MENZEN_RON})
 
         fu_value = sum([item['fu'] for item in fu_details])
         fu_value = (fu_value + 9) // 10 * 10
