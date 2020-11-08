@@ -1,7 +1,7 @@
 from hand_calculation.meld import Meld
 from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, NINE_MAN, \
     ONE_PIN, FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, RED_FIVE_MAN, \
-    RED_FIVE_PIN, RED_FIVE_SOU, TERMINALS, YAOCHUUHAI
+    RED_FIVE_PIN, RED_FIVE_SOU, TERMINALS, DRAGONS, YAOCHUUHAI
 from hand_calculation.tiles import Tiles
 
 
@@ -16,8 +16,9 @@ class FuCalculator:
     TSUMO = 'Tsumo'
     OPEN_PINFU = 'Open pinfu'
 
-    VALUED_PAIR = 'Valued pair'
-    DOUBLE_VALUED_PAIR = 'Double valued pair'
+    PLAYER_WIND_PAIR = 'Seat wind pair'
+    ROUND_WIND_PAIR = 'Prevalent wind pair'
+    DRAGON_PAIR = 'Dragon pair'
 
     OPEN_KOUTSU = 'Open koutsu'
     OPEN_YAOCHUU_KOUTSU = 'Open yaochuuhai koutsu'
@@ -29,8 +30,8 @@ class FuCalculator:
     CLOSED_KANTSU = 'Closed kantsu'
     CLOSED_YAOCHUU_KANTSU = 'Closed yaochuuhai kantsu'
 
-    def calculate_fu(self, hand, win_tile, win_group, hand_config,
-                     valued_tiles=None, melds=None):
+    @staticmethod
+    def calculate_fu(hand, win_tile, win_group, hand_config, melds=None):
         """
         Calculate hand fu with explanations
         :param hand: List of 34-arrays
@@ -38,8 +39,6 @@ class FuCalculator:
         :param win_group: 34-array containing the group where the winning tile
         is in
         :param hand_config: HandConfig object
-        :param valued_tiles: List of integer indices, containing dragons, the
-        seat wind, and the round wind
         :param melds: Meld object
         :return: A list of fu details, and an integer total fu value
         """
@@ -57,9 +56,6 @@ class FuCalculator:
             win_tile = FIVE_PIN
         elif win_tile == RED_FIVE_SOU:
             win_tile = FIVE_SOU
-
-        if not valued_tiles:
-            valued_tiles = []
 
         if not melds:
             melds = []
@@ -114,16 +110,26 @@ class FuCalculator:
         if Tiles.is_pair(win_group):
             fu_details.append({'fu': 2, 'reason': FuCalculator.PAIR_WAIT})
 
-        # detect valued pair
-        pair = [Tiles.array_to_indices(item) for item in hand
-                if Tiles.is_pair(item)][0]
-        valued_pair_count = valued_tiles.count(pair[0])
-        if valued_pair_count == 1:
-            fu_details.append({'fu': 2, 'reason': FuCalculator.VALUED_PAIR})
-        # detect double-valued pair
-        elif valued_pair_count == 2:
-            fu_details.append({'fu': 4,
-                               'reason': FuCalculator.DOUBLE_VALUED_PAIR})
+        pair_index = -1
+        for item in hand:
+            if Tiles.is_pair(item):
+                pair_index = Tiles.array_to_indices(item)[0]
+                break
+        assert pair_index != -1, 'Pair not found in hand'
+
+        # detect seat wind pair
+        if pair_index == hand_config.player_wind:
+            fu_details.append({'fu': 2,
+                               'reason': FuCalculator.PLAYER_WIND_PAIR})
+
+        # detect prevalent wind pair:
+        if pair_index == hand_config.round_wind:
+            fu_details.append({'fu': 2,
+                               'reason': FuCalculator.ROUND_WIND_PAIR})
+
+        # detect dragon wind pair:
+        if pair_index in DRAGONS:
+            fu_details.append({'fu': 2, 'reason': FuCalculator.DRAGON_PAIR})
 
         open_melds = [item.tiles for item in melds if item.is_open]
         if not hand_config.is_tsumo:

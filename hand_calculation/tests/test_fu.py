@@ -218,38 +218,67 @@ class FuCalculationTestCase(unittest.TestCase):
         self.assertEqual(fu, 40)
 
     def test_valued_pair_fu(self):
+        # player wind pair
         fu_calculator = FuCalculator()
-        hand_config = HandConfig()
+        hand_config = HandConfig(player_wind=tile_constants.EAST)
 
         private_tiles = Tiles.string_to_array(man="123456", sou="12378",
                                               honours="11")
         win_tile = tile_constants.SIX_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
-        valued_tiles = [tile_constants.EAST]
         fu_details, fu = fu_calculator.calculate_fu(
-            hand, win_tile, self.__get_win_group(hand, win_tile), hand_config,
-            valued_tiles=valued_tiles,
-        )
+            hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
         self.assertTrue({"fu": 20, "reason": FuCalculator.BASE} in fu_details)
         self.assertTrue({"fu": 10, "reason": FuCalculator.MENZEN_RON}
                         in fu_details)
-        self.assertTrue({"fu": 2, "reason": FuCalculator.VALUED_PAIR}
+        self.assertTrue({"fu": 2, "reason": FuCalculator.PLAYER_WIND_PAIR}
                         in fu_details)
         self.assertEqual(fu, 40)
 
-        # double valued pair
-        valued_tiles = [tile_constants.EAST, tile_constants.EAST]
+        # round wind pair
+        hand_config = HandConfig(round_wind=tile_constants.EAST)
         fu_details, fu = fu_calculator.calculate_fu(
-            hand, win_tile, self.__get_win_group(hand, win_tile), hand_config,
-            valued_tiles=valued_tiles
-        )
+            hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
         self.assertTrue({"fu": 20, "reason": FuCalculator.BASE} in fu_details)
         self.assertTrue({"fu": 10, "reason": FuCalculator.MENZEN_RON}
                         in fu_details)
-        self.assertTrue({"fu": 4, "reason": FuCalculator.DOUBLE_VALUED_PAIR}
+        self.assertTrue({"fu": 2, "reason": FuCalculator.ROUND_WIND_PAIR}
+                        in fu_details)
+        self.assertEqual(fu, 40)
+
+        # double wind pair
+        hand_config = HandConfig(player_wind=tile_constants.EAST,
+                                 round_wind=tile_constants.EAST)
+        fu_details, fu = fu_calculator.calculate_fu(
+            hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
+        self.assertEqual(4, len(fu_details))
+        self.assertTrue({"fu": 20, "reason": FuCalculator.BASE} in fu_details)
+        self.assertTrue({"fu": 10, "reason": FuCalculator.MENZEN_RON}
+                        in fu_details)
+        self.assertTrue({"fu": 2, "reason": FuCalculator.PLAYER_WIND_PAIR}
+                        in fu_details)
+        self.assertTrue({"fu": 2, "reason": FuCalculator.ROUND_WIND_PAIR}
+                        in fu_details)
+        self.assertEqual(fu, 40)
+
+        # dragon pair
+        hand_config = HandConfig()
+
+        private_tiles = Tiles.string_to_array(man="123456", sou="12378",
+                                              honours="77")
+        win_tile = tile_constants.SIX_SOU
+        hand = self.__make_hand(private_tiles, win_tile)
+
+        fu_details, fu = fu_calculator.calculate_fu(
+            hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
+        self.assertEqual(3, len(fu_details))
+        self.assertTrue({"fu": 20, "reason": FuCalculator.BASE} in fu_details)
+        self.assertTrue({"fu": 10, "reason": FuCalculator.MENZEN_RON}
+                        in fu_details)
+        self.assertTrue({"fu": 2, "reason": FuCalculator.DRAGON_PAIR}
                         in fu_details)
         self.assertEqual(fu, 40)
 
