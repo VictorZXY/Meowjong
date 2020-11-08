@@ -21,9 +21,13 @@ class HandConfig:
     is_tenhou = False
     is_chiihou = False
 
+    is_sanma = False
     player_wind = None
     round_wind = None
     is_dealer = False
+
+    deposit_number = 0  # 1000-point
+    honba_number = 0  # 100-point
 
     def __init__(self,
                  is_menzen=False,
@@ -38,8 +42,11 @@ class HandConfig:
                  is_nagashi_mangan=False,
                  is_tenhou=False,
                  is_chiihou=False,
+                 is_sanma=False,
                  player_wind=None,
-                 round_wind=None):
+                 round_wind=None,
+                 deposit_number=0,
+                 honba_number=0):
         self.yaku = YakuConfig()
 
         self.is_menzen = is_menzen
@@ -55,6 +62,10 @@ class HandConfig:
         self.is_tenhou = is_tenhou
         self.is_chiihou = is_chiihou
 
+        self.is_sanma = is_sanma
         self.player_wind = player_wind
         self.round_wind = round_wind
         self.is_dealer = (player_wind == EAST)
+
+        self.deposit_number = deposit_number
+        self.honba_number = honba_number
