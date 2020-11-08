@@ -1,7 +1,7 @@
 from hand_calculation.meld import Meld
 from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, NINE_MAN, \
-    ONE_PIN, FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, EAST, \
-    RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU, TERMINALS, YAOCHUUHAI
+    ONE_PIN, FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, RED_FIVE_MAN, \
+    RED_FIVE_PIN, RED_FIVE_SOU, TERMINALS, YAOCHUUHAI
 from hand_calculation.tiles import Tiles
 
 
@@ -35,8 +35,8 @@ class FuCalculator:
         Calculate hand fu with explanations
         :param hand: List of 34-arrays
         :param win_tile: Integer index
-        :param win_group: List of integer indices, containing the group where
-        the winning tile is in
+        :param win_group: 34-array containing the group where the winning tile
+        is in
         :param hand_config: HandConfig object
         :param valued_tiles: List of integer indices, containing dragons, the
         seat wind, and the round wind
@@ -81,7 +81,7 @@ class FuCalculator:
                 else:
                     open_shuntsu_set.remove(item)
 
-        if Tiles.indices_to_array(win_group) in closed_shuntsu_set:
+        if win_group in closed_shuntsu_set:
             if ONE_MAN <= win_tile <= NINE_MAN:
                 win_tile_index = win_tile % ONE_MAN
             elif ONE_PIN <= win_tile <= NINE_PIN:
@@ -91,23 +91,27 @@ class FuCalculator:
             else:
                 assert False, 'Honour tiles cannot form shuntsu'
 
+            win_group_indices = Tiles.array_to_indices(win_group)
+
             # edge wait
-            if contains_terminals(win_group):
+            if contains_terminals(win_group_indices):
                 # 12 in hand, waiting for 3
-                if win_tile_index == 2 and win_group.index(win_tile) == 2:
+                if win_tile_index == 2 \
+                        and win_group_indices.index(win_tile) == 2:
                     fu_details.append({'fu': 2,
                                        'reason': FuCalculator.EDGE_WAIT})
                 # 89 in hand, waiting for 7
-                elif win_tile_index == 6 and win_group.index(win_tile) == 0:
+                elif win_tile_index == 6 \
+                        and win_group_indices.index(win_tile) == 0:
                     fu_details.append({'fu': 2,
                                        'reason': FuCalculator.EDGE_WAIT})
 
             # closed wait
-            if win_group.index(win_tile) == 1:
+            if win_group_indices.index(win_tile) == 1:
                 fu_details.append({'fu': 2, 'reason': FuCalculator.CLOSED_WAIT})
 
         # detect pair wait
-        if Tiles.is_pair(Tiles.indices_to_array(win_group)):
+        if Tiles.is_pair(win_group):
             fu_details.append({'fu': 2, 'reason': FuCalculator.PAIR_WAIT})
 
         # detect valued pair
@@ -121,29 +125,36 @@ class FuCalculator:
             fu_details.append({'fu': 4,
                                'reason': FuCalculator.DOUBLE_VALUED_PAIR})
 
-        # detect koutsu
         open_melds = [item.tiles for item in melds if item.is_open]
         if not hand_config.is_tsumo:
-            open_melds.append(Tiles.indices_to_array(win_group))
+            open_melds.append(win_group)
+
+        # detect koutsu
         koutsu_set = [item for item in hand if Tiles.is_koutsu(item)]
         for koutsu in koutsu_set:
             koutsu_index = Tiles.array_to_indices(koutsu)[0]
             if koutsu in open_melds:
                 if koutsu_index in YAOCHUUHAI:
-                    fu_details.append({'fu': 4,
-                                       'reason':
-                                           FuCalculator.OPEN_YAOCHUU_KOUTSU})
+                    fu_details.append({
+                        'fu': 4,
+                        'reason': FuCalculator.OPEN_YAOCHUU_KOUTSU
+                    })
                 else:
-                    fu_details.append({'fu': 2,
-                                       'reason': FuCalculator.OPEN_KOUTSU})
+                    fu_details.append({
+                        'fu': 2,
+                        'reason': FuCalculator.OPEN_KOUTSU
+                    })
             else:
                 if koutsu_index in YAOCHUUHAI:
-                    fu_details.append({'fu': 8,
-                                       'reason':
-                                           FuCalculator.CLOSED_YAOCHUU_KOUTSU})
+                    fu_details.append({
+                        'fu': 8,
+                        'reason': FuCalculator.CLOSED_YAOCHUU_KOUTSU
+                    })
                 else:
-                    fu_details.append({'fu': 4,
-                                       'reason': FuCalculator.CLOSED_KOUTSU})
+                    fu_details.append({
+                        'fu': 4,
+                        'reason': FuCalculator.CLOSED_KOUTSU
+                    })
 
         # detect kantsu
         kantsu_set = [item for item in hand if Tiles.is_kantsu(item)]
@@ -151,27 +162,34 @@ class FuCalculator:
             kantsu_index = Tiles.array_to_indices(kantsu)[0]
             if kantsu in open_melds:
                 if kantsu_index in YAOCHUUHAI:
-                    fu_details.append({'fu': 16,
-                                       'reason':
-                                           FuCalculator.OPEN_YAOCHUU_KANTSU})
+                    fu_details.append({
+                        'fu': 16,
+                        'reason': FuCalculator.OPEN_YAOCHUU_KANTSU
+                    })
                 else:
-                    fu_details.append({'fu': 8,
-                                       'reason': FuCalculator.OPEN_KANTSU})
+                    fu_details.append({
+                        'fu': 8,
+                        'reason': FuCalculator.OPEN_KANTSU
+                    })
             else:
                 if kantsu_index in YAOCHUUHAI:
-                    fu_details.append({'fu': 32,
-                                       'reason':
-                                           FuCalculator.CLOSED_YAOCHUU_KANTSU})
+                    fu_details.append({
+                        'fu': 32,
+                        'reason': FuCalculator.CLOSED_YAOCHUU_KANTSU
+                    })
                 else:
-                    fu_details.append({'fu': 16,
-                                       'reason': FuCalculator.CLOSED_KANTSU})
+                    fu_details.append({
+                        'fu': 16,
+                        'reason': FuCalculator.CLOSED_KANTSU
+                    })
 
         # 2 fu for tsumo (except in the case of pinfu)
         if hand_config.is_tsumo and fu_details:
             fu_details.append({'fu': 2, 'reason': FuCalculator.TSUMO})
 
-        # 2 fu for open pinfu
         is_open_hand = any([item.is_open for item in melds])
+
+        # 2 fu for open pinfu
         if is_open_hand and (not fu_details):
             fu_details.append({'fu': 2, 'reason': FuCalculator.OPEN_PINFU})
 
