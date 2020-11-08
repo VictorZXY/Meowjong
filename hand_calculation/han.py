@@ -130,6 +130,8 @@ class HanCalculator:
             dora_details.append({'han': dora_count,
                                  'reason': HanCalculator.DORA})
 
+        return dora_details, dora_count + red_dora_count + nuki_dora_count
+
     @staticmethod
     def calculate_han(hand, win_tile, melds=None, hand_config=None):
         """
