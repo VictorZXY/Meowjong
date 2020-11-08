@@ -1,8 +1,9 @@
 from hand_calculation.yaku_list import MenzenTsumo, Riichi, Ippatsu, Chankan, \
-    RinshanKaihou, HaiteiRaoyue, HouteiRaoyui, East, South, West, North, Haku, \
-    Hatsu, Chun, Tanyao, Iipeikou, Pinfu, Chanta, Ikkitsuukan, SanshokuDoujun, \
-    SanshokuDoukou, DoubleRiichi, Toitoihou, Sankantsu, Sanankou, Shousangen, \
-    Honroutou, Chiitoitsu, Junchan, Honitsu, Ryanpeikou, Chinitsu, NagashiMangan
+    RinshanKaihou, HaiteiRaoyue, HouteiRaoyui, YakuhaiPlayerWind, \
+    YakuhaiRoundWind, East, South, West, North, Haku, Hatsu, Chun, Tanyao, \
+    Iipeikou, Pinfu, Chanta, Ikkitsuukan, SanshokuDoujun, SanshokuDoukou, \
+    DoubleRiichi, Toitoihou, Sankantsu, Sanankou, Shousangen, Honroutou, \
+    Chiitoitsu, Junchan, Honitsu, Ryanpeikou, Chinitsu, NagashiMangan
 from hand_calculation.yaku_list.yakuman import Tenhou, Chiihou, Daisangen, \
     Suuankou, SuuankouTanki, Tsuuiisou, Ryuuiisou, Chinroutou, KokushiMusou, \
     KokushiMusou13Men, Shousuushii, Daisuushii, Suukantsu, ChuurenPoutou, \
@@ -19,6 +20,8 @@ class YakuConfig:
         self.rinshan_kaihou = RinshanKaihou()
         self.haitei_raoyue = HaiteiRaoyue()
         self.houtei_raoyui = HouteiRaoyui()
+        self.yakuhai_player_wind = YakuhaiPlayerWind()
+        self.yakuhai_round_wind = YakuhaiRoundWind()
         self.east = East()
         self.south = South()
         self.west = West()
