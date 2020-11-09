@@ -24,5 +24,6 @@ class Toitoihou(Yaku):
         self.is_yakuman = False
 
     def is_condition_met(self, hand: List[List[int]], *args):
-        koutsu_set = [item for item in hand if Tiles.is_koutsu(item)]
+        koutsu_set = [item for item in hand \
+                      if Tiles.is_koutsu(item) or Tiles.is_kantsu(item)]
         return len(koutsu_set) == 4

@@ -6,9 +6,9 @@ from hand_calculation.yaku_list.chankan import Chankan
 from hand_calculation.yaku_list.rinshan import RinshanKaihou
 from hand_calculation.yaku_list.haitei import HaiteiRaoyue
 from hand_calculation.yaku_list.houtei import HouteiRaoyui
-from hand_calculation.yaku_list.yakuhai_seat_wind import YakuhaiSeatWind
-from hand_calculation.yaku_list.yakuhai_prevalent_wind import \
-    YakuhaiPrevalentWind
+from hand_calculation.yaku_list.seat_wind import SeatWind
+from hand_calculation.yaku_list.prevalent_wind import \
+    PrevalentWind
 from hand_calculation.yaku_list.east import East
 from hand_calculation.yaku_list.south import South
 from hand_calculation.yaku_list.west import West

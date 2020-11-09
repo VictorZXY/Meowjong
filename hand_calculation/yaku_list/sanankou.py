@@ -1,6 +1,5 @@
 from typing import List
 
-
 from hand_calculation.tile_constants import FIVE_MAN, FIVE_PIN, FIVE_SOU, \
     RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
 from hand_calculation.tiles import Tiles
@@ -27,8 +26,8 @@ class Sanankou(Yaku):
 
         self.is_yakuman = False
 
-    def is_condition_met(self, hand: List[List[int]], win_tile,
-                         hand_config, melds=None, *args):
+    def is_condition_met(self, hand: List[List[int]], win_tile, hand_config,
+                         melds=None, *args):
         """
         :param hand: List of 34-arrays
         :param win_tile: Integer index

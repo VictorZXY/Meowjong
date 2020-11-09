@@ -1,5 +1,6 @@
 import unittest
 
+from hand_calculation import tile_constants
 from hand_calculation.agari import Agari
 from hand_calculation.meld import Meld
 from hand_calculation.tiles import Tiles
@@ -84,7 +85,16 @@ class AgariTestCase(unittest.TestCase):
             Meld(Meld.CHII, tiles='345m'),
             Meld(Meld.CHII, tiles='555s')
         ]
-        self.assertFalse(agari.is_agari(tiles, melds))
+        self.assertFalse(agari.is_agari(tiles, melds=melds))
+
+        tiles = Tiles.string_to_array(pin="99", honours="77")
+        win_tile = tile_constants.NINE_PIN
+        melds = [
+            Meld(Meld.PON, tiles="111z"),
+            Meld(Meld.CHII, tiles="123p"),
+            Meld(Meld.CHII, tiles="123p"),
+        ]
+        self.assertTrue(agari.is_agari(tiles, win_tile, melds=melds))
 
 
 if __name__ == '__main__':

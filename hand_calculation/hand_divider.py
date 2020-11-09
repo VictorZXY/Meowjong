@@ -23,19 +23,20 @@ class HandDivider:
         :return: A list of lists of 34-arrays
         """
         # remove dora from all tiles
+        tiles = private_tiles[:]
         if win_tile is not None:
             if win_tile == RED_FIVE_MAN:
-                private_tiles[FIVE_MAN] += 1
+                tiles[FIVE_MAN] += 1
             elif win_tile == RED_FIVE_PIN:
-                private_tiles[FIVE_PIN] += 1
+                tiles[FIVE_PIN] += 1
             elif win_tile == RED_FIVE_SOU:
-                private_tiles[FIVE_SOU] += 1
+                tiles[FIVE_SOU] += 1
             else:
-                private_tiles[win_tile] += 1
+                tiles[win_tile] += 1
         for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
-            if private_tiles[index] >= RED_DORA_VALUE:
-                private_tiles[index] = private_tiles[index] // RED_DORA_VALUE \
-                                       + private_tiles[index] % RED_DORA_VALUE
+            if tiles[index] >= RED_DORA_VALUE:
+                tiles[index] = tiles[index] // RED_DORA_VALUE \
+                               + tiles[index] % RED_DORA_VALUE
 
         if melds is None:
             melds = []
@@ -49,7 +50,7 @@ class HandDivider:
 
         divisions = []
 
-        pair_indices = HandDivider.find_pairs(private_tiles)
+        pair_indices = HandDivider.find_pairs(tiles)
 
         # case of chiitoitsu
         if len(pair_indices) == 7:
@@ -60,22 +61,22 @@ class HandDivider:
 
         # find all possible standard, 4 mentsu + 1 pair division
         for pair_index in pair_indices:
-            private_tiles_copy = private_tiles[:]
-            private_tiles_copy[pair_index] -= 2
+            tiles_copy = tiles[:]
+            tiles_copy[pair_index] -= 2
 
             # manzu mentsu
             man = HandDivider.find_mentsu_combinations(
-                private_tiles_copy, ONE_MAN, NINE_MAN)
+                tiles_copy, ONE_MAN, NINE_MAN)
             # pinzu mentsu
             pin = HandDivider.find_mentsu_combinations(
-                private_tiles_copy, ONE_PIN, NINE_PIN)
+                tiles_copy, ONE_PIN, NINE_PIN)
             # souzu mentsu
             sou = HandDivider.find_mentsu_combinations(
-                private_tiles_copy, ONE_SOU, NINE_SOU)
+                tiles_copy, ONE_SOU, NINE_SOU)
             # honours (koutsu only)
             honours = []
             for index in HONOURS:
-                if private_tiles_copy[index] == 3:
+                if tiles_copy[index] == 3:
                     honours.append([index] * 3)
             if honours:
                 honours = [honours]
@@ -113,7 +114,7 @@ class HandDivider:
         if divisions:
             return sorted(divisions, reverse=True)
         else:
-            full_hand = private_tiles[:]
+            full_hand = tiles[:]
             for meld in melds:
                 full_hand = [x + y for x, y in zip(full_hand, meld)]
             return full_hand

@@ -39,7 +39,7 @@ class Fu:
         :param win_group: 34-array containing the group where the winning tile
         is in
         :param hand_config: HandConfig object
-        :param melds: Meld object
+        :param melds: List of Meld objects
         :return: A list of fu details, and an integer total fu value
         """
 
@@ -79,7 +79,7 @@ class Fu:
 
         if win_group in closed_shuntsu_set:
             if ONE_MAN <= win_tile <= NINE_MAN:
-                win_tile_index = win_tile % ONE_MAN
+                win_tile_index = win_tile
             elif ONE_PIN <= win_tile <= NINE_PIN:
                 win_tile_index = win_tile % ONE_PIN
             elif ONE_SOU <= win_tile <= NINE_SOU:

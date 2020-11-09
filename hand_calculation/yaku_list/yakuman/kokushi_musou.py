@@ -27,8 +27,11 @@ class KokushiMusou(Yaku):
         self.is_yakuman = True
 
     def is_condition_met(self, hand: List[int], *args):
-        if Tiles.tiles_count(hand) == 14 \
-                and prod([hand[i] for i in YAOCHUUHAI]) == 2:
-            return True
+        if isinstance(hand[0], int):
+            if Tiles.tiles_count(hand) == 14 \
+                    and prod([hand[i] for i in YAOCHUUHAI]) == 2:
+                return True
+            else:
+                return False
         else:
             return False

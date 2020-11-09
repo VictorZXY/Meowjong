@@ -1,5 +1,6 @@
 import unittest
 
+from hand_calculation import tile_constants
 from hand_calculation.hand_divider import HandDivider
 from hand_calculation.meld import Meld
 from hand_calculation.tiles import Tiles
@@ -142,6 +143,22 @@ class HandDividerTestCase(unittest.TestCase):
         self.assertEqual(
             Tiles.array_to_one_line_string(result),
             '147m258p369s1234z'
+        )
+
+    def test_hand_division_miscellaneous(self):
+        tiles = Tiles.string_to_array(pin="99", honours="77")
+        win_tile = tile_constants.NINE_PIN
+        melds = [
+            Meld(Meld.PON, tiles="111z"),
+            Meld(Meld.CHII, tiles="123p"),
+            Meld(Meld.CHII, tiles="123p"),
+        ]
+
+        result = HandDivider.divide_hand(tiles, win_tile, melds)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(
+            [Tiles.array_to_one_line_string(item) for item in result[0]],
+            ['123p', '123p', '999p', '111z', '77z']
         )
 
 

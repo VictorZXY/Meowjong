@@ -1,4 +1,3 @@
-
 from hand_calculation.yaku import Yaku
 
 
@@ -22,4 +21,4 @@ class Riichi(Yaku):
         self.is_yakuman = False
 
     def is_condition_met(self, hand, *args):
-        return hand.is_riichi
+        return hand.is_menzen and hand.is_riichi

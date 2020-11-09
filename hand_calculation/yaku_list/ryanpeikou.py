@@ -24,7 +24,10 @@ class Ryanpeikou(Yaku):
 
         self.is_yakuman = False
 
-    def is_condition_met(self, hand: List[List[int]], *args):
+    def is_condition_met(self, hand: List[List[int]], hand_config, *args):
+        if not hand_config.is_menzen:
+            return False
+
         shuntsu_set = [item for item in hand if Tiles.is_shuntsu(item)]
 
         identical_shuntsu_counts = []

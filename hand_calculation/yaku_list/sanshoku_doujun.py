@@ -36,7 +36,7 @@ class SanshokuDoujun(Yaku):
         for item in shuntsu_set:
             indices = Tiles.array_to_indices(item)
             if ONE_MAN <= indices[0] <= NINE_MAN:
-                man_shuntsu_set.append([i % ONE_MAN for i in indices])
+                man_shuntsu_set.append([i for i in indices])
             elif ONE_PIN <= Tiles.array_to_indices(item)[0] <= NINE_PIN:
                 pin_shuntsu_set.append([i % ONE_PIN for i in indices])
             elif ONE_SOU <= Tiles.array_to_indices(item)[0] <= NINE_SOU:

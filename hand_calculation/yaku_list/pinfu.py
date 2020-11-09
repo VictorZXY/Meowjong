@@ -34,9 +34,19 @@ class Pinfu(Yaku):
         :param win_tile: Integer index
         :param win_group: 34-array
         :param hand_config: HandConfig object
-        :param melds: Meld object
+        :param melds: List of Meld objects
         :return: Boolean
         """
-        fu_details = Fu.calculate_fu(hand, win_tile, win_group, hand_config,
-                                     melds)
-        return len(hand) == 5 and len(fu_details) == 1 and (melds is None or [])
+        fu_details, _ = Fu.calculate_fu(hand, win_tile, win_group, hand_config,
+                                        melds)
+        if len(hand) == 5 and hand_config.is_menzen:
+            if len(fu_details) == 1:
+                return True
+            elif len(fu_details) == 2 \
+                    and fu_details == [{'fu': 20, 'reason': Fu.BASE},
+                                       {'fu': 10, 'reason': Fu.MENZEN_RON}]:
+                return True
+            else:
+                return False
+        else:
+            return False

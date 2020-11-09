@@ -1,8 +1,7 @@
 from functools import reduce
 from typing import List
 
-
-from hand_calculation.tile_constants import ONE_MAN, ONE_PIN, ONE_SOU, MANZU, \
+from hand_calculation.tile_constants import NINE_MAN, ONE_PIN, ONE_SOU, MANZU, \
     PINZU, SOUZU, HONOURS
 from hand_calculation.tiles import Tiles
 from hand_calculation.yaku import Yaku
@@ -63,7 +62,7 @@ class ChuurenPoutou(Yaku):
             return False
 
         if man_sets_count != 0:
-            mod_base = ONE_MAN
+            mod_base = NINE_MAN + 1
         elif pin_sets_count != 0:
             mod_base = ONE_PIN
         else:  # if sou_sets_count != 0:

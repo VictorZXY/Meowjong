@@ -1,20 +1,29 @@
 class Score:
+    MANGAN = 'Mangan'
+    HANEMAN = 'Haneman'
+    BAIMAN = 'Baiman'
+    SANBAIMAN = 'Sanbaiman'
+    KAZOE_YAKUMAN = 'Kazoe Yakuman'
+    YAKUMAN = 'Yakuman'
+    DOUBLE_YAKUMAN = 'Double Yakuman'
+    TRIPLE_YAKUMAN = 'Triple Yakuman'
+
     @staticmethod
     def calculate_score(han, fu, hand_config):
         if han >= 13:
-            yaku_level = 'Kazoe Yakuman'
+            yaku_level = Score.KAZOE_YAKUMAN
             base_points = 8000
         elif 11 <= han <= 12:
-            yaku_level = 'Sanbaiman'
+            yaku_level = Score.SANBAIMAN
             base_points = 6000
         elif 8 <= han <= 10:
-            yaku_level = 'Baiman'
+            yaku_level = Score.BAIMAN
             base_points = 4000
         elif 6 <= han <= 7:
-            yaku_level = 'Haneman'
+            yaku_level = Score.HANEMAN
             base_points = 3000
         elif han == 5 or (han == 4 and fu >= 40) or (han == 3 and fu >= 70):
-            yaku_level = 'Mangan'
+            yaku_level = Score.MANGAN
             base_points = 2000
         else:
             yaku_level = ''
@@ -54,11 +63,11 @@ class Score:
     @staticmethod
     def calculate_yakuman_score(yakuman_list, hand_config):
         if len(yakuman_list) == 1:
-            yaku_level = 'Yakuman'
+            yaku_level = Score.YAKUMAN
         elif len(yakuman_list) == 2:
-            yaku_level = 'Double Yakuman'
+            yaku_level = Score.DOUBLE_YAKUMAN
         elif len(yakuman_list) == 3:
-            yaku_level = 'Triple Yakuman'
+            yaku_level = Score.TRIPLE_YAKUMAN
         else:
             yaku_level = str(len(yakuman_list)) + 'x Yakuman'
 
