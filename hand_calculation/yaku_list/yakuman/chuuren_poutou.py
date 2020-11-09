@@ -85,4 +85,7 @@ class ChuurenPoutou(Yaku):
         indices.remove(0)
         indices.remove(8)
         indices.remove(8)
-        return reduce(lambda x, y: x * y, indices) == 2
+        for i in range(9):
+            if i in indices:
+                indices.remove(i)
+        return len(indices) == 1

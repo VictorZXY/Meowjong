@@ -116,20 +116,26 @@ class HandCalculator:
                             yakuman_list=temp_han_details,
                             hand_config=hand_config
                         )
+                        if temp_score['score'] > max_score:
+                            han_details = temp_han_details
+                            han = temp_han
+                            fu_details = temp_fu_details
+                            fu = temp_fu
+                            max_score = temp_score['score']
+                            yaku_level = temp_score['yaku_level']
                     else:
                         temp_score = Score.calculate_score(
                             han=temp_han + dora_count,
                             fu=temp_fu,
                             hand_config=hand_config
                         )
-
-                    if temp_score['score'] > max_score:
-                        han_details = temp_han_details + dora_details
-                        han = temp_han + dora_count
-                        fu_details = temp_fu_details
-                        fu = temp_fu
-                        max_score = temp_score['score']
-                        yaku_level = temp_score['yaku_level']
+                        if temp_score['score'] > max_score:
+                            han_details = temp_han_details + dora_details
+                            han = temp_han + dora_count
+                            fu_details = temp_fu_details
+                            fu = temp_fu
+                            max_score = temp_score['score']
+                            yaku_level = temp_score['yaku_level']
 
         if han == 0:
             raise NoYakuError

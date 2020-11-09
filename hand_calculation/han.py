@@ -157,9 +157,7 @@ class Han:
 
         yaku_list = []
 
-        ########################################################################
-        # HandConfig-related yaku                                              #
-        ########################################################################
+        # HandConfig-related yaku
 
         # riichi, double riichi, and ippatsu
         if hand_config.yaku.double_riichi.is_condition_met(hand_config):
@@ -196,163 +194,161 @@ class Han:
             return [{'han': 5,
                      'reason': hand_config.yaku.nagashi_mangan.name}], 5, False
 
-        ########################################################################
-        # Non-standard hand (kokushi musou and chiitoitsu)                     #
-        ########################################################################
-
         # kokushi musou and koukushi musou 13-men
-        if hand_config.yaku.kokushi_musou.is_condition_met(hand):
-            if hand_config.yaku.kokushi_musou_13_men.is_condition_met(
-                    hand, win_tile):
-                yaku_list.append(hand_config.yaku.kokushi_musou_13_men)
+        if isinstance(hand[0], int):
+            if hand_config.yaku.kokushi_musou.is_condition_met(hand):
+                if hand_config.yaku.kokushi_musou_13_men.is_condition_met(
+                        hand, win_tile):
+                    yaku_list.append(hand_config.yaku.kokushi_musou_13_men)
+                else:
+                    yaku_list.append(hand_config.yaku.kokushi_musou)
             else:
-                yaku_list.append(hand_config.yaku.kokushi_musou)
-        elif isinstance(hand[0], int):
-            return [], 0, False
-        # chiitoitsu
-        elif hand_config.yaku.chiitoitsu.is_condition_met(hand):
-            yaku_list.append(hand_config.yaku.chiitoitsu)
-
-        ########################################################################
-        # Standard hand (4 mentsu + 1 pair)                                    #
-        ########################################################################
-
+                return [], 0, False
         else:
-            shuntsu_set = [item for item in hand if Tiles.is_shuntsu(item)]
-            koutsu_set = [item for item in hand
-                          if Tiles.is_koutsu(item) or Tiles.is_kantsu(item)]
+            # chiitoitsu
+            if hand_config.yaku.chiitoitsu.is_condition_met(hand):
+                yaku_list.append(hand_config.yaku.chiitoitsu)
 
-            # yaku that require at least one shuntsu
-            if shuntsu_set:
-                # pinfu
-                if hand_config.yaku.pinfu.is_condition_met(
-                        hand, win_tile, win_group, hand_config, melds):
-                    yaku_list.append(hand_config.yaku.pinfu)
+            # Standard hand (4 mentsu + 1 pair)
+            else:
+                shuntsu_set = [item for item in hand if Tiles.is_shuntsu(item)]
+                koutsu_set = [item for item in hand
+                              if Tiles.is_koutsu(item) or Tiles.is_kantsu(item)]
 
-                # ippeikou and ryanpeikou
-                if hand_config.yaku.ryanpeikou.is_condition_met(
-                        hand, hand_config):
-                    yaku_list.append(hand_config.yaku.ryanpeikou)
-                elif hand_config.yaku.iipeikou.is_condition_met(
-                        hand, hand_config):
-                    yaku_list.append(hand_config.yaku.iipeikou)
+                # yaku that require at least one shuntsu
+                if shuntsu_set:
+                    # pinfu
+                    if hand_config.yaku.pinfu.is_condition_met(
+                            hand, win_tile, win_group, hand_config, melds):
+                        yaku_list.append(hand_config.yaku.pinfu)
 
-                # chanta and junchan
-                if hand_config.yaku.junchan.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.junchan)
-                elif hand_config.yaku.chanta.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.chanta)
+                    # ippeikou and ryanpeikou
+                    if hand_config.yaku.ryanpeikou.is_condition_met(
+                            hand, hand_config):
+                        yaku_list.append(hand_config.yaku.ryanpeikou)
+                    elif hand_config.yaku.iipeikou.is_condition_met(
+                            hand, hand_config):
+                        yaku_list.append(hand_config.yaku.iipeikou)
 
-                # ikkitsuukan
-                if hand_config.yaku.ikkitsuukan.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.ikkitsuukan)
+                    # chanta and junchan
+                    if hand_config.yaku.junchan.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.junchan)
+                    elif hand_config.yaku.chanta.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.chanta)
 
-                # sanshoku doujun
-                if hand_config.yaku.sanshoku_doujun.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.sanshoku_doujun)
+                    # ikkitsuukan
+                    if hand_config.yaku.ikkitsuukan.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.ikkitsuukan)
 
-            # yaku that require at least one koutsu/kantsu
-            if koutsu_set:
-                # yakuhai: seat wind
-                if hand_config.yaku.seat_wind.is_condition_met(
-                        hand, hand_config):
-                    yaku_list.append(hand_config.yaku.seat_wind)
+                    # sanshoku doujun
+                    if hand_config.yaku.sanshoku_doujun.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.sanshoku_doujun)
 
-                # yakuhai: prevalent wind
-                if hand_config.yaku.prevalent_wind.is_condition_met(
-                        hand, hand_config):
-                    yaku_list.append(hand_config.yaku.prevalent_wind)
+                # yaku that require at least one koutsu/kantsu
+                if koutsu_set:
+                    # yakuhai: seat wind
+                    if hand_config.yaku.seat_wind.is_condition_met(
+                            hand, hand_config):
+                        yaku_list.append(hand_config.yaku.seat_wind)
 
-                # yakuhai: haku
-                if hand_config.yaku.haku.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.haku)
+                    # yakuhai: prevalent wind
+                    if hand_config.yaku.prevalent_wind.is_condition_met(
+                            hand, hand_config):
+                        yaku_list.append(hand_config.yaku.prevalent_wind)
 
-                # yakuhai: hatsu
-                if hand_config.yaku.hatsu.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.hatsu)
+                    # yakuhai: haku
+                    if hand_config.yaku.haku.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.haku)
 
-                # yakuhai: chun
-                if hand_config.yaku.chun.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.chun)
+                    # yakuhai: hatsu
+                    if hand_config.yaku.hatsu.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.hatsu)
 
-                # shousangen and daisangen
-                if hand_config.yaku.daisangen.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.daisangen)
-                    yaku_list.remove(hand_config.yaku.haku)
-                    yaku_list.remove(hand_config.yaku.hatsu)
-                    yaku_list.remove(hand_config.yaku.chun)
-                elif hand_config.yaku.shousangen.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.shousangen)
+                    # yakuhai: chun
+                    if hand_config.yaku.chun.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.chun)
 
-                # shousuushii and daisuushii
-                if hand_config.yaku.daisuushii.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.daisuushii)
-                    yaku_list.remove(hand_config.yaku.seat_wind)
-                    yaku_list.remove(hand_config.yaku.prevalent_wind)
-                elif hand_config.yaku.shousuushii.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.shousuushii)
-                    yaku_list.remove(hand_config.yaku.seat_wind)
-                    yaku_list.remove(hand_config.yaku.prevalent_wind)
+                    # shousangen and daisangen
+                    if hand_config.yaku.daisangen.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.daisangen)
+                        yaku_list.remove(hand_config.yaku.haku)
+                        yaku_list.remove(hand_config.yaku.hatsu)
+                        yaku_list.remove(hand_config.yaku.chun)
+                    elif hand_config.yaku.shousangen.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.shousangen)
 
-                # sanshoku doukou
-                if hand_config.yaku.sanshoku_doukou.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.sanshoku_doukou)
+                    # shousuushii and daisuushii
+                    if hand_config.yaku.daisuushii.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.daisuushii)
+                        if hand_config.yaku.seat_wind in yaku_list:
+                            yaku_list.remove(hand_config.yaku.seat_wind)
+                        if hand_config.yaku.prevalent_wind in yaku_list:
+                            yaku_list.remove(hand_config.yaku.prevalent_wind)
+                    elif hand_config.yaku.shousuushii.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.shousuushii)
+                        if hand_config.yaku.seat_wind in yaku_list:
+                            yaku_list.remove(hand_config.yaku.seat_wind)
+                        if hand_config.yaku.prevalent_wind in yaku_list:
+                            yaku_list.remove(hand_config.yaku.prevalent_wind)
 
-                # toitoi
-                if hand_config.yaku.toitoihou.is_condition_met(hand):
-                    yaku_list.append(hand_config.yaku.toitoihou)
+                    # sanshoku doukou
+                    if hand_config.yaku.sanshoku_doukou.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.sanshoku_doukou)
 
-                # sanankou, suuankou, and suuankou tanki
-                if hand_config.yaku.suuankou_tanki.is_condition_met(
-                        hand, win_tile, hand_config):
-                    yaku_list.append(hand_config.yaku.suuankou_tanki)
-                elif hand_config.yaku.suuankou.is_condition_met(
-                        hand, win_tile, hand_config):
-                    yaku_list.append(hand_config.yaku.suuankou)
-                elif hand_config.yaku.sanankou.is_condition_met(
-                        hand, win_tile, hand_config, melds):
-                    yaku_list.append(hand_config.yaku.sanankou)
+                    # toitoi
+                    if hand_config.yaku.toitoihou.is_condition_met(hand):
+                        yaku_list.append(hand_config.yaku.toitoihou)
 
-                # sankantsu and suukantsu
-                if hand_config.yaku.suukantsu.is_condition_met(hand, melds):
-                    yaku_list.append(hand_config.yaku.suukantsu)
-                elif hand_config.yaku.sankantsu.is_condition_met(hand, melds):
-                    yaku_list.append(hand_config.yaku.sankantsu)
+                    # sanankou, suuankou, and suuankou tanki
+                    if hand_config.yaku.suuankou_tanki.is_condition_met(
+                            hand, win_tile, hand_config):
+                        yaku_list.append(hand_config.yaku.suuankou_tanki)
+                    elif hand_config.yaku.suuankou.is_condition_met(
+                            hand, win_tile, hand_config):
+                        yaku_list.append(hand_config.yaku.suuankou)
+                    elif hand_config.yaku.sanankou.is_condition_met(
+                            hand, win_tile, hand_config, melds):
+                        yaku_list.append(hand_config.yaku.sanankou)
 
-        ########################################################################
-        # Tiles-related yaku (tanyao, (chin/hon)-routou, (chin/hon)-itsu etc.) #
-        ########################################################################
+                    # sankantsu and suukantsu
+                    if hand_config.yaku.suukantsu.is_condition_met(hand, melds):
+                        yaku_list.append(hand_config.yaku.suukantsu)
+                    elif hand_config.yaku.sankantsu.is_condition_met(hand,
+                                                                     melds):
+                        yaku_list.append(hand_config.yaku.sankantsu)
 
-        # tanyao, chinroutou, and honroutou
-        if hand_config.yaku.tanyao.is_condition_met(hand):
-            yaku_list.append(hand_config.yaku.tanyao)
-        elif hand_config.yaku.chinroutou.is_condition_met(hand):
-            yaku_list.append(hand_config.yaku.chinroutou)
-        elif hand_config.yaku.honroutou.is_condition_met(hand):
-            yaku_list.append(hand_config.yaku.honroutou)
+            # Tiles-related yaku (tanyao, chinitsu, etc.)
 
-        # chinitsu (including tsuuiisou, ryuuiisou and (junsei) chuuren poutou)
-        if hand_config.yaku.chinitsu.is_condition_met(hand):
+            # tanyao, chinroutou, and honroutou
+            if hand_config.yaku.tanyao.is_condition_met(hand):
+                yaku_list.append(hand_config.yaku.tanyao)
+            elif hand_config.yaku.chinroutou.is_condition_met(hand):
+                yaku_list.append(hand_config.yaku.chinroutou)
+            elif hand_config.yaku.honroutou.is_condition_met(hand):
+                yaku_list.append(hand_config.yaku.honroutou)
+
             # tsuuiisou
             if hand_config.yaku.tsuuiisou.is_condition_met(hand):
                 yaku_list.append(hand_config.yaku.tsuuiisou)
             # ryuuiisou
             elif hand_config.yaku.ryuuiisou.is_condition_met(hand):
                 yaku_list.append(hand_config.yaku.ryuuiisou)
-            # chuuren poutou and junsei chuuren poutou
-            elif hand_config.yaku.chuuren_poutou.is_condition_met(
-                    hand, hand_config):
-                if hand_config.yaku.junsei_chuuren_poutou.is_condition_met(
-                        hand, win_tile, hand_config):
-                    yaku_list.append(hand_config.yaku.junsei_chuuren_poutou)
+            # chinitsu, chuuren poutou, and junsei chuuren poutou
+            elif hand_config.yaku.chinitsu.is_condition_met(hand):
+                # chuuren poutou and junsei chuuren poutou
+                if hand_config.yaku.chuuren_poutou.is_condition_met(
+                        hand, hand_config):
+                    if hand_config.yaku.junsei_chuuren_poutou.is_condition_met(
+                            hand, win_tile, hand_config):
+                        yaku_list.append(hand_config.yaku.junsei_chuuren_poutou)
+                    else:
+                        yaku_list.append(hand_config.yaku.chuuren_poutou)
+                # chinitsu
                 else:
-                    yaku_list.append(hand_config.yaku.chuuren_poutou)
-            # chinitsu
-            else:
-                yaku_list.append(hand_config.yaku.chinitsu)
-        # honitsu
-        elif hand_config.yaku.honitsu.is_condition_met(hand):
-            yaku_list.append(hand_config.yaku.honitsu)
+                    yaku_list.append(hand_config.yaku.chinitsu)
+            # honitsu
+            elif hand_config.yaku.honitsu.is_condition_met(hand):
+                yaku_list.append(hand_config.yaku.honitsu)
 
         # deal with yakuman
         is_yakuman = False

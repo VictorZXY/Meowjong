@@ -97,6 +97,9 @@ class Tiles:
         result = [0] * 34
         for index in indices:
             result[index] += 1
+        for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
+            if result[index] == 4:
+                result[index] = 7
         return result
 
     @staticmethod

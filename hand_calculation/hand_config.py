@@ -49,8 +49,8 @@ class HandConfig:
                  honba_number=0):
         self.yaku = YakuConfig()
 
-        self.is_menzen = is_menzen
-        self.is_tsumo = is_tsumo
+        self.is_menzen = is_menzen or is_tenhou or is_chiihou
+        self.is_tsumo = is_tsumo or is_tenhou or is_chiihou
         self.is_riichi = is_riichi
         self.is_ippatsu = is_ippatsu
         self.is_rinshan = is_rinshan
@@ -65,7 +65,7 @@ class HandConfig:
         self.is_sanma = is_sanma
         self.seat_wind = seat_wind
         self.prevalent_wind = prevalent_wind
-        self.is_dealer = (seat_wind == EAST)
+        self.is_dealer = (seat_wind == EAST) or is_tenhou or (not is_chiihou)
 
         self.deposit_number = deposit_number
         self.honba_number = honba_number

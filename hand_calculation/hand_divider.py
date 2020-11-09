@@ -22,31 +22,30 @@ class HandDivider:
         :param melds: Melds represented by a list of Meld objects
         :return: A list of lists of 34-arrays
         """
-        # remove dora from all tiles
         tiles = private_tiles[:]
         if win_tile is not None:
             if win_tile == RED_FIVE_MAN:
-                tiles[FIVE_MAN] += 1
+                tiles[FIVE_MAN] += RED_DORA_VALUE
             elif win_tile == RED_FIVE_PIN:
-                tiles[FIVE_PIN] += 1
+                tiles[FIVE_PIN] += RED_DORA_VALUE
             elif win_tile == RED_FIVE_SOU:
-                tiles[FIVE_SOU] += 1
+                tiles[FIVE_SOU] += RED_DORA_VALUE
             else:
                 tiles[win_tile] += 1
-        for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
-            if tiles[index] >= RED_DORA_VALUE:
-                tiles[index] = tiles[index] // RED_DORA_VALUE \
-                               + tiles[index] % RED_DORA_VALUE
+        # for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
+        #     if tiles[index] >= RED_DORA_VALUE:
+        #         tiles[index] = tiles[index] // RED_DORA_VALUE \
+        #                        + tiles[index] % RED_DORA_VALUE
 
         if melds is None:
             melds = []
         else:
             melds = HandDivider.convert_melds_to_list(melds)
-            for meld in melds:
-                for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
-                    if meld[index] >= RED_DORA_VALUE:
-                        meld[index] = meld[index] // RED_DORA_VALUE \
-                                      + meld[index] % RED_DORA_VALUE
+            # for meld in melds:
+            #     for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
+            #         if meld[index] >= RED_DORA_VALUE:
+            #             meld[index] = meld[index] // RED_DORA_VALUE \
+            #                           + meld[index] % RED_DORA_VALUE
 
         divisions = []
 
