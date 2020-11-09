@@ -341,15 +341,6 @@ class HandCalculatorTestCase(unittest.TestCase):
             HandCalculator.calculate_hand_score, tiles, win_tile, melds
         )
 
-    def test_riichi(self):
-        tiles = Tiles.string_to_array(sou="12344", man="234456", pin="66")
-        win_tile = self.__string_to_tile_index(sou="4")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, hand_config=HandConfig(is_riichi=True))
-        self.assertEqual(result['han'], 1)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
     def test_menzen_tsumo(self):
         tiles = Tiles.string_to_array(sou="12344", man="234456", pin="66")
         win_tile = self.__string_to_tile_index(sou="4")
@@ -358,6 +349,15 @@ class HandCalculatorTestCase(unittest.TestCase):
             hand_config=HandConfig(is_menzen=True, is_tsumo=True))
         self.assertEqual(result['han'], 1)
         self.assertEqual(result['fu'], 30)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_riichi(self):
+        tiles = Tiles.string_to_array(sou="12344", man="234456", pin="66")
+        win_tile = self.__string_to_tile_index(sou="4")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, hand_config=HandConfig(is_riichi=True))
+        self.assertEqual(result['han'], 1)
+        self.assertEqual(result['fu'], 40)
         self.assertEqual(len(result['han_details']), 1)
 
     def test_ippatsu(self):
@@ -370,20 +370,20 @@ class HandCalculatorTestCase(unittest.TestCase):
         self.assertEqual(result['fu'], 40)
         self.assertEqual(len(result['han_details']), 2)
 
-    def test_rinshan(self):
-        tiles = Tiles.string_to_array(sou="12344", man="234456", pin="66")
-        win_tile = self.__string_to_tile_index(sou="4")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, hand_config=HandConfig(is_rinshan=True))
-        self.assertEqual(result['han'], 1)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
     def test_chankan(self):
         tiles = Tiles.string_to_array(sou="12344", man="234456", pin="66")
         win_tile = self.__string_to_tile_index(sou="4")
         result = HandCalculator.calculate_hand_score(
             tiles, win_tile, hand_config=HandConfig(is_chankan=True))
+        self.assertEqual(result['han'], 1)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_rinshan(self):
+        tiles = Tiles.string_to_array(sou="12344", man="234456", pin="66")
+        win_tile = self.__string_to_tile_index(sou="4")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, hand_config=HandConfig(is_rinshan=True))
         self.assertEqual(result['han'], 1)
         self.assertEqual(result['fu'], 40)
         self.assertEqual(len(result['han_details']), 1)
@@ -402,382 +402,6 @@ class HandCalculatorTestCase(unittest.TestCase):
         win_tile = self.__string_to_tile_index(sou="4")
         result = HandCalculator.calculate_hand_score(
             tiles, win_tile, hand_config=HandConfig(is_houtei=True))
-        self.assertEqual(result['han'], 1)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_double_riichi(self):
-        tiles = Tiles.string_to_array(sou="12344", man="234456", pin="66")
-        win_tile = self.__string_to_tile_index(sou="4")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile,
-            hand_config=HandConfig(is_double_riichi=True, is_riichi=True))
-        self.assertEqual(result['han'], 2)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_nagashi_mangan(self):
-        tiles = Tiles.string_to_array(sou="13579", man="234456", pin="66")
-        result = HandCalculator.calculate_hand_score(
-            tiles, None, hand_config=HandConfig(is_nagashi_mangan=True))
-        self.assertEqual(result['han'], 5)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_chiitoitsu(self):
-        tiles = Tiles.string_to_array(sou="113355", man="113355", pin="1")
-        win_tile = self.__string_to_tile_index(pin="1")
-        result = HandCalculator.calculate_hand_score(tiles, win_tile)
-        self.assertEqual(result['han'], 2)
-        self.assertEqual(result['fu'], 25)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_tanyao(self):
-        tiles = Tiles.string_to_array(sou="234567", man="23456", pin="22")
-        win_tile = self.__string_to_tile_index(man="7")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile,
-            hand_config=HandConfig(is_tsumo=False, is_riichi=True)
-        )
-        self.assertEqual(result['han'], 3)
-        self.assertEqual(result['fu'], 30)
-        self.assertEqual(len(result['han_details']), 3)
-
-        tiles = Tiles.string_to_array(sou="567", man="23456", pin="22")
-        win_tile = self.__string_to_tile_index(man="7")
-        melds = [self.__make_meld(Meld.CHII, sou="234")]
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds,
-            hand_config=HandConfig()
-        )
-        self.assertEqual(result['han'], 1)
-        self.assertEqual(result['fu'], 30)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_pinfu(self):
-        seat_wind, prevalent_wind = EAST, WEST
-
-        tiles = Tiles.string_to_array(sou="123456", man="12345", pin="55")
-        win_tile = self.__string_to_tile_index(man="6")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile,
-            hand_config=HandConfig(seat_wind=seat_wind,
-                                   prevalent_wind=prevalent_wind)
-        )
-        self.assertEqual(result['han'], 1)
-        self.assertEqual(result['fu'], 30)
-        self.assertEqual(len(result['han_details']), 1)
-
-        # waiting in two pairs
-        tiles = Tiles.string_to_array(sou="123456", man="12355", pin="55")
-        win_tile = self.__string_to_tile_index(man="5")
-        self.assertRaises(NoYakuError,
-                          HandCalculator.calculate_hand_score, tiles, win_tile)
-
-        # contains pon or kan
-        tiles = Tiles.string_to_array(sou="111456", man="12345", pin="55")
-        win_tile = self.__string_to_tile_index(man="6")
-        self.assertRaises(NoYakuError,
-                          HandCalculator.calculate_hand_score, tiles, win_tile)
-
-        # edge wait
-        tiles = Tiles.string_to_array(sou="12456", man="123456", pin="55")
-        win_tile = self.__string_to_tile_index(sou="3")
-        self.assertRaises(NoYakuError,
-                          HandCalculator.calculate_hand_score, tiles, win_tile)
-
-        # closed wait
-        tiles = Tiles.string_to_array(sou="12357", man="123456", pin="55")
-        win_tile = self.__string_to_tile_index(sou="6")
-        self.assertRaises(NoYakuError,
-                          HandCalculator.calculate_hand_score, tiles, win_tile)
-
-        # pair wait
-        tiles = Tiles.string_to_array(man="2456678", pin="123678")
-        win_tile = self.__string_to_tile_index(man="2")
-        self.assertRaises(NoYakuError,
-                          HandCalculator.calculate_hand_score, tiles, win_tile)
-
-        # valued pair
-        tiles = Tiles.string_to_array(sou="12378", man="123456", honours="11")
-        win_tile = self.__string_to_tile_index(sou="6")
-        self.assertRaises(
-            NoYakuError,
-            HandCalculator.calculate_hand_score, tiles, win_tile,
-            hand_config=HandConfig(seat_wind=seat_wind,
-                                   prevalent_wind=prevalent_wind)
-        )
-
-        # not valued pair
-        tiles = Tiles.string_to_array(sou="12378", man="123456", honours="22")
-        win_tile = self.__string_to_tile_index(sou="6")
-        result = HandCalculator.calculate_hand_score(tiles, win_tile)
-        self.assertEqual(result['han'], 1)
-        self.assertEqual(result['fu'], 30)
-        self.assertEqual(len(result['han_details']), 1)
-
-        # open hand
-        tiles = Tiles.string_to_array(sou="99", man="23456", pin="456")
-        win_tile = self.__string_to_tile_index(man="1")
-        melds = [self.__make_meld(Meld.CHII, sou="123")]
-        self.assertRaises(
-            NoYakuError,
-            HandCalculator.calculate_hand_score, tiles, win_tile, melds=melds
-        )
-
-    def test_iipeiko(self):
-        tiles = Tiles.string_to_array(sou="112233", man="33", pin="12344")
-        win_tile = self.__string_to_tile_index(man="3")
-        result = HandCalculator.calculate_hand_score(tiles, win_tile)
-        self.assertEqual(result['han'], 1)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-        tiles = Tiles.string_to_array(sou="123", man="33", pin="12344")
-        melds = [self.__make_meld(Meld.CHII, sou="123")]
-        self.assertRaises(
-            NoYakuError,
-            HandCalculator.calculate_hand_score, tiles, win_tile, melds=melds
-        )
-
-        tiles = Tiles.string_to_array(sou="112233", man="33", pin="44")
-        melds = [self.__make_meld(Meld.CHII, pin="123")]
-        self.assertRaises(
-            NoYakuError,
-            HandCalculator.calculate_hand_score, tiles, win_tile, melds=melds
-        )
-
-    def test_ryanpeiko(self):
-        tiles = Tiles.string_to_array(sou="112233", man="33", pin="22344")
-        win_tile = self.__string_to_tile_index(pin="3")
-        result = HandCalculator.calculate_hand_score(tiles, win_tile)
-        self.assertEqual(result['han'], 3)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-        tiles = Tiles.string_to_array(sou="123", man="33", pin="22344")
-        melds = [self.__make_meld(Meld.CHII, sou="123")]
-        self.assertRaises(
-            NoYakuError,
-            HandCalculator.calculate_hand_score, tiles, win_tile, melds=melds
-        )
-
-    def test_sanshoku_doujun(self):
-        tiles = Tiles.string_to_array(sou="123456", man="1399", pin="123")
-        win_tile = self.__string_to_tile_index(man="2")
-        result = HandCalculator.calculate_hand_score(tiles, win_tile)
-        self.assertEqual(result['han'], 2)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-        tiles = Tiles.string_to_array(sou="456", man="1399", pin="123")
-        melds = [self.__make_meld(Meld.CHII, sou="123")]
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds)
-        self.assertEqual(result['han'], 1)
-        self.assertEqual(result['fu'], 30)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_sanshoku_doukou(self):
-        tiles = Tiles.string_to_array(man="222", pin="2224569")
-        melds = [self.__make_meld(Meld.CHII, sou="222")]
-        win_tile = self.__string_to_tile_index(pin="9")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds)
-        self.assertEqual(result['han'], 2)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_toitoi(self):
-        tiles = Tiles.string_to_array(man="333", pin="4455")
-        melds = [self.__make_meld(Meld.PON, sou="111"),
-                 self.__make_meld(Meld.PON, sou="333")]
-        win_tile = self.__string_to_tile_index(pin="5")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds)
-        self.assertEqual(result['han'], 2)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-        tiles = Tiles.string_to_array(pin="77788899", honours="44")
-        melds = [self.__make_meld(Meld.PON, sou="777")]
-        win_tile = self.__string_to_tile_index(pin="9")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds)
-        self.assertEqual(result['han'], 2)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_sankantsu(self):
-        tiles = Tiles.string_to_array(man="12", pin="44")
-        melds = [
-            self.__make_meld(Meld.KAN, sou="1111"),
-            self.__make_meld(Meld.KAN, sou="3333"),
-            self.__make_meld(Meld.KAN, pin="6666"),
-        ]
-        win_tile = self.__string_to_tile_index(man="3")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds)
-        self.assertEqual(result['han'], 2)
-        self.assertEqual(result['fu'], 60)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_honroutou(self):
-        tiles = Tiles.string_to_array(sou="999", man="111", honours="1122")
-        win_tile = self.__string_to_tile_index(honours="2")
-        melds = [self.__make_meld(Meld.PON, sou="111")]
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds)
-        self.assertEqual(result['han'], 4)
-        self.assertEqual(result['fu'], 50)
-        self.assertEqual(len(result['han_details']), 2)
-
-        tiles = Tiles.string_to_array(pin="11", honours="22334466", man="199")
-        win_tile = self.__string_to_tile_index(man="1")
-        result = HandCalculator.calculate_hand_score(tiles, win_tile)
-        self.assertEqual(result['fu'], 25)
-        self.assertEqual(result['han'], 4)
-
-    def test_sanankou(self):
-        tiles = Tiles.string_to_array(sou="444", man="333", pin="4455")
-        melds = [self.__make_meld(Meld.CHII, sou="123")]
-        win_tile = self.__string_to_tile_index(pin="5")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds, hand_config=HandConfig(is_tsumo=True))
-        self.assertEqual(result['han'], 2)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_shousangen(self):
-        tiles = Tiles.string_to_array(sou="123", man="345", honours="5566677")
-        win_tile = self.__string_to_tile_index(honours="7")
-        result = HandCalculator.calculate_hand_score(tiles, win_tile)
-        self.assertEqual(result['han'], 4)
-        self.assertEqual(result['fu'], 50)
-        self.assertEqual(len(result['han_details']), 3)
-
-    def test_chanta(self):
-        tiles = Tiles.string_to_array(sou="123", man="123789", honours="2233")
-        win_tile = self.__string_to_tile_index(honours="3")
-        result = HandCalculator.calculate_hand_score(tiles, win_tile)
-        self.assertEqual(result['han'], 2)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-        tiles = Tiles.string_to_array(man="123789", honours="2233")
-        melds = [self.__make_meld(Meld.CHII, sou="123")]
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds)
-        self.assertEqual(result['han'], 1)
-        self.assertEqual(result['fu'], 30)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_junchan(self):
-        tiles = Tiles.string_to_array(sou="789", man="13789", pin="12399")
-        win_tile = self.__string_to_tile_index(man="2")
-        result = HandCalculator.calculate_hand_score(tiles, win_tile)
-        self.assertEqual(result['han'], 3)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-        tiles = Tiles.string_to_array(man="13789", pin="12399")
-        melds = [self.__make_meld(Meld.CHII, sou="789")]
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds)
-        self.assertEqual(result['han'], 2)
-        self.assertEqual(result['fu'], 30)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_honitsu(self):
-        tiles = Tiles.string_to_array(man="123455667", honours="1112")
-        win_tile = self.__string_to_tile_index(honours="2")
-        result = HandCalculator.calculate_hand_score(tiles, win_tile)
-        self.assertEqual(result['han'], 3)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-        tiles = Tiles.string_to_array(man="455667", honours="1112")
-        melds = [self.__make_meld(Meld.CHII, man="123")]
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds)
-        self.assertEqual(result['han'], 2)
-        self.assertEqual(result['fu'], 30)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_chinitsu(self):
-        tiles = Tiles.string_to_array(man="1234567677889")
-        win_tile = self.__string_to_tile_index(man="1")
-        result = HandCalculator.calculate_hand_score(tiles, win_tile)
-        self.assertEqual(result['han'], 6)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-        tiles = Tiles.string_to_array(man="1234567789")
-        melds = [self.__make_meld(Meld.CHII, man="678")]
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds)
-        self.assertEqual(result['han'], 5)
-        self.assertEqual(result['fu'], 30)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_ikkitsuukan(self):
-        hand_config = HandConfig()
-
-        tiles = Tiles.string_to_array(man="123456789", sou="123", honours="22")
-        self.assertTrue(hand_config.yaku.ikkitsuukan.is_condition_met(
-            HandDivider.divide_hand(tiles)[0]))
-
-        tiles = Tiles.string_to_array(man="112233456789", honours="22")
-        self.assertTrue(hand_config.yaku.ikkitsuukan.is_condition_met(
-            HandDivider.divide_hand(tiles)[0]))
-
-        tiles = Tiles.string_to_array(man="122334567789", honours="11")
-        self.assertFalse(hand_config.yaku.ikkitsuukan.is_condition_met(
-            HandDivider.divide_hand(tiles)[0]))
-
-        tiles = Tiles.string_to_array(man="123456789", sou="12", honours="22")
-        win_tile = self.__string_to_tile_index(sou="3")
-        result = HandCalculator.calculate_hand_score(tiles, win_tile)
-        self.assertEqual(result['han'], 2)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-        tiles = Tiles.string_to_array(man="456789", sou="12", honours="22")
-        melds = [self.__make_meld(Meld.CHII, man="123")]
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile, melds=melds)
-        self.assertEqual(result['han'], 1)
-        self.assertEqual(result['fu'], 30)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_haku(self):
-        tiles = Tiles.string_to_array(sou="234567", man="23422", honours="55")
-        win_tile = self.__string_to_tile_index(honours="5")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile,
-            hand_config=HandConfig(is_tsumo=False, is_riichi=False)
-        )
-        self.assertEqual(result['han'], 1)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_hatsu(self):
-        tiles = Tiles.string_to_array(sou="234567", man="23422", honours="66")
-        win_tile = self.__string_to_tile_index(honours="6")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile,
-            hand_config=HandConfig(is_tsumo=False, is_riichi=False)
-        )
-        self.assertEqual(result['han'], 1)
-        self.assertEqual(result['fu'], 40)
-        self.assertEqual(len(result['han_details']), 1)
-
-    def test_chun(self):
-        tiles = Tiles.string_to_array(sou="234567", man="23422", honours="77")
-        win_tile = self.__string_to_tile_index(honours="7")
-        result = HandCalculator.calculate_hand_score(
-            tiles, win_tile,
-            hand_config=HandConfig(is_tsumo=False, is_riichi=False)
-        )
         self.assertEqual(result['han'], 1)
         self.assertEqual(result['fu'], 40)
         self.assertEqual(len(result['han_details']), 1)
@@ -901,6 +525,382 @@ class HandCalculatorTestCase(unittest.TestCase):
         self.assertEqual(result['han'], 2)
         self.assertEqual(result['fu'], 40)
         self.assertEqual(len(result['han_details']), 2)
+
+    def test_haku(self):
+        tiles = Tiles.string_to_array(sou="234567", man="23422", honours="55")
+        win_tile = self.__string_to_tile_index(honours="5")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile,
+            hand_config=HandConfig(is_tsumo=False, is_riichi=False)
+        )
+        self.assertEqual(result['han'], 1)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_hatsu(self):
+        tiles = Tiles.string_to_array(sou="234567", man="23422", honours="66")
+        win_tile = self.__string_to_tile_index(honours="6")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile,
+            hand_config=HandConfig(is_tsumo=False, is_riichi=False)
+        )
+        self.assertEqual(result['han'], 1)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_chun(self):
+        tiles = Tiles.string_to_array(sou="234567", man="23422", honours="77")
+        win_tile = self.__string_to_tile_index(honours="7")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile,
+            hand_config=HandConfig(is_tsumo=False, is_riichi=False)
+        )
+        self.assertEqual(result['han'], 1)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_tanyao(self):
+        tiles = Tiles.string_to_array(sou="234567", man="23456", pin="22")
+        win_tile = self.__string_to_tile_index(man="7")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile,
+            hand_config=HandConfig(is_tsumo=False, is_riichi=True)
+        )
+        self.assertEqual(result['han'], 3)
+        self.assertEqual(result['fu'], 30)
+        self.assertEqual(len(result['han_details']), 3)
+
+        tiles = Tiles.string_to_array(sou="567", man="23456", pin="22")
+        win_tile = self.__string_to_tile_index(man="7")
+        melds = [self.__make_meld(Meld.CHII, sou="234")]
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds,
+            hand_config=HandConfig()
+        )
+        self.assertEqual(result['han'], 1)
+        self.assertEqual(result['fu'], 30)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_iipeiko(self):
+        tiles = Tiles.string_to_array(sou="112233", man="33", pin="12344")
+        win_tile = self.__string_to_tile_index(man="3")
+        result = HandCalculator.calculate_hand_score(tiles, win_tile)
+        self.assertEqual(result['han'], 1)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+        tiles = Tiles.string_to_array(sou="123", man="33", pin="12344")
+        melds = [self.__make_meld(Meld.CHII, sou="123")]
+        self.assertRaises(
+            NoYakuError,
+            HandCalculator.calculate_hand_score, tiles, win_tile, melds=melds
+        )
+
+        tiles = Tiles.string_to_array(sou="112233", man="33", pin="44")
+        melds = [self.__make_meld(Meld.CHII, pin="123")]
+        self.assertRaises(
+            NoYakuError,
+            HandCalculator.calculate_hand_score, tiles, win_tile, melds=melds
+        )
+
+    def test_pinfu(self):
+        seat_wind, prevalent_wind = EAST, WEST
+
+        tiles = Tiles.string_to_array(sou="123456", man="12345", pin="55")
+        win_tile = self.__string_to_tile_index(man="6")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile,
+            hand_config=HandConfig(seat_wind=seat_wind,
+                                   prevalent_wind=prevalent_wind)
+        )
+        self.assertEqual(result['han'], 1)
+        self.assertEqual(result['fu'], 30)
+        self.assertEqual(len(result['han_details']), 1)
+
+        # waiting in two pairs
+        tiles = Tiles.string_to_array(sou="123456", man="12355", pin="55")
+        win_tile = self.__string_to_tile_index(man="5")
+        self.assertRaises(NoYakuError,
+                          HandCalculator.calculate_hand_score, tiles, win_tile)
+
+        # contains pon or kan
+        tiles = Tiles.string_to_array(sou="111456", man="12345", pin="55")
+        win_tile = self.__string_to_tile_index(man="6")
+        self.assertRaises(NoYakuError,
+                          HandCalculator.calculate_hand_score, tiles, win_tile)
+
+        # edge wait
+        tiles = Tiles.string_to_array(sou="12456", man="123456", pin="55")
+        win_tile = self.__string_to_tile_index(sou="3")
+        self.assertRaises(NoYakuError,
+                          HandCalculator.calculate_hand_score, tiles, win_tile)
+
+        # closed wait
+        tiles = Tiles.string_to_array(sou="12357", man="123456", pin="55")
+        win_tile = self.__string_to_tile_index(sou="6")
+        self.assertRaises(NoYakuError,
+                          HandCalculator.calculate_hand_score, tiles, win_tile)
+
+        # pair wait
+        tiles = Tiles.string_to_array(man="2456678", pin="123678")
+        win_tile = self.__string_to_tile_index(man="2")
+        self.assertRaises(NoYakuError,
+                          HandCalculator.calculate_hand_score, tiles, win_tile)
+
+        # valued pair
+        tiles = Tiles.string_to_array(sou="12378", man="123456", honours="11")
+        win_tile = self.__string_to_tile_index(sou="6")
+        self.assertRaises(
+            NoYakuError,
+            HandCalculator.calculate_hand_score, tiles, win_tile,
+            hand_config=HandConfig(seat_wind=seat_wind,
+                                   prevalent_wind=prevalent_wind)
+        )
+
+        # not valued pair
+        tiles = Tiles.string_to_array(sou="12378", man="123456", honours="22")
+        win_tile = self.__string_to_tile_index(sou="6")
+        result = HandCalculator.calculate_hand_score(tiles, win_tile)
+        self.assertEqual(result['han'], 1)
+        self.assertEqual(result['fu'], 30)
+        self.assertEqual(len(result['han_details']), 1)
+
+        # open hand
+        tiles = Tiles.string_to_array(sou="99", man="23456", pin="456")
+        win_tile = self.__string_to_tile_index(man="1")
+        melds = [self.__make_meld(Meld.CHII, sou="123")]
+        self.assertRaises(
+            NoYakuError,
+            HandCalculator.calculate_hand_score, tiles, win_tile, melds=melds
+        )
+
+    def test_chanta(self):
+        tiles = Tiles.string_to_array(sou="123", man="123789", honours="2233")
+        win_tile = self.__string_to_tile_index(honours="3")
+        result = HandCalculator.calculate_hand_score(tiles, win_tile)
+        self.assertEqual(result['han'], 2)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+        tiles = Tiles.string_to_array(man="123789", honours="2233")
+        melds = [self.__make_meld(Meld.CHII, sou="123")]
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds)
+        self.assertEqual(result['han'], 1)
+        self.assertEqual(result['fu'], 30)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_ikkitsuukan(self):
+        hand_config = HandConfig()
+
+        tiles = Tiles.string_to_array(man="123456789", sou="123", honours="22")
+        self.assertTrue(hand_config.yaku.ikkitsuukan.is_condition_met(
+            HandDivider.divide_hand(tiles)[0]))
+
+        tiles = Tiles.string_to_array(man="112233456789", honours="22")
+        self.assertTrue(hand_config.yaku.ikkitsuukan.is_condition_met(
+            HandDivider.divide_hand(tiles)[0]))
+
+        tiles = Tiles.string_to_array(man="122334567789", honours="11")
+        self.assertFalse(hand_config.yaku.ikkitsuukan.is_condition_met(
+            HandDivider.divide_hand(tiles)[0]))
+
+        tiles = Tiles.string_to_array(man="123456789", sou="12", honours="22")
+        win_tile = self.__string_to_tile_index(sou="3")
+        result = HandCalculator.calculate_hand_score(tiles, win_tile)
+        self.assertEqual(result['han'], 2)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+        tiles = Tiles.string_to_array(man="456789", sou="12", honours="22")
+        melds = [self.__make_meld(Meld.CHII, man="123")]
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds)
+        self.assertEqual(result['han'], 1)
+        self.assertEqual(result['fu'], 30)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_sanshoku_doujun(self):
+        tiles = Tiles.string_to_array(sou="123456", man="1399", pin="123")
+        win_tile = self.__string_to_tile_index(man="2")
+        result = HandCalculator.calculate_hand_score(tiles, win_tile)
+        self.assertEqual(result['han'], 2)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+        tiles = Tiles.string_to_array(sou="456", man="1399", pin="123")
+        melds = [self.__make_meld(Meld.CHII, sou="123")]
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds)
+        self.assertEqual(result['han'], 1)
+        self.assertEqual(result['fu'], 30)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_sanshoku_doukou(self):
+        tiles = Tiles.string_to_array(man="222", pin="2224569")
+        melds = [self.__make_meld(Meld.CHII, sou="222")]
+        win_tile = self.__string_to_tile_index(pin="9")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds)
+        self.assertEqual(result['han'], 2)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_double_riichi(self):
+        tiles = Tiles.string_to_array(sou="12344", man="234456", pin="66")
+        win_tile = self.__string_to_tile_index(sou="4")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile,
+            hand_config=HandConfig(is_double_riichi=True, is_riichi=True))
+        self.assertEqual(result['han'], 2)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_toitoi(self):
+        tiles = Tiles.string_to_array(man="333", pin="4455")
+        melds = [self.__make_meld(Meld.PON, sou="111"),
+                 self.__make_meld(Meld.PON, sou="333")]
+        win_tile = self.__string_to_tile_index(pin="5")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds)
+        self.assertEqual(result['han'], 2)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+        tiles = Tiles.string_to_array(pin="77788899", honours="44")
+        melds = [self.__make_meld(Meld.PON, sou="777")]
+        win_tile = self.__string_to_tile_index(pin="9")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds)
+        self.assertEqual(result['han'], 2)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_sankantsu(self):
+        tiles = Tiles.string_to_array(man="12", pin="44")
+        melds = [
+            self.__make_meld(Meld.KAN, sou="1111"),
+            self.__make_meld(Meld.KAN, sou="3333"),
+            self.__make_meld(Meld.KAN, pin="6666"),
+        ]
+        win_tile = self.__string_to_tile_index(man="3")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds)
+        self.assertEqual(result['han'], 2)
+        self.assertEqual(result['fu'], 60)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_sanankou(self):
+        tiles = Tiles.string_to_array(sou="444", man="333", pin="4455")
+        melds = [self.__make_meld(Meld.CHII, sou="123")]
+        win_tile = self.__string_to_tile_index(pin="5")
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds, hand_config=HandConfig(is_tsumo=True))
+        self.assertEqual(result['han'], 2)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_shousangen(self):
+        tiles = Tiles.string_to_array(sou="123", man="345", honours="5566677")
+        win_tile = self.__string_to_tile_index(honours="7")
+        result = HandCalculator.calculate_hand_score(tiles, win_tile)
+        self.assertEqual(result['han'], 4)
+        self.assertEqual(result['fu'], 50)
+        self.assertEqual(len(result['han_details']), 3)
+
+    def test_honroutou(self):
+        tiles = Tiles.string_to_array(sou="999", man="111", honours="1122")
+        win_tile = self.__string_to_tile_index(honours="2")
+        melds = [self.__make_meld(Meld.PON, sou="111")]
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds)
+        self.assertEqual(result['han'], 4)
+        self.assertEqual(result['fu'], 50)
+        self.assertEqual(len(result['han_details']), 2)
+
+        tiles = Tiles.string_to_array(pin="11", honours="22334466", man="199")
+        win_tile = self.__string_to_tile_index(man="1")
+        result = HandCalculator.calculate_hand_score(tiles, win_tile)
+        self.assertEqual(result['fu'], 25)
+        self.assertEqual(result['han'], 4)
+
+    def test_chiitoitsu(self):
+        tiles = Tiles.string_to_array(sou="113355", man="113355", pin="1")
+        win_tile = self.__string_to_tile_index(pin="1")
+        result = HandCalculator.calculate_hand_score(tiles, win_tile)
+        self.assertEqual(result['han'], 2)
+        self.assertEqual(result['fu'], 25)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_junchan(self):
+        tiles = Tiles.string_to_array(sou="789", man="13789", pin="12399")
+        win_tile = self.__string_to_tile_index(man="2")
+        result = HandCalculator.calculate_hand_score(tiles, win_tile)
+        self.assertEqual(result['han'], 3)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+        tiles = Tiles.string_to_array(man="13789", pin="12399")
+        melds = [self.__make_meld(Meld.CHII, sou="789")]
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds)
+        self.assertEqual(result['han'], 2)
+        self.assertEqual(result['fu'], 30)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_honitsu(self):
+        tiles = Tiles.string_to_array(man="123455667", honours="1112")
+        win_tile = self.__string_to_tile_index(honours="2")
+        result = HandCalculator.calculate_hand_score(tiles, win_tile)
+        self.assertEqual(result['han'], 3)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+        tiles = Tiles.string_to_array(man="455667", honours="1112")
+        melds = [self.__make_meld(Meld.CHII, man="123")]
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds)
+        self.assertEqual(result['han'], 2)
+        self.assertEqual(result['fu'], 30)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_ryanpeiko(self):
+        tiles = Tiles.string_to_array(sou="112233", man="33", pin="22344")
+        win_tile = self.__string_to_tile_index(pin="3")
+        result = HandCalculator.calculate_hand_score(tiles, win_tile)
+        self.assertEqual(result['han'], 3)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+        tiles = Tiles.string_to_array(sou="123", man="33", pin="22344")
+        melds = [self.__make_meld(Meld.CHII, sou="123")]
+        self.assertRaises(
+            NoYakuError,
+            HandCalculator.calculate_hand_score, tiles, win_tile, melds=melds
+        )
+
+    def test_chinitsu(self):
+        tiles = Tiles.string_to_array(man="1234567677889")
+        win_tile = self.__string_to_tile_index(man="1")
+        result = HandCalculator.calculate_hand_score(tiles, win_tile)
+        self.assertEqual(result['han'], 6)
+        self.assertEqual(result['fu'], 40)
+        self.assertEqual(len(result['han_details']), 1)
+
+        tiles = Tiles.string_to_array(man="1234567789")
+        melds = [self.__make_meld(Meld.CHII, man="678")]
+        result = HandCalculator.calculate_hand_score(
+            tiles, win_tile, melds=melds)
+        self.assertEqual(result['han'], 5)
+        self.assertEqual(result['fu'], 30)
+        self.assertEqual(len(result['han_details']), 1)
+
+    def test_nagashi_mangan(self):
+        tiles = Tiles.string_to_array(sou="13579", man="234456", pin="66")
+        result = HandCalculator.calculate_hand_score(
+            tiles, None, hand_config=HandConfig(is_nagashi_mangan=True))
+        self.assertEqual(result['han'], 5)
+        self.assertEqual(len(result['han_details']), 1)
 
     def test_dora(self):
         # hand without yaku, but with dora should be consider as invalid
