@@ -5,6 +5,10 @@ from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, NINE_MAN, \
 from hand_calculation.tiles import Tiles
 
 
+class IllegalKitaError(Exception):
+    pass
+
+
 class Han:
     DORA = 'Dora from dora indicators'
     RED_DORA = 'Red dora'
@@ -32,11 +36,14 @@ class Han:
         dora_details = []
 
         # count nuki-dora
-        nuki_dora_count = sum([Tiles.tiles_count(meld) for meld in melds
+        nuki_dora_count = sum([Tiles.tiles_count(meld.tiles) for meld in melds
                                if meld.type == Meld.KITA])
         if nuki_dora_count > 0:
-            dora_details.append({'han': nuki_dora_count,
-                                 'reason': Han.NUKI_DORA})
+            if is_sanma:
+                dora_details.append({'han': nuki_dora_count,
+                                     'reason': Han.NUKI_DORA})
+            else:
+                raise IllegalKitaError
 
         # count red dora
         red_dora_count = 0

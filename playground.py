@@ -18,7 +18,7 @@ if __name__ == '__main__':
         is_nagashi_mangan=False,
         is_tenhou=False,
         is_chiihou=False,
-        is_sanma=False,
+        is_sanma=True,
         seat_wind=None,
         prevalent_wind=tile_constants.EAST,
         deposit_number=0,
@@ -29,14 +29,15 @@ if __name__ == '__main__':
         man="34",
         pin="406",
         sou="11",
-        honours="111777"
+        honours=""
     )
 
     win_tile = tile_constants.RED_FIVE_MAN
 
     melds = [
-        # Meld(meld_type=Meld.PON, tiles="111z"),
-        # Meld(meld_type=Meld.PON, tiles="777z")
+        Meld(meld_type=Meld.PON, tiles="111z"),
+        Meld(meld_type=Meld.PON, tiles="777z"),
+        Meld(meld_type=Meld.KITA, tiles="4444z")
     ]
 
     dora_indicators = []
