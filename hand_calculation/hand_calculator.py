@@ -24,13 +24,14 @@ class HandCalculator:
         :param dora_indicators: List of integer indices
         :param hand_config: HandConfig object
         :return: A dictionary containing:
-            'han_details' : A list of han details;
-            'han'         : Total han (0 if hand is yakuman or above);
-            'fu_details'  : A list of fu details (Empty if hand is mangan or
+            'han_details'  : A list of han details;
+            'han'          : Total han (0 if hand is yakuman or above);
+            'fu_details'   : A list of fu details (Empty if hand is mangan or
                             above);
-            'fu'          : Total fu (0 if hand is mangan or above);
-            'score'       : Total hand score;
-            'yaku_level'  : Yaku level;
+            'fu'           : Total fu (0 if hand is mangan or above);
+            'split_scores' : Points that each player should pay to the winner;
+            'total_score'  : Total hand score;
+            'yaku_level'   : Yaku level;
         """
         if not melds:
             melds = []
@@ -59,9 +60,11 @@ class HandCalculator:
         han = 0
         fu_details = []
         fu = 0
+        split_scores = []
         max_score = -1
         yaku_level = ''
 
+        # Kokushi musou or nagashi mangan
         if isinstance(hand_options[0], int):
             han_details, han, is_yakuman = Han.calculate_han(
                 hand=hand_options,
@@ -72,18 +75,25 @@ class HandCalculator:
             )
 
             if is_yakuman:
-                max_score = Score.calculate_yakuman_score(
+                score = Score.calculate_yakuman_score(
                     yakuman_list=han_details,
                     hand_config=hand_config
                 )
+                split_scores = score['split_scores']
+                max_score = score['total_score']
+                yaku_level = score['yaku_level']
             elif han == 5:
-                max_score = Score.calculate_score(
+                score = Score.calculate_score(
                     han=han,
                     fu=0,
                     hand_config=hand_config
                 )
+                split_scores = score['split_scores']
+                max_score = score['total_score']
+                yaku_level = score['yaku_level']
             else:
                 raise NoYakuError
+        # Other winning hand options
         else:
             for hand in hand_options:
                 win_group_options = HandCalculator.find_all_win_groups(
@@ -116,12 +126,13 @@ class HandCalculator:
                             yakuman_list=temp_han_details,
                             hand_config=hand_config
                         )
-                        if temp_score['score'] > max_score:
+                        if temp_score['total_score'] > max_score:
                             han_details = temp_han_details
                             han = temp_han
                             fu_details = temp_fu_details
                             fu = temp_fu
-                            max_score = temp_score['score']
+                            split_scores = temp_score['split_scores']
+                            max_score = temp_score['total_score']
                             yaku_level = temp_score['yaku_level']
                     else:
                         temp_score = Score.calculate_score(
@@ -129,12 +140,13 @@ class HandCalculator:
                             fu=temp_fu,
                             hand_config=hand_config
                         )
-                        if temp_score['score'] > max_score:
+                        if temp_score['total_score'] > max_score:
                             han_details = temp_han_details + dora_details
                             han = temp_han + dora_count
                             fu_details = temp_fu_details
                             fu = temp_fu
-                            max_score = temp_score['score']
+                            split_scores = temp_score['split_scores']
+                            max_score = temp_score['total_score']
                             yaku_level = temp_score['yaku_level']
 
         if han == 0:
@@ -145,7 +157,8 @@ class HandCalculator:
                 'han': han,
                 'fu_details': fu_details,
                 'fu': fu,
-                'score': max_score,
+                'split_scores': split_scores,
+                'total_score': max_score,
                 'yaku_level': yaku_level
             }
 

@@ -1,3 +1,4 @@
+from copy import deepcopy
 from itertools import product
 from pyswip import Prolog
 
@@ -22,7 +23,7 @@ class HandDivider:
         :param melds: Melds represented by a list of Meld objects
         :return: A list of lists of 34-arrays
         """
-        tiles = private_tiles[:]
+        tiles = deepcopy(private_tiles)
         if win_tile is not None:
             if win_tile == RED_FIVE_MAN:
                 tiles[FIVE_MAN] += RED_DORA_VALUE
@@ -32,20 +33,20 @@ class HandDivider:
                 tiles[FIVE_SOU] += RED_DORA_VALUE
             else:
                 tiles[win_tile] += 1
-        # for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
-        #     if tiles[index] >= RED_DORA_VALUE:
-        #         tiles[index] = tiles[index] // RED_DORA_VALUE \
-        #                        + tiles[index] % RED_DORA_VALUE
+        for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
+            if tiles[index] >= RED_DORA_VALUE:
+                tiles[index] = tiles[index] // RED_DORA_VALUE \
+                               + tiles[index] % RED_DORA_VALUE
 
         if melds is None:
-            melds = []
+            melds_copy = []
         else:
-            melds = HandDivider.convert_melds_to_list(melds)
-            # for meld in melds:
-            #     for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
-            #         if meld[index] >= RED_DORA_VALUE:
-            #             meld[index] = meld[index] // RED_DORA_VALUE \
-            #                           + meld[index] % RED_DORA_VALUE
+            melds_copy = HandDivider.convert_melds_to_list(melds)
+            for meld in melds_copy:
+                for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
+                    if meld[index] >= RED_DORA_VALUE:
+                        meld[index] = meld[index] // RED_DORA_VALUE \
+                                      + meld[index] % RED_DORA_VALUE
 
         divisions = []
 
@@ -60,7 +61,7 @@ class HandDivider:
 
         # find all possible standard, 4 mentsu + 1 pair division
         for pair_index in pair_indices:
-            tiles_copy = tiles[:]
+            tiles_copy = deepcopy(tiles)
             tiles_copy[pair_index] -= 2
 
             # manzu mentsu
@@ -89,7 +90,7 @@ class HandDivider:
                 combination_sets.append(sou)
             if honours:
                 combination_sets.append(honours)
-            for meld in melds:
+            for meld in melds_copy:
                 meld_indices = Tiles.array_to_indices(meld)
                 combination_sets.append([meld_indices])
 
@@ -113,8 +114,8 @@ class HandDivider:
         if divisions:
             return sorted(divisions, reverse=True)
         else:
-            full_hand = tiles[:]
-            for meld in melds:
+            full_hand = deepcopy(tiles)
+            for meld in melds_copy:
                 full_hand = [x + y for x, y in zip(full_hand, meld)]
             return full_hand
 
@@ -124,7 +125,7 @@ class HandDivider:
         for meld in melds:
             # exclude kita from hand division
             if meld.type != Meld.KITA:
-                melds_list.append(meld.tiles)
+                melds_list.append(deepcopy(meld.tiles))
         return melds_list
 
     @staticmethod

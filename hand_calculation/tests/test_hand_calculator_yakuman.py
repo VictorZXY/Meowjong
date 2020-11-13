@@ -302,7 +302,7 @@ class HandCalculatorYakumanTestCase(unittest.TestCase):
         result = HandCalculator.calculate_hand_score(
             tiles, win_tile, melds=melds, hand_config=hand_config)
         self.assertEqual(result['han'], 91)
-        self.assertEqual(result["score"], 240000)
+        self.assertEqual(result["total_score"], 240000)
 
     def test_kokushi_musou_multiple_yakuman(self):
         # kokushi musou tests

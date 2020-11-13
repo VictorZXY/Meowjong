@@ -51,7 +51,7 @@ class Tiles:
         :return: Boolean
         """
         if Tiles.tiles_count(tiles) == 4:
-            indices = Tiles.array_to_indices(tiles)
+            indices = Tiles.array_to_indices(tiles, count_red_dora=True)
             if len(indices) == 4:
                 return indices[0] == indices[1] == indices[2] == indices[3]
         return False
@@ -70,7 +70,8 @@ class Tiles:
         return False
 
     @staticmethod
-    def array_to_indices(tiles, start_index=0, end_index=33):
+    def array_to_indices(tiles, start_index=0, end_index=33,
+                         count_red_dora=False):
         """
         Convert a 34-array tiles into a list of array indices, counting only
         within the specified interval.
@@ -82,7 +83,9 @@ class Tiles:
         indices = []
         for index in range(start_index, end_index + 1):
             if tiles[index] > 0:
-                if index == FIVE_MAN or index == FIVE_PIN or index == FIVE_SOU:
+                if count_red_dora \
+                        and (index == FIVE_MAN or index == FIVE_PIN
+                             or index == FIVE_SOU):
                     indices.extend([index] * (tiles[index] // RED_DORA_VALUE
                                               + tiles[index] % RED_DORA_VALUE))
                 else:

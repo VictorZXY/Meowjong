@@ -1044,7 +1044,7 @@ class HandCalculatorTestCase(unittest.TestCase):
         result = HandCalculator.calculate_hand_score(
             tiles, win_tile, melds, dora_indicators, hand_config)
         self.assertEqual(result['han'], 28)
-        self.assertEqual(result["score"], 32000)
+        self.assertEqual(result["total_score"], 32000)
 
 
 if __name__ == '__main__':

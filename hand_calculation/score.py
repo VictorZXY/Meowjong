@@ -36,29 +36,49 @@ class Score:
 
         if hand_config.is_dealer:
             if hand_config.is_tsumo:
+                split_scores = [double_rounded]
                 if hand_config.is_sanma:
-                    score = 2 * double_rounded
+                    total_score = 2 * double_rounded
                 else:
-                    score = 3 * double_rounded
+                    total_score = 3 * double_rounded
             else:
-                score = six_rounded
+                split_scores = [six_rounded]
+                total_score = six_rounded
         else:
             if hand_config.is_tsumo:
+                split_scores = [double_rounded, rounded]
                 if hand_config.is_sanma:
-                    score = double_rounded + rounded
+                    total_score = double_rounded + rounded
                 else:
-                    score = double_rounded + 2 * rounded
+                    total_score = double_rounded + 2 * rounded
             else:
-                score = four_rounded
+                split_scores = [four_rounded]
+                total_score = four_rounded
 
-        score += hand_config.deposit_number * 1000
+        total_score += hand_config.deposit_number * 1000
 
         if hand_config.is_sanma:
-            score += hand_config.honba_number * 200
+            total_score += hand_config.honba_number * 200
+            if hand_config.is_tsumo:
+                for i in range(len(split_scores)):
+                    split_scores[i] += hand_config.honba_number * 100
+            else:
+                assert len(split_scores) == 1
+                split_scores[0] += hand_config.honba_number * 200
         else:
-            score += hand_config.honba_number * 300
+            total_score += hand_config.honba_number * 300
+            if hand_config.is_tsumo:
+                for i in range(len(split_scores)):
+                    split_scores[i] += hand_config.honba_number * 100
+            else:
+                assert len(split_scores) == 1
+                split_scores[0] += hand_config.honba_number * 300
 
-        return {'score': score, 'yaku_level': yaku_level}
+        return {
+            'split_scores': split_scores,
+            'total_score': total_score,
+            'yaku_level': yaku_level
+        }
 
     @staticmethod
     def calculate_yakuman_score(yakuman_list, hand_config):
@@ -72,21 +92,48 @@ class Score:
             yaku_level = str(len(yakuman_list)) + 'x Yakuman'
 
         if hand_config.is_dealer:
-            if hand_config.is_sanma and hand_config.is_tsumo:
-                score = len(yakuman_list) * 32000
+            if hand_config.is_tsumo:
+                split_scores = [len(yakuman_list) * 16000]
+                if hand_config.is_sanma:
+                    total_score = len(yakuman_list) * 32000
+                else:
+                    total_score = len(yakuman_list) * 48000
             else:
-                score = len(yakuman_list) * 48000
+                split_scores = [len(yakuman_list) * 48000]
+                total_score = len(yakuman_list) * 48000
         else:
-            if hand_config.is_sanma and hand_config.is_tsumo:
-                score = len(yakuman_list) * 24000
+            if hand_config.is_tsumo:
+                split_scores = [len(yakuman_list) * 16000,
+                                len(yakuman_list) * 8000]
+                if hand_config.is_sanma:
+                    total_score = len(yakuman_list) * 24000
+                else:
+                    total_score = len(yakuman_list) * 32000
             else:
-                score = len(yakuman_list) * 32000
+                split_scores = [len(yakuman_list) * 32000]
+                total_score = len(yakuman_list) * 32000
 
-        score += hand_config.deposit_number * 1000
+        total_score += hand_config.deposit_number * 1000
 
         if hand_config.is_sanma:
-            score += hand_config.honba_number * 200
+            total_score += hand_config.honba_number * 200
+            if hand_config.is_tsumo:
+                for i in range(len(split_scores)):
+                    split_scores[i] += hand_config.honba_number * 100
+            else:
+                assert len(split_scores) == 1
+                split_scores[0] += hand_config.honba_number * 200
         else:
-            score += hand_config.honba_number * 300
+            total_score += hand_config.honba_number * 300
+            if hand_config.is_tsumo:
+                for i in range(len(split_scores)):
+                    split_scores[i] += hand_config.honba_number * 100
+            else:
+                assert len(split_scores) == 1
+                split_scores[0] += hand_config.honba_number * 300
 
-        return {'score': score, 'yaku_level': yaku_level}
+        return {
+            'split_scores': split_scores,
+            'total_score': total_score,
+            'yaku_level': yaku_level
+        }
