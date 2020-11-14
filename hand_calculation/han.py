@@ -1,7 +1,8 @@
 from hand_calculation.meld import Meld
-from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, NINE_MAN, \
-    ONE_PIN, FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, EAST, NORTH, \
-    HAKU, CHUN, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU, RED_DORA_VALUE
+from hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, SIX_MAN, \
+    NINE_MAN, ONE_PIN, FIVE_PIN, SIX_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, \
+    SIX_SOU, NINE_SOU, EAST, NORTH, HAKU, CHUN, RED_FIVE_MAN, RED_FIVE_PIN, \
+    RED_FIVE_SOU, RED_DORA_VALUE
 from hand_calculation.tiles import Tiles
 
 
@@ -95,7 +96,13 @@ class Han:
                     dora_list.append(indicator + 1)
                 elif indicator == CHUN:
                     dora_list.append(HAKU)
-                else:  # if ONE_MAN < indicator < NINE_MAN:
+                elif indicator == RED_FIVE_PIN:
+                    dora_list.append(SIX_PIN)
+                elif indicator == RED_FIVE_SOU:
+                    dora_list.append(SIX_SOU)
+                else:
+                    # if ONE_MAN < indicator < NINE_MAN
+                    #     or indicator == RED_FIVE_MAN:
                     assert False, '2-8m does not exist in Sanma'
             else:
                 if indicator == NINE_MAN:
@@ -103,11 +110,17 @@ class Han:
                 elif indicator == NINE_PIN:
                     dora_list.append(ONE_PIN)
                 elif indicator == NINE_SOU:
-                    dora_list.append(ONE_PIN)
+                    dora_list.append(ONE_SOU)
                 elif indicator == NORTH:
                     dora_list.append(EAST)
                 elif indicator == CHUN:
                     dora_list.append(HAKU)
+                elif indicator == RED_FIVE_MAN:
+                    dora_list.append(SIX_MAN)
+                elif indicator == RED_FIVE_PIN:
+                    dora_list.append(SIX_PIN)
+                elif indicator == RED_FIVE_SOU:
+                    dora_list.append(SIX_SOU)
                 else:
                     dora_list.append(indicator + 1)
 

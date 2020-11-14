@@ -6,9 +6,9 @@ from hand_calculation.tiles import Tiles
 
 if __name__ == '__main__':
     hand_config = HandConfig(
-        is_menzen=False,
+        is_menzen=True,
         is_tsumo=False,
-        is_riichi=False,
+        is_riichi=True,
         is_ippatsu=False,
         is_rinshan=False,
         is_chankan=False,
@@ -18,29 +18,32 @@ if __name__ == '__main__':
         is_nagashi_mangan=False,
         is_tenhou=False,
         is_chiihou=False,
-        is_sanma=True,
-        seat_wind=None,
+        is_sanma=False,
+        seat_wind=tile_constants.EAST,
         prevalent_wind=tile_constants.EAST,
         deposit_number=0,
-        honba_number=0
+        honba_number=1
     )
 
+    dora_indicators = [tile_constants.SEVEN_MAN, tile_constants.WEST]
+
     tiles = Tiles.string_to_array(
-        man="34",
-        pin="406",
-        sou="11",
+        man="2344",
+        pin="",
+        sou="678",
         honours=""
     )
 
-    win_tile = tile_constants.RED_FIVE_MAN
+    win_tile = tile_constants.ONE_MAN
 
     melds = [
-        Meld(meld_type=Meld.PON, tiles="111z"),
-        Meld(meld_type=Meld.PON, tiles="777z"),
-        Meld(meld_type=Meld.KITA, tiles="4444z")
+        # Meld(meld_type=Meld.CHII, tiles="789s"),
+        Meld(meld_type=Meld.PON, tiles="666z"),
+        # Meld(meld_type=Meld.PON, tiles="777s")
+        Meld(meld_type=Meld.KAN, tiles="5555z"),
+        # Meld(meld_type=Meld.KAN, tiles="7777z"),
+        # Meld(meld_type=Meld.KITA, tiles="4444z")
     ]
-
-    dora_indicators = []
 
     result = HandCalculator.calculate_hand_score(
         tiles, win_tile, melds=melds, hand_config=hand_config,
