@@ -131,3 +131,7 @@ dmypy.json
 # Pycharm stuff
 .idea
 .idea/
+
+# Meowjong-specific (game logs, training data, etc.)
+game_logs
+game_logs/
