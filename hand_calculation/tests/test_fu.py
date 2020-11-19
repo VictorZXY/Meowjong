@@ -28,8 +28,8 @@ class FuTestCase(unittest.TestCase):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="115599", pin="6",
-                                              sou="112244")
+        private_tiles = Tiles.string_to_array(man='115599', pin='6',
+                                              sou='112244')
         win_tile = tile_constants.SIX_PIN
         hand = self.__make_hand(private_tiles, win_tile)
         win_group = self.__get_win_group(hand, win_tile)
@@ -37,16 +37,16 @@ class FuTestCase(unittest.TestCase):
         fu_details, fu = fu_calculator.calculate_fu(hand, win_tile, win_group,
                                                     hand_config)
         self.assertEqual(1, len(fu_details))
-        self.assertTrue({"fu": 25, "reason": Fu.CHIITOITSU} in fu_details)
+        self.assertTrue({'fu': 25, 'reason': Fu.CHIITOITSU} in fu_details)
         self.assertEqual(fu, 25)
 
     def test_open_hand_base_fu(self):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", pin="11", sou="78")
+        private_tiles = Tiles.string_to_array(man='123456', pin='11', sou='78')
         win_tile = tile_constants.SIX_SOU
-        melds = [self.__make_meld(Meld.PON, sou="222")]
+        melds = [self.__make_meld(Meld.PON, sou='222')]
         hand = self.__make_hand(private_tiles, win_tile, melds)
 
         fu_details, fu = fu_calculator.calculate_fu(
@@ -54,15 +54,15 @@ class FuTestCase(unittest.TestCase):
             melds=melds
         )
         self.assertEqual(2, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.OPEN_KOUTSU} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 2, 'reason': Fu.OPEN_KOUTSU} in fu_details)
         self.assertEqual(fu, 30)
 
     def test_fu_based_on_different_win_groups(self):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="234789", pin="1234566")
+        private_tiles = Tiles.string_to_array(man='234789', pin='1234566')
         win_tile = tile_constants.SIX_PIN
         hand = self.__make_hand(private_tiles, win_tile)
         win_groups = self.__get_win_groups(hand, win_tile)
@@ -81,9 +81,9 @@ class FuTestCase(unittest.TestCase):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="234567", pin="22", sou="78")
+        private_tiles = Tiles.string_to_array(man='234567', pin='22', sou='78')
         win_tile = tile_constants.SIX_SOU
-        melds = [self.__make_meld(Meld.CHII, sou="234")]
+        melds = [self.__make_meld(Meld.CHII, sou='234')]
         hand = self.__make_hand(private_tiles, win_tile, melds)
 
         fu_details, fu = fu_calculator.calculate_fu(
@@ -91,51 +91,51 @@ class FuTestCase(unittest.TestCase):
             melds=melds
         )
         self.assertEqual(2, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.OPEN_PINFU} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 2, 'reason': Fu.OPEN_PINFU} in fu_details)
         self.assertEqual(fu, 30)
 
     def test_tsumo_base_fu(self):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", pin="11",
-                                              sou="22278")
+        private_tiles = Tiles.string_to_array(man='123456', pin='11',
+                                              sou='22278')
         win_tile = tile_constants.SIX_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, _ = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
 
     def test_tsumo_pinfu_fu(self):
         fu_calculator = Fu()
         hand_config = HandConfig(is_tsumo=True)
 
-        private_tiles = Tiles.string_to_array(man="123456", pin="123",
-                                              sou="2278")
+        private_tiles = Tiles.string_to_array(man='123456', pin='123',
+                                              sou='2278')
         win_tile = tile_constants.SIX_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(1, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
         self.assertEqual(fu, 20)
 
     def test_tsumo_fu(self):
         fu_calculator = Fu()
         hand_config = HandConfig(is_tsumo=True)
 
-        private_tiles = Tiles.string_to_array(man="123456", pin="111",
-                                              sou="2278")
+        private_tiles = Tiles.string_to_array(man='123456', pin='111',
+                                              sou='2278')
         win_tile = tile_constants.SIX_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.TSUMO} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 2, 'reason': Fu.TSUMO} in fu_details)
         self.assertEqual(fu, 30)
 
     def test_edge_wait_fu(self):
@@ -143,65 +143,65 @@ class FuTestCase(unittest.TestCase):
         hand_config = HandConfig()
 
         # 12 in hand, waiting for 3
-        private_tiles = Tiles.string_to_array(man="123456", pin="55",
-                                              sou="12456")
+        private_tiles = Tiles.string_to_array(man='123456', pin='55',
+                                              sou='12456')
         win_tile = tile_constants.THREE_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.EDGE_WAIT} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 2, 'reason': Fu.EDGE_WAIT} in fu_details)
         self.assertEqual(fu, 40)
 
         # 89 in hand, waiting for 7
-        private_tiles = Tiles.string_to_array(man="123456", pin="55",
-                                              sou="34589")
+        private_tiles = Tiles.string_to_array(man='123456', pin='55',
+                                              sou='34589')
         win_tile = tile_constants.SEVEN_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.EDGE_WAIT} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 2, 'reason': Fu.EDGE_WAIT} in fu_details)
         self.assertEqual(fu, 40)
 
     def test_closed_wait_fu(self):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", pin="55",
-                                              sou="12357")
+        private_tiles = Tiles.string_to_array(man='123456', pin='55',
+                                              sou='12357')
         win_tile = tile_constants.SIX_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.CLOSED_WAIT} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 2, 'reason': Fu.CLOSED_WAIT} in fu_details)
         self.assertEqual(fu, 40)
 
     def test_pair_wait_fu(self):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", pin="1",
-                                              sou="123678")
+        private_tiles = Tiles.string_to_array(man='123456', pin='1',
+                                              sou='123678')
         win_tile = tile_constants.ONE_PIN
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.PAIR_WAIT} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 2, 'reason': Fu.PAIR_WAIT} in fu_details)
         self.assertEqual(fu, 40)
 
     def test_valued_pair_fu(self):
@@ -209,17 +209,17 @@ class FuTestCase(unittest.TestCase):
         fu_calculator = Fu()
         hand_config = HandConfig(seat_wind=tile_constants.EAST)
 
-        private_tiles = Tiles.string_to_array(man="123456", sou="12378",
-                                              honours="11")
+        private_tiles = Tiles.string_to_array(man='123456', sou='12378',
+                                              honours='11')
         win_tile = tile_constants.SIX_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.SEAT_WIND_PAIR} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 2, 'reason': Fu.SEAT_WIND_PAIR} in fu_details)
         self.assertEqual(fu, 40)
 
         # prevalent wind pair
@@ -227,10 +227,10 @@ class FuTestCase(unittest.TestCase):
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON}
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON}
                         in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.PREVALENT_WIND_PAIR}
+        self.assertTrue({'fu': 2, 'reason': Fu.PREVALENT_WIND_PAIR}
                         in fu_details)
         self.assertEqual(fu, 40)
 
@@ -240,36 +240,36 @@ class FuTestCase(unittest.TestCase):
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(4, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.SEAT_WIND_PAIR} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 2, 'reason': Fu.SEAT_WIND_PAIR} in fu_details)
         self.assertTrue(
-            {"fu": 2, "reason": Fu.PREVALENT_WIND_PAIR} in fu_details)
+            {'fu': 2, 'reason': Fu.PREVALENT_WIND_PAIR} in fu_details)
         self.assertEqual(fu, 40)
 
         # dragon pair
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", sou="12378",
-                                              honours="77")
+        private_tiles = Tiles.string_to_array(man='123456', sou='12378',
+                                              honours='77')
         win_tile = tile_constants.SIX_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.DRAGON_PAIR} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 2, 'reason': Fu.DRAGON_PAIR} in fu_details)
         self.assertEqual(fu, 40)
 
     def test_open_koutsu_fu(self):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", pin="11", sou="78")
+        private_tiles = Tiles.string_to_array(man='123456', pin='11', sou='78')
         win_tile = tile_constants.SIX_SOU
-        melds = [self.__make_meld(Meld.PON, sou="222")]
+        melds = [self.__make_meld(Meld.PON, sou='222')]
         hand = self.__make_hand(private_tiles, win_tile, melds)
 
         fu_details, fu = fu_calculator.calculate_fu(
@@ -277,48 +277,48 @@ class FuTestCase(unittest.TestCase):
             melds=melds
         )
         self.assertEqual(2, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.OPEN_KOUTSU} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 2, 'reason': Fu.OPEN_KOUTSU} in fu_details)
         self.assertEqual(fu, 30)
 
     def test_closed_koutsu_fu(self):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", pin="11",
-                                              sou="22278")
+        private_tiles = Tiles.string_to_array(man='123456', pin='11',
+                                              sou='22278')
         win_tile = tile_constants.SIX_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 4, "reason": Fu.CLOSED_KOUTSU} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 4, 'reason': Fu.CLOSED_KOUTSU} in fu_details)
         self.assertEqual(fu, 40)
 
         # when we ron on the third koutsu tile, we consider the koutsu as open
-        private_tiles = Tiles.string_to_array(man="123456", pin="11",
-                                              sou="22678")
+        private_tiles = Tiles.string_to_array(man='123456', pin='11',
+                                              sou='22678')
         win_tile = tile_constants.TWO_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 2, "reason": Fu.OPEN_KOUTSU} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 2, 'reason': Fu.OPEN_KOUTSU} in fu_details)
         self.assertEqual(fu, 40)
 
     def test_open_yaochuuhai_koutsu_fu(self):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", sou="2278")
+        private_tiles = Tiles.string_to_array(man='123456', sou='2278')
         win_tile = tile_constants.SIX_SOU
-        melds = [self.__make_meld(Meld.PON, honours="111")]
+        melds = [self.__make_meld(Meld.PON, honours='111')]
         hand = self.__make_hand(private_tiles, win_tile, melds)
 
         fu_details, fu = fu_calculator.calculate_fu(
@@ -326,8 +326,8 @@ class FuTestCase(unittest.TestCase):
             melds=melds
         )
         self.assertEqual(2, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 4, "reason": Fu.OPEN_YAOCHUU_KOUTSU}
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 4, 'reason': Fu.OPEN_YAOCHUU_KOUTSU}
                         in fu_details)
         self.assertEqual(fu, 30)
 
@@ -335,32 +335,32 @@ class FuTestCase(unittest.TestCase):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", pin="11",
-                                              sou="11178")
+        private_tiles = Tiles.string_to_array(man='123456', pin='11',
+                                              sou='11178')
         win_tile = tile_constants.SIX_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 8, "reason": Fu.CLOSED_YAOCHUU_KOUTSU}
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 8, 'reason': Fu.CLOSED_YAOCHUU_KOUTSU}
                         in fu_details)
         self.assertEqual(fu, 40)
 
         # when we ron on the third koutsu tile, we consider the koutsu as open
-        private_tiles = Tiles.string_to_array(man="123456", pin="11",
-                                              sou="11678")
+        private_tiles = Tiles.string_to_array(man='123456', pin='11',
+                                              sou='11678')
         win_tile = tile_constants.ONE_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 4, "reason": Fu.OPEN_YAOCHUU_KOUTSU}
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 4, 'reason': Fu.OPEN_YAOCHUU_KOUTSU}
                         in fu_details)
         self.assertEqual(fu, 40)
 
@@ -368,32 +368,32 @@ class FuTestCase(unittest.TestCase):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", sou="1178",
-                                              honours="111")
+        private_tiles = Tiles.string_to_array(man='123456', sou='1178',
+                                              honours='111')
         win_tile = tile_constants.SIX_SOU
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 8, "reason": Fu.CLOSED_YAOCHUU_KOUTSU}
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 8, 'reason': Fu.CLOSED_YAOCHUU_KOUTSU}
                         in fu_details)
         self.assertEqual(fu, 40)
 
         # when we ron on the third pon tile we consider pon as open
-        private_tiles = Tiles.string_to_array(man="123456", sou="11678",
-                                              honours="11")
+        private_tiles = Tiles.string_to_array(man='123456', sou='11678',
+                                              honours='11')
         win_tile = tile_constants.EAST
         hand = self.__make_hand(private_tiles, win_tile)
 
         fu_details, fu = fu_calculator.calculate_fu(
             hand, win_tile, self.__get_win_group(hand, win_tile), hand_config)
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 4, "reason": Fu.OPEN_YAOCHUU_KOUTSU}
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 4, 'reason': Fu.OPEN_YAOCHUU_KOUTSU}
                         in fu_details)
         self.assertEqual(fu, 40)
 
@@ -401,9 +401,9 @@ class FuTestCase(unittest.TestCase):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", pin="11", sou="78")
+        private_tiles = Tiles.string_to_array(man='123456', pin='11', sou='78')
         win_tile = tile_constants.SIX_SOU
-        melds = [self.__make_meld(Meld.KAN, sou="2222", is_open=True)]
+        melds = [self.__make_meld(Meld.KAN, sou='2222', is_open=True)]
         hand = self.__make_hand(private_tiles, win_tile, melds)
 
         fu_details, fu = fu_calculator.calculate_fu(
@@ -411,17 +411,17 @@ class FuTestCase(unittest.TestCase):
             melds=melds
         )
         self.assertEqual(2, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 8, "reason": Fu.OPEN_KANTSU} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 8, 'reason': Fu.OPEN_KANTSU} in fu_details)
         self.assertEqual(fu, 30)
 
     def test_closed_kantsu_fu(self):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", pin="11", sou="78")
+        private_tiles = Tiles.string_to_array(man='123456', pin='11', sou='78')
         win_tile = tile_constants.SIX_SOU
-        melds = [self.__make_meld(Meld.KAN, sou="2222", is_open=False)]
+        melds = [self.__make_meld(Meld.KAN, sou='2222', is_open=False)]
         hand = self.__make_hand(private_tiles, win_tile, melds)
 
         fu_details, fu = fu_calculator.calculate_fu(
@@ -429,18 +429,18 @@ class FuTestCase(unittest.TestCase):
             melds=melds
         )
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 16, "reason": Fu.CLOSED_KANTSU} in fu_details)
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 16, 'reason': Fu.CLOSED_KANTSU} in fu_details)
         self.assertEqual(fu, 50)
 
     def test_open_yaochuuhai_kantsu_fu(self):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", sou="2278")
+        private_tiles = Tiles.string_to_array(man='123456', sou='2278')
         win_tile = tile_constants.SIX_SOU
-        melds = [self.__make_meld(Meld.KAN, pin="1111")]
+        melds = [self.__make_meld(Meld.KAN, pin='1111')]
         hand = self.__make_hand(private_tiles, win_tile, melds)
 
         fu_details, fu = fu_calculator.calculate_fu(
@@ -448,8 +448,8 @@ class FuTestCase(unittest.TestCase):
             melds=melds
         )
         self.assertEqual(2, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 16, "reason": Fu.OPEN_YAOCHUU_KANTSU}
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 16, 'reason': Fu.OPEN_YAOCHUU_KANTSU}
                         in fu_details)
         self.assertEqual(fu, 40)
 
@@ -457,9 +457,9 @@ class FuTestCase(unittest.TestCase):
         fu_calculator = Fu()
         hand_config = HandConfig()
 
-        private_tiles = Tiles.string_to_array(man="123456", sou="2278")
+        private_tiles = Tiles.string_to_array(man='123456', sou='2278')
         win_tile = tile_constants.SIX_SOU
-        melds = [self.__make_meld(Meld.KAN, pin="1111", is_open=False)]
+        melds = [self.__make_meld(Meld.KAN, pin='1111', is_open=False)]
         hand = self.__make_hand(private_tiles, win_tile, melds)
 
         fu_details, fu = fu_calculator.calculate_fu(
@@ -467,9 +467,9 @@ class FuTestCase(unittest.TestCase):
             melds=melds
         )
         self.assertEqual(3, len(fu_details))
-        self.assertTrue({"fu": 20, "reason": Fu.BASE} in fu_details)
-        self.assertTrue({"fu": 10, "reason": Fu.MENZEN_RON} in fu_details)
-        self.assertTrue({"fu": 32, "reason": Fu.CLOSED_YAOCHUU_KANTSU}
+        self.assertTrue({'fu': 20, 'reason': Fu.BASE} in fu_details)
+        self.assertTrue({'fu': 10, 'reason': Fu.MENZEN_RON} in fu_details)
+        self.assertTrue({'fu': 32, 'reason': Fu.CLOSED_YAOCHUU_KANTSU}
                         in fu_details)
         self.assertEqual(fu, 70)
 

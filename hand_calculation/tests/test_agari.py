@@ -87,12 +87,12 @@ class AgariTestCase(unittest.TestCase):
         ]
         self.assertFalse(agari.is_agari(tiles, melds=melds))
 
-        tiles = Tiles.string_to_array(pin="99", honours="77")
+        tiles = Tiles.string_to_array(pin='99', honours='77')
         win_tile = tile_constants.NINE_PIN
         melds = [
-            Meld(Meld.PON, tiles="111z"),
-            Meld(Meld.CHII, tiles="123p"),
-            Meld(Meld.CHII, tiles="123p"),
+            Meld(Meld.PON, tiles='111z'),
+            Meld(Meld.CHII, tiles='123p'),
+            Meld(Meld.CHII, tiles='123p'),
         ]
         self.assertTrue(agari.is_agari(tiles, win_tile, melds=melds))
 

@@ -146,12 +146,12 @@ class HandDividerTestCase(unittest.TestCase):
         )
 
     def test_hand_division_miscellaneous(self):
-        tiles = Tiles.string_to_array(pin="99", honours="77")
+        tiles = Tiles.string_to_array(pin='99', honours='77')
         win_tile = tile_constants.NINE_PIN
         melds = [
-            Meld(Meld.PON, tiles="111z"),
-            Meld(Meld.CHII, tiles="123p"),
-            Meld(Meld.CHII, tiles="123p"),
+            Meld(Meld.PON, tiles='111z'),
+            Meld(Meld.CHII, tiles='123p'),
+            Meld(Meld.CHII, tiles='123p'),
         ]
 
         result = HandDivider.divide_hand(tiles, win_tile, melds)
