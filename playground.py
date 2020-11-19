@@ -21,8 +21,8 @@ if __name__ == '__main__':
         is_sanma=False,
         seat_wind=tile_constants.EAST,
         prevalent_wind=tile_constants.EAST,
-        deposit_number=0,
-        honba_number=1
+        deposit_counter=0,
+        honba_counter=1
     )
 
     dora_indicators = [tile_constants.SEVEN_MAN, tile_constants.WEST]

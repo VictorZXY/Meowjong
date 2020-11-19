@@ -278,27 +278,27 @@ class ScoreTestCase(unittest.TestCase):
 
     def test_calculate_score_with_bonus(self):
         hand_config = HandConfig(seat_wind=EAST, is_tsumo=True,
-                                 deposit_number=3, honba_number=2)
+                                 deposit_counter=3, honba_counter=2)
         result = Score.calculate_score(han=3, fu=30, hand_config=hand_config)
         self.assertEqual(result["total_score"], 9600)
 
         hand_config = HandConfig(seat_wind=WEST, is_sanma=True, is_tsumo=True,
-                                 deposit_number=1, honba_number=4)
+                                 deposit_counter=1, honba_counter=4)
         result = Score.calculate_score(han=4, fu=30, hand_config=hand_config)
         self.assertEqual(result["total_score"], 7700)
 
-        hand_config = HandConfig(seat_wind=WEST, honba_number=5)
+        hand_config = HandConfig(seat_wind=WEST, honba_counter=5)
         result = Score.calculate_score(han=6, fu=30, hand_config=hand_config)
         self.assertEqual(result["total_score"], 13500)
 
         hand_config = HandConfig(seat_wind=EAST, is_sanma=True,
-                                 honba_number=5)
+                                 honba_counter=5)
         result = Score.calculate_score(han=5, fu=30, hand_config=hand_config)
         self.assertEqual(result["total_score"], 13000)
 
     def test_calculate_yakuman_score(self):
         hand_config = HandConfig(seat_wind=EAST, is_tsumo=True,
-                                 deposit_number=2, honba_number=3)
+                                 deposit_counter=2, honba_counter=3)
         result = Score.calculate_yakuman_score(
             yakuman_list=['Kokushi Musou'],
             hand_config=hand_config
@@ -306,7 +306,7 @@ class ScoreTestCase(unittest.TestCase):
         self.assertEqual(result['total_score'], 50900)
 
         hand_config = HandConfig(seat_wind=EAST, is_sanma=True, is_tsumo=True,
-                                 deposit_number=2, honba_number=3)
+                                 deposit_counter=2, honba_counter=3)
         result = Score.calculate_yakuman_score(
             yakuman_list=['Ryuuiisou'],
             hand_config=hand_config
@@ -314,8 +314,8 @@ class ScoreTestCase(unittest.TestCase):
         self.assertEqual(result['total_score'], 34600)
 
         hand_config = HandConfig(seat_wind=SOUTH, is_sanma=True,
-                                 is_tsumo=True, deposit_number=2,
-                                 honba_number=3)
+                                 is_tsumo=True, deposit_counter=2,
+                                 honba_counter=3)
         result = Score.calculate_yakuman_score(
             yakuman_list=['Junsei Chuuren Poutou'],
             hand_config=hand_config
@@ -323,7 +323,7 @@ class ScoreTestCase(unittest.TestCase):
         self.assertEqual(result['total_score'], 26600)
 
         hand_config = HandConfig(seat_wind=EAST, is_sanma=True,
-                                 deposit_number=3)
+                                 deposit_counter=3)
         result = Score.calculate_yakuman_score(
             yakuman_list=['Tsuuiisou', 'Daisuushii', 'Suukantsu',
                           'Suuankou Tanki'],

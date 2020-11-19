@@ -55,24 +55,24 @@ class Score:
                 split_scores = [four_rounded]
                 total_score = four_rounded
 
-        total_score += hand_config.deposit_number * 1000
+        total_score += hand_config.deposit_counter * 1000
 
         if hand_config.is_sanma:
-            total_score += hand_config.honba_number * 200
+            total_score += hand_config.honba_counter * 200
             if hand_config.is_tsumo:
                 for i in range(len(split_scores)):
-                    split_scores[i] += hand_config.honba_number * 100
+                    split_scores[i] += hand_config.honba_counter * 100
             else:
                 assert len(split_scores) == 1
-                split_scores[0] += hand_config.honba_number * 200
+                split_scores[0] += hand_config.honba_counter * 200
         else:
-            total_score += hand_config.honba_number * 300
+            total_score += hand_config.honba_counter * 300
             if hand_config.is_tsumo:
                 for i in range(len(split_scores)):
-                    split_scores[i] += hand_config.honba_number * 100
+                    split_scores[i] += hand_config.honba_counter * 100
             else:
                 assert len(split_scores) == 1
-                split_scores[0] += hand_config.honba_number * 300
+                split_scores[0] += hand_config.honba_counter * 300
 
         return {
             'split_scores': split_scores,
@@ -113,24 +113,24 @@ class Score:
                 split_scores = [len(yakuman_list) * 32000]
                 total_score = len(yakuman_list) * 32000
 
-        total_score += hand_config.deposit_number * 1000
+        total_score += hand_config.deposit_counter * 1000
 
         if hand_config.is_sanma:
-            total_score += hand_config.honba_number * 200
+            total_score += hand_config.honba_counter * 200
             if hand_config.is_tsumo:
                 for i in range(len(split_scores)):
-                    split_scores[i] += hand_config.honba_number * 100
+                    split_scores[i] += hand_config.honba_counter * 100
             else:
                 assert len(split_scores) == 1
-                split_scores[0] += hand_config.honba_number * 200
+                split_scores[0] += hand_config.honba_counter * 200
         else:
-            total_score += hand_config.honba_number * 300
+            total_score += hand_config.honba_counter * 300
             if hand_config.is_tsumo:
                 for i in range(len(split_scores)):
-                    split_scores[i] += hand_config.honba_number * 100
+                    split_scores[i] += hand_config.honba_counter * 100
             else:
                 assert len(split_scores) == 1
-                split_scores[0] += hand_config.honba_number * 300
+                split_scores[0] += hand_config.honba_counter * 300
 
         return {
             'split_scores': split_scores,
