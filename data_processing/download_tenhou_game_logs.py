@@ -5,6 +5,7 @@ import requests
 from multiprocessing import Pool
 from tqdm import tqdm
 
+CPU_COUNT = 8
 HTML_COUNT = 4241
 URL_COUNT = 603416
 URL_COUNTS_BY_YEAR = {
@@ -90,16 +91,71 @@ def download_json_from_urls(year):
                     pbar.update(1)
 
 
+def download_2011_json_from_urls(index):
+    # This was explicitly written due to the 2011 JSON objects were not fully
+    # downloaded at the first run.
+    with tqdm(desc='Downloading JSON objects from 2011_' + str(index) + '.txt',
+              total=URL_COUNTS_BY_YEAR['2011'] // CPU_COUNT) as pbar:
+        with open(os.path.join(GAME_LOG_URLS_PATH,
+                               '2011_' + str(index) + '.txt'), 'r') as fread:
+            with open(os.path.join(RAW_GAME_LOGS_PATH, '2011_' + str(index)),
+                      'wb') as fwrite:
+                for line in fread:
+                    referer_link = line.replace('\n', '')
+                    url = referer_link.replace('tenhou.net/6/?log=',
+                                               'tenhou.net/5/mjlog2json.cgi?')
+                    headers = {
+                        'User-Agent': USER_AGENT,
+                        'Referer': referer_link
+                    }
+                    response = requests.get(url, headers=headers)
+                    fwrite.write(response.content + b'\n')
+                    pbar.update(1)
+
+
 if __name__ == '__main__':
-    try:
-        extract_urls_from_html_logs()
+    # Original code
+    extract_urls_from_html_logs()
 
-        pool = Pool(len(SELECTED_YEARS))
-        for index, year in enumerate(SELECTED_YEARS):
-            pool.apply_async(download_json_from_urls, args=(year,))
-        pool.close()
-        pool.join()
+    pool = Pool(len(SELECTED_YEARS))
+    for year in SELECTED_YEARS:
+        pool.apply_async(download_json_from_urls, args=(year,))
+    pool.close()
+    pool.join()
 
-        print('Success')
-    except Exception as e:
-        print(e)
+    # This was explicitly written due to the 2011 JSON objects were not fully
+    # downloaded at the first run.
+    with open(os.path.join(GAME_LOG_URLS_PATH, '2011' + '.txt'), 'r') \
+            as fread:
+        for index in range(CPU_COUNT):
+            with open(os.path.join(GAME_LOG_URLS_PATH,
+                                   '2011_' + str(index) + '.txt'), 'w') \
+                    as fwrite:
+                for count in range(URL_COUNTS_BY_YEAR['2011'] // CPU_COUNT):
+                    line = fread.readline()
+                    fwrite.write(line)
+    print('Finished extracting 2011 URLs.\n')
+
+    pool = Pool(CPU_COUNT)
+    for index in range(CPU_COUNT):
+        pool.apply_async(download_2011_json_from_urls, args=(index,))
+    pool.close()
+    pool.join()
+
+    # This was used to merge the 2011 JSON sub-files into a single file.
+    with open(os.path.join(RAW_GAME_LOGS_PATH, '2011'), 'wb') as fwrite:
+        for index in range(CPU_COUNT):
+            with open(os.path.join(RAW_GAME_LOGS_PATH, '2011_' + str(index)),
+                      'rb') as fread:
+                content = fread.read()
+                fwrite.write(content)
+
+    # Testing whether all JSON objects are successfully downloaded
+    for year in SELECTED_YEARS:
+        with open(os.path.join(RAW_GAME_LOGS_PATH, year), 'rb') as fread:
+            json_count = 0
+            for line in fread:
+                json_count += 1
+            assert json_count == URL_COUNTS_BY_YEAR[year]
+
+    print('Success')
