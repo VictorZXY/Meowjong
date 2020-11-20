@@ -1,12 +1,26 @@
-import json
 import os
 import re
 import requests
 
-from multiprocessing import Process
-from progress.bar import IncrementalBar
+from multiprocessing import Pool
+from tqdm import tqdm
 
 HTML_COUNT = 4241
+URL_COUNT = 603416
+URL_COUNTS_BY_YEAR = {
+    '2009': 21976,
+    '2010': 38105,
+    '2011': 50984,
+    '2012': 60627,
+    '2013': 48407,
+    '2014': 54314,
+    '2015': 51171,
+    '2016': 47718,
+    '2017': 51872,
+    '2018': 57674,
+    '2019': 62341,
+    '2020': 58227
+}
 HTML_GAME_LOGS_PATH = '../game_logs/html'
 GAME_LOG_URLS_PATH = '../game_logs/html\\game_log_urls'
 JSON_GAME_LOGS_PATH = '../game_logs\\json'
@@ -22,12 +36,12 @@ USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' \
 
 
 def extract_urls_from_html_logs():
-    year_urls_counts = {}
-    for year in SELECTED_YEARS:
-        year_urls_counts[year] = 0
-    total_urls_count = 0
+    # year_urls_counts = {}
+    # for year in SELECTED_YEARS:
+    #     year_urls_counts[year] = 0
+    # total_urls_count = 0
 
-    with IncrementalBar('Extracting URLs', max=HTML_COUNT) as bar:
+    with tqdm(desc='Extracting URLs', total=HTML_COUNT) as pbar:
         for dirpath, dirnames, files in os.walk(HTML_GAME_LOGS_PATH):
             for year in SELECTED_YEARS:
                 if year in dirpath:
@@ -47,20 +61,19 @@ def extract_urls_from_html_logs():
                                             fwrite.write(url.replace(
                                                 'tenhou.net/0/',
                                                 'tenhou.net/6/') + '\n')
-                                            year_urls_counts[year] += 1
-                                            total_urls_count += 1
-                                    bar.next()
+                                            # year_urls_counts[year] += 1
+                                            # total_urls_count += 1
+                                    pbar.update(1)
 
-    for year in SELECTED_YEARS:
-        print(year + ' URLs count: ' + str(year_urls_counts[year]))
-    print('Total URLs count: ' + str(total_urls_count) + '\n')
+    print('Extracting URLs finished.\n')
+    # for year in SELECTED_YEARS:
+    #     print(year + ' URLs count: ' + str(year_urls_counts[year]))
+    # print('Total URLs count: ' + str(total_urls_count) + '\n')
 
-    return year_urls_counts
 
-
-def download_json_from_urls(year, year_urls_counts):
-    with IncrementalBar('Downloading ' + year + ' game logs',
-                        max=year_urls_counts[year]) as bar:
+def download_json_from_urls(year):
+    with tqdm(desc='Downloading ' + year + ' JSON objects',
+              total=URL_COUNTS_BY_YEAR[year]) as pbar:
         with open(os.path.join(GAME_LOG_URLS_PATH, year + '.txt'), 'r') \
                 as fread:
             with open(os.path.join(RAW_GAME_LOGS_PATH, year), 'wb') as fwrite:
@@ -74,22 +87,18 @@ def download_json_from_urls(year, year_urls_counts):
                     }
                     response = requests.get(url, headers=headers)
                     fwrite.write(response.content + b'\n')
-                    bar.next()
-    print('Finished downloading ' + year + ' game logs')
+                    pbar.update(1)
 
 
 if __name__ == '__main__':
     try:
-        year_urls_counts = extract_urls_from_html_logs()
+        extract_urls_from_html_logs()
 
-        process_list = []
-        for year in SELECTED_YEARS:
-            p = Process(target=download_json_from_urls,
-                        args=(year, year_urls_counts))
-            p.start()
-            process_list.append(p)
-        for p in process_list:
-            p.join()
+        pool = Pool(len(SELECTED_YEARS))
+        for index, year in enumerate(SELECTED_YEARS):
+            pool.apply_async(download_json_from_urls, args=(year,))
+        pool.close()
+        pool.join()
 
         print('Success')
     except Exception as e:
