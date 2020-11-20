@@ -53,7 +53,8 @@ def extract_urls_from_html_logs():
 
     for year in SELECTED_YEARS:
         print(year + ' URLs count: ' + str(year_urls_counts[year]))
-    print('Total URLs count: ' + str(total_urls_count))
+    print('Total URLs count: ' + str(total_urls_count) + '\n')
+
     return year_urls_counts
 
 
