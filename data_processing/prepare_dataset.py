@@ -50,6 +50,8 @@ def count_extracted_game_logs(year):
 
 
 if __name__ == '__main__':
+    assert False  # comment this line to confirm running the scripts
+
     pool = Pool(len(SELECTED_YEARS))
     for year in SELECTED_YEARS:
         pool.apply_async(extract_game_logs_from_json, args=(year,))
