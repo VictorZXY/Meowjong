@@ -7,7 +7,7 @@ from tqdm import tqdm
 
 CPU_COUNT = 8
 HTML_COUNT = 4241
-URL_COUNT = 603416
+TOTAL_URL_COUNT = 603416
 URL_COUNTS_BY_YEAR = {
     '2009': 21976,
     '2010': 38105,
