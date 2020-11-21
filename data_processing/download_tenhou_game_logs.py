@@ -114,6 +114,8 @@ def download_2011_json_from_urls(index):
 
 
 if __name__ == '__main__':
+    assert False  # comment this line to confirm running the scripts
+
     # Original code
     extract_urls_from_html_logs()
 
