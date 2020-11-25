@@ -1,16 +1,14 @@
-import json
+import os
+import numpy as np
+import pandas as pd
 import pickle
 
-if __name__ == '__main__':
-    with open('../game_logs\\json\\raw\\2009', 'rb') as fread:
-        line = fread.readline()
-        j = json.loads(line)
-        with open('test', 'wb') as fwrite:
-            for log in j['log']:
-                pickle.dump(log, fwrite)
-                fwrite.write(b'\n')
+from tqdm import tqdm
 
-    with open('test','rb') as f:
-        for line in f:
-            result = pickle.loads(line)
-            print(result)
+from data_processing.data_preprocessing_constants import SELECTED_YEARS, \
+    EXTRACTED_GAME_LOGS_PATH, GAME_LOGS_COUNT
+
+if __name__ == '__main__':
+    a = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])
+    a = a.reshape(10)
+    print(a)
