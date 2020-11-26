@@ -7,8 +7,15 @@ from tqdm import tqdm
 
 from data_processing.data_preprocessing_constants import SELECTED_YEARS, \
     EXTRACTED_GAME_LOGS_PATH, GAME_LOGS_COUNT
+from data_processing.prepare_dataset import to_binary, to_array
 
 if __name__ == '__main__':
-    a = np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])
-    a = a.reshape(10)
-    print(a)
+    r = 0
+    for i in range(34 * 364):
+        r = (r << 1) + 1
+    print(r)
+    a = np.ones((34, 364))
+    b = to_binary(a)
+    print(b)
+    c = to_array(b)
+    print(c)

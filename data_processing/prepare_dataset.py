@@ -12,7 +12,7 @@ from data_processing.data_preprocessing_constants import JSON_COUNTS_BY_YEAR, \
     GAME_LOGS_COUNT, TENHOU_TILE_INDEX, ROUND_NUMBER_SIZE, HONBA_NUMBER_SIZE, \
     DEPOSIT_NUMBER_SIZE, SCORES_SIZE, ONE_SCORE_SIZE, DORA_INDICATORS_SIZE, \
     PRIVATE_TILES_SIZE, SELF_RED_DORA_INDICATORS_SIZE, MELDS_SIZE, \
-    ONE_MELD_SIZE, TILES_SIZE
+    ONE_MELD_SIZE, TILES_SIZE, TOTAL_COLUMNS_SIZE, TOTAL_FEATURES_COUNT
 
 from hand_calculation.tile_constants import FIVE_MAN, FIVE_PIN, FIVE_SOU, \
     NORTH, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
@@ -234,8 +234,21 @@ def can_kita(target_tile, private_tiles):
     return np.sum(private_tiles[NORTH]) + target_tile[NORTH] > 0
 
 
+def to_binary(array):
+    result_str = ''
+    reshaped_state = array.reshape(TOTAL_FEATURES_COUNT).astype(int)
+    for val in reshaped_state:
+        result_str += str(val)
+    return int(result_str, 2)
+
+
+def to_array(binary):
+    return np.array([int(item) for item in list(bin(binary)[2:])]) \
+        .reshape((34, TOTAL_COLUMNS_SIZE)).astype(float)
+
+
 if __name__ == '__main__':
-    # assert False  # comment this line to confirm running the scripts
+    assert False  # comment this line to confirm running the scripts
 
     # Extract game logs from the downloaded JSON objects
     pool = Pool(len(SELECTED_YEARS))
