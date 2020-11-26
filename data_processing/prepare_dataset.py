@@ -72,6 +72,10 @@ def find_max_honba_and_deposit():
 
 
 def encode_round_number(round_number):
+    """
+    :param round_number: log[0][0] from Tenhou
+    :return: (34, 3) np.array
+    """
     output = np.empty((34, ROUND_NUMBER_SIZE))
     for bit, val in enumerate(bin(round_number)[2:].zfill(ROUND_NUMBER_SIZE)):
         if val == '1':
@@ -82,6 +86,10 @@ def encode_round_number(round_number):
 
 
 def encode_honba_number(honba_number):
+    """
+    :param honba_number: log[0][1] from Tenhou
+    :return: (34, 4) np.array
+    """
     output = np.empty((34, HONBA_NUMBER_SIZE))
     for bit, val in enumerate(bin(honba_number)[2:].zfill(HONBA_NUMBER_SIZE)):
         if val == '1':
@@ -92,6 +100,10 @@ def encode_honba_number(honba_number):
 
 
 def encode_deposit_number(deposit_number):
+    """
+    :param deposit_number: log[0][2] from Tenhou
+    :return: (34, 4) np.array
+    """
     output = np.empty((34, DEPOSIT_NUMBER_SIZE))
     for bit, val in \
             enumerate(bin(deposit_number)[2:].zfill(DEPOSIT_NUMBER_SIZE)):
@@ -103,6 +115,10 @@ def encode_deposit_number(deposit_number):
 
 
 def encode_scores(scores):
+    """
+    :param scores: log[1] from Tenhou, a list of all 4 player's scores
+    :return: (34, 44) np.array
+    """
     output = np.zeros((34, SCORES_SIZE))
     for index, score in enumerate(scores):
         for bit, val in enumerate(bin(score // 100)[2:].zfill(ONE_SCORE_SIZE)):
@@ -112,6 +128,12 @@ def encode_scores(scores):
 
 
 def encode_dora_indicator(array, dora_indicators, index):
+    """
+    :param array: (34, 4) np.array, original encoded dora indicators
+    :param dora_indicators: log[2] from Tenhou, the list of dora indicators
+    :param index: index of the dora indicator from Tenhou's log
+    :return: updated (34, 4) np.array
+    """
     if TENHOU_TILE_INDEX[dora_indicators[0]] == RED_FIVE_MAN:
         array[FIVE_MAN, index] = 1
     elif TENHOU_TILE_INDEX[dora_indicators[0]] == RED_FIVE_PIN:
@@ -154,6 +176,10 @@ def add_tile_to_hand(tile, hand, red_dora_indicators):
 
 
 def encode_start_hand(start_hand):
+    """
+    :param start_hand: list of Tenhou-encoded integer indices
+    :return: hand: (34, 4) np.array; red_dora_indicators: (34, 1) np.array
+    """
     hand = np.zeros((34, PRIVATE_TILES_SIZE))
     red_dora_indicators = np.zeros((34, SELF_RED_DORA_INDICATORS_SIZE))
     for tile in start_hand:
