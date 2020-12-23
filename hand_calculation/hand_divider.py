@@ -154,7 +154,7 @@ class HandDivider:
         :param tiles: Input tiles represented by a 34-array
         :param start_index: Start index of the interval (inclusive)
         :param end_index: End index of the interval (inclusive)
-        :return: A list of lists of mentsu indecies
+        :return: A list of lists of mentsu indices
         """
         indices = Tiles.array_to_indices(tiles, start_index, end_index)
 
