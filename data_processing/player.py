@@ -124,7 +124,7 @@ class Player:
             tile = FIVE_SOU
 
         for meld in self.meld_tiles:
-            if meld == tile or self.hand[tile, 0] == 1:
+            if meld == tile or self.hand[meld, 0] == 1:
                 return True
         return False
 
