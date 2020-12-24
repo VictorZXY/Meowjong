@@ -5,6 +5,7 @@ import numpy as np
 from data_processing.data_preprocessing_constants import TILES_SIZE, \
     SELF_RED_DORA_SIZE, MELDS_SIZE, KITA_SIZE, DISCARDS_SIZE, TENHOU_TILE_INDEX, \
     ONE_MELD_SIZE, TURN_NUMBER_SIZE
+from hand_calculation.riichi_checker import RiichiChecker
 from hand_calculation.tenpai import Tenpai
 from hand_calculation.tile_constants import FIVE_MAN, FIVE_PIN, FIVE_SOU, \
     NORTH, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
@@ -20,7 +21,9 @@ class Player:
         self.log_draws = None
         self.log_discards = None
         self.meld_tiles = []
+        self.closed_kan = []
         self.riichi_status = False
+        self.riichi_turn_number = 0
 
     @staticmethod
     def __encode_number(number, size):
@@ -44,6 +47,17 @@ class Player:
         """
         return Player.__encode_number(turn_number, TURN_NUMBER_SIZE)
 
+    def encode_riichi_status(self):
+        if self.riichi_status:
+            riichi_status_encoded = np.ones((34, 1))
+        else:
+            riichi_status_encoded = np.zeros((34, 1))
+
+        return np.concatenate((
+            riichi_status_encoded,
+            Player.__encode_turn_number(self.riichi_turn_number)
+        ), axis=1)
+
     def can_pon(self, target_tile):
         """
         :param target_tile: Tenhou-encoded integer index of a tile
@@ -62,7 +76,23 @@ class Player:
 
         return np.sum(self.hand[tile], dtype=np.int32) >= 2
 
-    def can_kan(self, target_tile):
+    def can_closed_kan(self, target_tile):
+        """
+        :param target_tile: Tenhou-encoded integer index of a tile
+        :return: Boolean
+        """
+        tile = TENHOU_TILE_INDEX[target_tile]
+        if tile == RED_FIVE_MAN:
+            tile = FIVE_MAN
+        elif tile == RED_FIVE_PIN:
+            tile = FIVE_PIN
+        elif tile == RED_FIVE_SOU:
+            tile = FIVE_SOU
+
+        return np.sum(self.hand[tile], dtype=np.int32) == 3 \
+               or 4 in self.hand.sum(axis=1)
+
+    def can_open_kan(self, target_tile):
         """
         :param target_tile: Tenhou-encoded integer index of a tile
         :return: Boolean
@@ -93,7 +123,10 @@ class Player:
         elif tile == RED_FIVE_SOU:
             tile = FIVE_SOU
 
-        return tile in self.meld_tiles
+        for meld in self.meld_tiles:
+            if meld == tile or self.hand[tile, 0] == 1:
+                return True
+        return False
 
     def can_kita(self, target_tile):
         """
@@ -113,6 +146,8 @@ class Player:
         """
         if self.riichi_status:
             return False
+        if self.meld_tiles:
+            return False
 
         tile = TENHOU_TILE_INDEX[target_tile]
         if tile == RED_FIVE_MAN:
@@ -123,17 +158,9 @@ class Player:
             tile = FIVE_SOU
 
         private_tiles_array = np.sum(self.hand, axis=1, dtype=np.int32).tolist()
-        private_tiles_array[tile] += 1
 
-        for i in range(34):
-            private_tiles_temp_copy = deepcopy(private_tiles_array)
-            if private_tiles_array[i] != 0:
-                private_tiles_temp_copy[i] -= 1
-
-            if Tenpai.calculate_tenpai(private_tiles_temp_copy):
-                return True
-
-        return False
+        return RiichiChecker.can_riichi(private_tiles_array, tile,
+                                        self.closed_kan)
 
     def add_tile_to_hand(self, tile):
         """
@@ -170,26 +197,26 @@ class Player:
         """
         if TENHOU_TILE_INDEX[tile] == RED_FIVE_MAN:
             index = 0
-            while self.hand[FIVE_MAN, index] != 0:
+            while index < 4 and self.hand[FIVE_MAN, index] != 0:
                 index += 1
             self.hand[FIVE_MAN, index - 1] = 0
             self.red_dora[FIVE_MAN] = 0
         elif TENHOU_TILE_INDEX[tile] == RED_FIVE_PIN:
             index = 0
-            while self.hand[FIVE_PIN, index] != 0:
+            while index < 4 and self.hand[FIVE_PIN, index] != 0:
                 index += 1
             self.hand[FIVE_PIN, index - 1] = 0
             self.red_dora[FIVE_PIN] = 0
         elif TENHOU_TILE_INDEX[tile] == RED_FIVE_SOU:
             index = 0
-            while self.hand[FIVE_SOU, index] != 0:
+            while index < 4 and self.hand[FIVE_SOU, index] != 0:
                 index += 1
             self.hand[FIVE_SOU, index - 1] = 0
             self.red_dora[FIVE_SOU] = 0
         else:
             converted_tile = TENHOU_TILE_INDEX[tile]
             index = 0
-            while self.hand[converted_tile, index] != 0:
+            while index < 4 and self.hand[converted_tile, index] != 0:
                 index += 1
             self.hand[converted_tile, index - 1] = 0
 

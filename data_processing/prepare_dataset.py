@@ -184,7 +184,6 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
     scores = encode_scores(log[1])
     dora_indicators = np.zeros((34, DORA_INDICATORS_SIZE))
     encode_dora_indicator(dora_indicators, log[2], 0)
-    riichi_players = np.zeros((34, RIICHI_PLAYERS_SIZE))
 
     players = [Player(), Player(), Player()]
     hand_index = 4
@@ -199,8 +198,6 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
     self_index = east_index
     turn_number = 0
     is_pon = False
-    drawn_tile = -1
-    discarded_tile = -1
 
     while remaining_discards > 0:
         # Tenhou game log representations:
@@ -213,11 +210,16 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
         if self_index == east_index:
             turn_number += 1
 
+        # if turn_number == 6 and self_index == 1:  # TODO: for debugging
+        #     assert True  # TODO: for debugging
+
         player_self = players[self_index]
         player1 = players[(self_index + 1) % 3]
         player2 = players[(self_index + 2) % 3]
         player3 = Player()
         self_wind = encode_tile(self_index % 4 + 41)
+
+        endgame_flag = False
 
         if not is_pon:
             draw_flag = True
@@ -240,7 +242,9 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             player_self.kita,
                             player_self.discards,
                             dora_indicators,
-                            riichi_players,
+                            player1.encode_riichi_status(),
+                            player2.encode_riichi_status(),
+                            player3.encode_riichi_status(),
                             scores,
                             round_number,
                             honba_number,
@@ -264,19 +268,26 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                         # Update state
                         player_self.add_tile_to_hand(drawn_tile)
                         player_self.add_kita()
-                        draw_flag = True
-                        drawn_tile = player_self.log_draws.popleft()
-                        action = player_self.log_discards.popleft()
-                        if action == 60:
-                            action = drawn_tile
-                        remaining_discards -= 1
-                        continue
+                        if player_self.log_draws:
+                            draw_flag = True
+                            drawn_tile = player_self.log_draws.popleft()
+                            if remaining_discards > 0:
+                                action = player_self.log_discards.popleft()
+                                if action == 60:
+                                    action = drawn_tile
+                                remaining_discards -= 1
+                                continue
+                            else:
+                                endgame_flag = True
+                                break
+                        else:
+                            endgame_flag = True
+                            break
                     else:
                         # add action to the Kita dataset
                         pickle.dump(0, f_kita)
 
-                if player_self.can_kan(drawn_tile) \
-                        or player_self.can_add_kan(drawn_tile):
+                if player_self.can_closed_kan(drawn_tile):
                     # add state to the Kan dataset
                     pickle.dump(
                         np.concatenate((
@@ -287,7 +298,9 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             player_self.kita,
                             player_self.discards,
                             dora_indicators,
-                            riichi_players,
+                            player1.encode_riichi_status(),
+                            player2.encode_riichi_status(),
+                            player3.encode_riichi_status(),
                             scores,
                             round_number,
                             honba_number,
@@ -304,23 +317,104 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             player3.discards
                         ), axis=1), f_kan)
 
-                    if 'a' in str(action) or 'k' in str(action):
+                    if 'a' in str(action):
                         # add action to the Kan dataset
                         pickle.dump(1, f_kan)
 
                         # Update state
                         player_self.add_tile_to_hand(drawn_tile)
-                        player_self.add_meld('kan', drawn_tile, turn_number)
-                        draw_flag = True
-                        drawn_tile = player_self.log_draws.popleft()
-                        action = player_self.log_discards.popleft()
-                        if action == 60:
-                            action = drawn_tile
-                        remaining_discards -= 1
-                        continue
+                        kan_tile = int(str(action).replace('a', '')[:2])
+                        player_self.add_meld('kan', kan_tile, turn_number)
+
+                        kan_tile_converted = TENHOU_TILE_INDEX[kan_tile]
+                        if kan_tile_converted == RED_FIVE_MAN:
+                            kan_tile_converted = FIVE_MAN
+                        elif kan_tile_converted == RED_FIVE_PIN:
+                            kan_tile_converted = FIVE_PIN
+                        elif kan_tile_converted == RED_FIVE_SOU:
+                            kan_tile_converted = FIVE_SOU
+                        player_self.meld_tiles.remove(kan_tile_converted)
+                        player_self.closed_kan.append(kan_tile_converted)
+
+                        if player_self.log_draws:
+                            draw_flag = True
+                            drawn_tile = player_self.log_draws.popleft()
+                            if remaining_discards > 0:
+                                action = player_self.log_discards.popleft()
+                                if action == 60:
+                                    action = drawn_tile
+                                remaining_discards -= 1
+                                continue
+                            else:
+                                endgame_flag = True
+                                break
+                        else:
+                            endgame_flag = True
+                            break
                     else:
                         # add action to the Kita dataset
                         pickle.dump(0, f_kan)
+
+                if player_self.can_add_kan(drawn_tile):
+                    # add state to the Kan dataset
+                    pickle.dump(
+                        np.concatenate((
+                            encode_tile(drawn_tile),
+                            player_self.hand,
+                            player_self.red_dora,
+                            player_self.melds,
+                            player_self.kita,
+                            player_self.discards,
+                            dora_indicators,
+                            player1.encode_riichi_status(),
+                            player2.encode_riichi_status(),
+                            player3.encode_riichi_status(),
+                            scores,
+                            round_number,
+                            honba_number,
+                            deposit_number,
+                            self_wind,
+                            player1.melds,
+                            player1.kita,
+                            player1.discards,
+                            player2.melds,
+                            player2.kita,
+                            player2.discards,
+                            player3.melds,
+                            player3.kita,
+                            player3.discards
+                        ), axis=1), f_kan)
+
+                    if 'k' in str(action):
+                        # add action to the Kan dataset
+                        pickle.dump(1, f_kan)
+
+                        # Update state
+                        player_self.add_tile_to_hand(drawn_tile)
+                        kan_tile = int(str(action).replace('k', '')[:2])
+                        player_self.add_meld('kan', kan_tile, turn_number)
+
+                        if player_self.log_draws:
+                            draw_flag = True
+                            drawn_tile = player_self.log_draws.popleft()
+                            if remaining_discards > 0:
+                                action = player_self.log_discards.popleft()
+                                if action == 60:
+                                    action = drawn_tile
+                                remaining_discards -= 1
+                                continue
+                            else:
+                                endgame_flag = True
+                                break
+                        else:
+                            endgame_flag = True
+                            break
+                    else:
+                        # add action to the Kita dataset
+                        pickle.dump(0, f_kan)
+
+            if endgame_flag:
+                break
 
             if player_self.can_riichi(drawn_tile):
                 # add state to the Riichi dataset
@@ -333,7 +427,9 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                         player_self.kita,
                         player_self.discards,
                         dora_indicators,
-                        riichi_players,
+                        player1.encode_riichi_status(),
+                        player2.encode_riichi_status(),
+                        player3.encode_riichi_status(),
                         scores,
                         round_number,
                         honba_number,
@@ -364,7 +460,9 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             player_self.kita,
                             player_self.discards,
                             dora_indicators,
-                            riichi_players,
+                            player1.encode_riichi_status(),
+                            player2.encode_riichi_status(),
+                            player3.encode_riichi_status(),
                             scores,
                             round_number,
                             honba_number,
@@ -391,6 +489,7 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                     player_self.add_tile_to_hand(drawn_tile)
                     player_self.discard_tile_from_hand(discarded_tile)
                     player_self.riichi_status = True
+                    player_self.riichi_turn_number = turn_number
 
                 else:
                     # add action to the Riichi dataset
@@ -406,7 +505,9 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             player_self.kita,
                             player_self.discards,
                             dora_indicators,
-                            riichi_players,
+                            player1.encode_riichi_status(),
+                            player2.encode_riichi_status(),
+                            player3.encode_riichi_status(),
                             scores,
                             round_number,
                             honba_number,
@@ -432,7 +533,54 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                     player_self.discard_tile_from_hand(discarded_tile)
 
             else:
-                # add state to the discard dataset
+                discarded_tile = action
+
+                # if player hasn't declared Riichi, add data to the
+                # discard dataset
+                if not player_self.riichi_status:
+                    pickle.dump(
+                        np.concatenate((
+                            encode_tile(drawn_tile),
+                            player_self.hand,
+                            player_self.red_dora,
+                            player_self.melds,
+                            player_self.kita,
+                            player_self.discards,
+                            dora_indicators,
+                            player1.encode_riichi_status(),
+                            player2.encode_riichi_status(),
+                            player3.encode_riichi_status(),
+                            scores,
+                            round_number,
+                            honba_number,
+                            deposit_number,
+                            self_wind,
+                            player1.melds,
+                            player1.kita,
+                            player1.discards,
+                            player2.melds,
+                            player2.kita,
+                            player2.discards,
+                            player3.melds,
+                            player3.kita,
+                            player3.discards
+                        ), axis=1), f_discard)
+
+                    pickle.dump(encode_tile(discarded_tile), f_discard)
+
+                # update state
+                player_self.add_tile_to_hand(drawn_tile)
+                player_self.discard_tile_from_hand(discarded_tile)
+
+        else:
+            action = player_self.log_discards.popleft()
+            if action == 60:
+                action = drawn_tile
+            discarded_tile = action
+            remaining_discards -= 1
+
+            # if player hasn't declared Riichi, add data to the discard dataset
+            if not player_self.riichi_status:
                 pickle.dump(
                     np.concatenate((
                         encode_tile(drawn_tile),
@@ -442,7 +590,9 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                         player_self.kita,
                         player_self.discards,
                         dora_indicators,
-                        riichi_players,
+                        player1.encode_riichi_status(),
+                        player2.encode_riichi_status(),
+                        player3.encode_riichi_status(),
                         scores,
                         round_number,
                         honba_number,
@@ -459,50 +609,7 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                         player3.discards
                     ), axis=1), f_discard)
 
-                # add action to the discard dataset
-                discarded_tile = action
                 pickle.dump(encode_tile(discarded_tile), f_discard)
-
-                # update state
-                player_self.add_tile_to_hand(drawn_tile)
-                player_self.discard_tile_from_hand(discarded_tile)
-
-        else:
-            action = player_self.log_discards.popleft()
-            if action == 60:
-                action = drawn_tile
-            remaining_discards -= 1
-
-            # add state to the discard dataset
-            pickle.dump(
-                np.concatenate((
-                    encode_tile(drawn_tile),
-                    player_self.hand,
-                    player_self.red_dora,
-                    player_self.melds,
-                    player_self.kita,
-                    player_self.discards,
-                    dora_indicators,
-                    riichi_players,
-                    scores,
-                    round_number,
-                    honba_number,
-                    deposit_number,
-                    self_wind,
-                    player1.melds,
-                    player1.kita,
-                    player1.discards,
-                    player2.melds,
-                    player2.kita,
-                    player2.discards,
-                    player3.melds,
-                    player3.kita,
-                    player3.discards
-                ), axis=1), f_discard)
-
-            # add action to the discard dataset
-            discarded_tile = action
-            pickle.dump(encode_tile(discarded_tile), f_discard)
 
             # update state
             player_self.add_tile_to_hand(drawn_tile)
@@ -526,7 +633,9 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             players[i].kita,
                             players[i].discards,
                             dora_indicators,
-                            riichi_players,
+                            players[(i + 1) % 3].encode_riichi_status(),
+                            players[(i + 2) % 3].encode_riichi_status(),
+                            player3.encode_riichi_status(),
                             scores,
                             round_number,
                             honba_number,
@@ -544,25 +653,35 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                         ), axis=1), f_pon)
 
                     if 'p' in str(action):
-                        # add action to the Pon dataset
-                        pickle.dump(1, f_pon)
+                        pon_tile = int(str(action).replace('p', '')[:2])
+                        if pon_tile == discarded_tile \
+                                or (pon_tile == 15 and discarded_tile == 51) \
+                                or (pon_tile == 25 and discarded_tile == 52) \
+                                or (pon_tile == 35 and discarded_tile == 53):
+                            # add action to the Pon dataset
+                            pickle.dump(1, f_pon)
 
-                        # update state
-                        drawn_tile = discarded_tile
-                        players[i].log_draws.popleft()
-                        players[i].add_tile_to_hand(drawn_tile)
-                        players[i].add_meld('pon', drawn_tile, turn_number)
-                        self_index = i
-                        is_pon = True
-                        interrupted = True
-                        break
+                            # update state
+                            drawn_tile = discarded_tile
+                            players[i].log_draws.popleft()
+                            players[i].add_tile_to_hand(drawn_tile)
+                            players[i].add_meld('pon', drawn_tile, turn_number)
+                            self_index = i
+                            is_pon = True
+                            interrupted = True
+                            break
+                        else:
+                            # add action to the Pon dataset
+                            pickle.dump(0, f_pon)
+                            is_pon = False
+                            interrupted = False
                     else:
                         # add action to the Pon dataset
                         pickle.dump(0, f_pon)
                         is_pon = False
                         interrupted = False
 
-                if players[i].can_kan(discarded_tile):
+                if players[i].can_open_kan(discarded_tile):
                     # add state to the Kan dataset
                     pickle.dump(
                         np.concatenate((
@@ -573,7 +692,9 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             players[i].kita,
                             players[i].discards,
                             dora_indicators,
-                            riichi_players,
+                            players[(i + 1) % 3].encode_riichi_status(),
+                            players[(i + 2) % 3].encode_riichi_status(),
+                            player3.encode_riichi_status(),
                             scores,
                             round_number,
                             honba_number,
@@ -591,18 +712,31 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                         ), axis=1), f_kan)
 
                     if 'm' in str(action):
-                        # add action to the Kan dataset
-                        pickle.dump(1, f_kan)
+                        kan_tile = int(str(action).replace('m', '')[:2])
+                        if kan_tile == discarded_tile \
+                                or (kan_tile == 15 and discarded_tile == 51) \
+                                or (kan_tile == 25 and discarded_tile == 52) \
+                                or (kan_tile == 35 and discarded_tile == 53):
+                            # add action to the Kan dataset
+                            pickle.dump(1, f_kan)
 
-                        # update state
-                        drawn_tile = discarded_tile
-                        players[i].log_draws.popleft()
-                        players[i].add_tile_to_hand(drawn_tile)
-                        players[i].add_meld('kan', drawn_tile, turn_number)
-                        self_index = i
-                        is_pon = False
-                        interrupted = True
-                        break
+                            # update state
+                            drawn_tile = discarded_tile
+                            players[i].log_draws.popleft()
+                            players[i].add_tile_to_hand(drawn_tile)
+                            players[i].add_meld('kan', drawn_tile, turn_number)
+                            if players[i].log_discards:
+                                players[i].log_discards.popleft()
+                                remaining_discards -= 1
+                            self_index = i
+                            is_pon = False
+                            interrupted = True
+                            break
+                        else:
+                            # add action to the Kan dataset
+                            pickle.dump(0, f_kan)
+                            is_pon = False
+                            interrupted = False
                     else:
                         # add action to the Kan dataset
                         pickle.dump(0, f_kan)
@@ -615,27 +749,27 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
 
 
 if __name__ == '__main__':
-    assert False  # comment this line to confirm running the scripts
-
-    # Extract game logs from the downloaded JSON objects
-    pool = Pool(len(SELECTED_YEARS))
-    for year in SELECTED_YEARS:
-        pool.apply_async(extract_game_logs_from_json, args=(year,))
-    pool.close()
-    pool.join()
-
-    # Count the number of extracted game logs
-    total = 0
-    for year in SELECTED_YEARS:
-        count = count_extracted_game_logs(year)
-        print(str(count) + ' game logs extracted from ' + year)
-        total += count
-    print('Total no. of game logs extracted: ' + str(total))
-
-    # Find the maximum honba and deposit numbers
-    max_honba_and_deposit_results = find_max_honba_and_deposit()
-    for key, val in max_honba_and_deposit_results.items():
-        print(key + ':', val)
+    # assert False  # comment this line to confirm running the scripts
+    #
+    # # Extract game logs from the downloaded JSON objects
+    # pool = Pool(len(SELECTED_YEARS))
+    # for year in SELECTED_YEARS:
+    #     pool.apply_async(extract_game_logs_from_json, args=(year,))
+    # pool.close()
+    # pool.join()
+    #
+    # # Count the number of extracted game logs
+    # total = 0
+    # for year in SELECTED_YEARS:
+    #     count = count_extracted_game_logs(year)
+    #     print(str(count) + ' game logs extracted from ' + year)
+    #     total += count
+    # print('Total no. of game logs extracted: ' + str(total))
+    #
+    # # Find the maximum honba and deposit numbers
+    # max_honba_and_deposit_results = find_max_honba_and_deposit()
+    # for key, val in max_honba_and_deposit_results.items():
+    #     print(key + ':', val)
 
     with tqdm(desc='Encoding', total=GAME_LOGS_COUNTS_BY_YEAR['2019']) as pbar:
         with open(os.path.join(DATASET_PATH, 'discard' + '.pickle'),
@@ -653,7 +787,13 @@ if __name__ == '__main__':
                                                    '2019' + '.pickle'),
                                       'rb') as fread:
                                 try:
+                                    count = 0  # TODO: for debugging
+
                                     while log := pickle.load(fread):
+                                        count += 1  # TODO: for debugging
+                                        if count != 917:  # TODO: for debugging
+                                            continue  # TODO: for debugging
+
                                         encode_game_log(log,
                                                         f_discard=f_discard,
                                                         f_pon=f_pon,
