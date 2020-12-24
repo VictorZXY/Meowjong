@@ -347,8 +347,8 @@ class Player:
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(tile)
 
-        self.melds[:, len(self.meld_tiles) * ONE_MELD_SIZE + 4:
-                      len(self.meld_tiles) * ONE_MELD_SIZE + 9] = \
+        self.melds[:, len(self.meld_tiles) * ONE_MELD_SIZE - 5:
+                      len(self.meld_tiles) * ONE_MELD_SIZE] = \
             Player.__encode_turn_number(turn_number)
 
     def encode_start_hand(self, start_hand):

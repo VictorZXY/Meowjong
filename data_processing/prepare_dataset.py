@@ -839,7 +839,7 @@ if __name__ == '__main__':
 
                                     while log := pickle.load(fread):
                                         # count += 1  # TODO: for debugging
-                                        # if count != 966:  # TODO: for debugging
+                                        # if count != 5743:  # TODO: for debugging
                                         #     continue  # TODO: for debugging
 
                                         encode_game_log(log,
