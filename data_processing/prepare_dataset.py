@@ -221,9 +221,6 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
         if self_index == east_index:
             turn_number += 1
 
-        # if turn_number == 9 and self_index == 1:  # TODO: for debugging
-        #     assert True  # TODO: for debugging
-
         player_self = players[self_index]
         player1 = players[(self_index + 1) % 3]
         player2 = players[(self_index + 2) % 3]
@@ -796,6 +793,51 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
             is_pon = False
 
 
+def summarise_dataset(action, year, files_count):
+    if action == 'discard':
+        discard_count = 0
+        for i in range(files_count):
+            filename = os.path.join(DATASET_PATH + '\\discard',
+                                    'discard_' + str(year)
+                                    + '_{:0>2d}'.format(i + 1) + '.pickle')
+            with open(filename, 'rb') as f_discard:
+                try:
+                    while True:
+                        pickle.load(f_discard)
+                        discard_count += 1
+                except EOFError:
+                    pass
+        print('total discard data:', discard_count / 2)
+    else:
+        count = {
+            'yes': 0,
+            'no': 0,
+            'total': 0
+        }
+        action_flag = False
+        for i in range(files_count):
+            filename = os.path.join(DATASET_PATH + '\\' + action,
+                                    action + '_' + str(year)
+                                    + '_{:0>2d}'.format(i + 1) + '.pickle')
+            with open(filename, 'rb') as fread:
+                try:
+                    while True:
+                        data = pickle.load(fread)
+                        if action_flag:
+                            if data == 1:
+                                count['yes'] += 1
+                            else:
+                                count['no'] += 1
+                        else:
+                            count['total'] += 1
+                        action_flag = not action_flag
+                except EOFError:
+                    pass
+        print('total ' + action + ' data:', count['total'])
+        print(action + ' accepted:', count['yes'])
+        print(action + ' declined:', count['no'])
+
+
 if __name__ == '__main__':
     # assert False  # comment this line to confirm running the scripts
     #
@@ -819,36 +861,66 @@ if __name__ == '__main__':
     # for key, val in max_honba_and_deposit_results.items():
     #     print(key + ':', val)
 
-    with tqdm(desc='Encoding', total=GAME_LOGS_COUNTS_BY_YEAR['2019']) as pbar:
-        with open(os.path.join(DATASET_PATH, 'discard' + '.pickle'),
-                  'wb') as f_discard:
-            with open(os.path.join(DATASET_PATH, 'pon' + '.pickle'),
-                      'wb') as f_pon:
-                with open(os.path.join(DATASET_PATH, 'kan' + '.pickle'),
-                          'wb') as f_kan:
-                    with open(os.path.join(DATASET_PATH, 'kita' + '.pickle'),
-                              'wb') as f_kita:
-                        with open(os.path.join(DATASET_PATH,
-                                               'riichi' + '.pickle'),
-                                  'wb') as f_riichi:
-                            with open(os.path.join(EXTRACTED_GAME_LOGS_PATH,
-                                                   '2019' + '.pickle'),
-                                      'rb') as fread:
-                                try:
-                                    # count = 0  # TODO: for debugging
+    # with tqdm(desc='Encoding', total=GAME_LOGS_COUNTS_BY_YEAR['2020'],
+    #           initial=7000) as pbar:
+    #     with open(os.path.join(DATASET_PATH, 'discard' + '.pickle'),
+    #               'wb') as f_discard:
+    #         with open(os.path.join(DATASET_PATH, 'pon' + '.pickle'),
+    #                   'wb') as f_pon:
+    #             with open(os.path.join(DATASET_PATH, 'kan' + '.pickle'),
+    #                       'wb') as f_kan:
+    #                 with open(os.path.join(DATASET_PATH, 'kita' + '.pickle'),
+    #                           'wb') as f_kita:
+    #                     with open(os.path.join(DATASET_PATH,
+    #                                            'riichi' + '.pickle'),
+    #                               'wb') as f_riichi:
+    #                         with open(os.path.join(EXTRACTED_GAME_LOGS_PATH,
+    #                                                '2020' + '.pickle'),
+    #                                   'rb') as fread:
+    #                             try:
+    #                                 count = 0
+    #
+    #                                 while log := pickle.load(fread):
+    #                                     count += 1
+    #                                     if count <= 7000:
+    #                                         continue
+    #                                     # elif count == 63813:  # 2019
+    #                                     #     pbar.update(1)
+    #                                     #     continue
+    #                                     elif count == 7628:  # 2020
+    #                                         pbar.update(1)
+    #                                         continue
+    #
+    #                                     encode_game_log(log,
+    #                                                     f_discard=f_discard,
+    #                                                     f_pon=f_pon,
+    #                                                     f_kan=f_kan,
+    #                                                     f_kita=f_kita,
+    #                                                     f_riichi=f_riichi)
+    #                                     pbar.update(1)
+    #                             except EOFError:
+    #                                 pass
 
-                                    while log := pickle.load(fread):
-                                        # count += 1  # TODO: for debugging
-                                        # if count != 5743:  # TODO: for debugging
-                                        #     continue  # TODO: for debugging
+    print('2019 dataset:')
+    summarise_dataset(action='discard', year='2019', files_count=20)
+    print()
+    summarise_dataset(action='pon', year='2019', files_count=20)
+    print()
+    summarise_dataset(action='kan', year='2019', files_count=20)
+    print()
+    summarise_dataset(action='kita', year='2019', files_count=20)
+    print()
+    summarise_dataset(action='riichi', year='2019', files_count=20)
+    print()
 
-                                        encode_game_log(log,
-                                                        f_discard=f_discard,
-                                                        f_pon=f_pon,
-                                                        f_kan=f_kan,
-                                                        f_kita=f_kita,
-                                                        f_riichi=f_riichi)
-                                        pbar.update(1)
-                                except EOFError:
-                                    pass
-    print('Success')
+    print('2020 dataset:')
+    summarise_dataset(action='discard', year='2020', files_count=2)
+    print()
+    summarise_dataset(action='pon', year='2020', files_count=2)
+    print()
+    summarise_dataset(action='kan', year='2020', files_count=2)
+    print()
+    summarise_dataset(action='kita', year='2020', files_count=2)
+    print()
+    summarise_dataset(action='riichi', year='2020', files_count=2)
+    print()
