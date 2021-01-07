@@ -1,7 +1,7 @@
 from typing import List
 
-from evaluation.hand_calculation import Tiles
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.tiles import Tiles
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class Iipeikou(Yaku):

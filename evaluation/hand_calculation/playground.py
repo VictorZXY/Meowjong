@@ -1,8 +1,8 @@
-from evaluation.hand_calculation import HandCalculator
-from evaluation.hand_calculation import HandConfig
-from evaluation.hand_calculation import Meld
-from evaluation.hand_calculation import Tiles
 from evaluation.hand_calculation import tile_constants
+from evaluation.hand_calculation.hand_calculator import HandCalculator
+from evaluation.hand_calculation.hand_config import HandConfig
+from evaluation.hand_calculation.meld import Meld
+from evaluation.hand_calculation.tiles import Tiles
 
 if __name__ == '__main__':
     hand_config = HandConfig(

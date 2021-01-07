@@ -1,4 +1,4 @@
-from evaluation.hand_calculation import Tiles
+from evaluation.hand_calculation.tiles import Tiles
 
 
 class InvalidFormatError(Exception):

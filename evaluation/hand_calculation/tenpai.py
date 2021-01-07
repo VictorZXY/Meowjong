@@ -1,4 +1,4 @@
-from evaluation.hand_calculation import Agari
+from evaluation.hand_calculation.agari import Agari
 
 
 class Tenpai:

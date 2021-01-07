@@ -1,10 +1,11 @@
 from functools import reduce
 from typing import List
 
-from evaluation.hand_calculation import NINE_MAN, ONE_PIN, ONE_SOU, \
-    RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU, MANZU, PINZU, SOUZU, HONOURS
-from evaluation.hand_calculation import Tiles
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.tile_constants import NINE_MAN, ONE_PIN, \
+    ONE_SOU, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU, MANZU, PINZU, SOUZU, \
+    HONOURS
+from evaluation.hand_calculation.tiles import Tiles
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class JunseiChuurenPoutou(Yaku):

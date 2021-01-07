@@ -3,9 +3,9 @@ from itertools import product
 
 from pyswip import Prolog
 
-from evaluation.hand_calculation import ONE_MAN, NINE_MAN, ONE_PIN, NINE_PIN, \
-    ONE_SOU, NINE_SOU, EAST, CHUN, YAOCHUUHAI
-from evaluation.hand_calculation import Tiles
+from evaluation.hand_calculation.tile_constants import ONE_MAN, NINE_MAN, \
+    ONE_PIN, NINE_PIN, ONE_SOU, NINE_SOU, EAST, CHUN, YAOCHUUHAI
+from evaluation.hand_calculation.tiles import Tiles
 
 
 class RiichiChecker:
@@ -131,7 +131,7 @@ class RiichiChecker:
         # prolog.consult('riichi_checker.pl')
         prolog.consult('C:/Users/Victor/Desktop/To-Do List/_CST/Part II'
                        + '/Part II Project/Source Code/meowjong'
-                       + '/hand_calculation/riichi_checker.pl')
+                       + '/evaluation/hand_calculation/riichi_checker.pl')
         for solution in prolog.query(
                 'combination(' + str(indices) + ', Combination)'):
             combination = sorted(solution['Combination'])

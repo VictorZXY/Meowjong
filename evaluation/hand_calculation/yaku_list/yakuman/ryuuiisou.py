@@ -1,7 +1,7 @@
 from typing import List
 
-from evaluation.hand_calculation import GREEN_TILES
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.tile_constants import GREEN_TILES
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class Ryuuiisou(Yaku):

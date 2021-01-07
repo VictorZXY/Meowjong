@@ -1,9 +1,9 @@
 from typing import List
 
-from evaluation.hand_calculation import ONE_MAN, NINE_MAN, ONE_PIN, \
-    NINE_PIN, ONE_SOU, NINE_SOU
-from evaluation.hand_calculation import Tiles
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.tile_constants import ONE_MAN, NINE_MAN, \
+    ONE_PIN, NINE_PIN, ONE_SOU, NINE_SOU
+from evaluation.hand_calculation.tiles import Tiles
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class SanshokuDoujun(Yaku):

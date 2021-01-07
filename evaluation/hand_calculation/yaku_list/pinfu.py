@@ -1,7 +1,7 @@
 from typing import List
 
-from evaluation.hand_calculation import Fu
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.fu import Fu
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class Pinfu(Yaku):

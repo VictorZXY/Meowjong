@@ -1,5 +1,5 @@
-from evaluation.hand_calculation import EAST
-from evaluation.hand_calculation import YakuConfig
+from evaluation.hand_calculation.tile_constants import EAST
+from evaluation.hand_calculation.yaku_config import YakuConfig
 
 
 class HandConfig:

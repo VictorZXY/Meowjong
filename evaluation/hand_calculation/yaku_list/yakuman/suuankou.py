@@ -1,9 +1,9 @@
 from typing import List
 
-from evaluation.hand_calculation import FIVE_MAN, FIVE_PIN, FIVE_SOU, \
-    RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
-from evaluation.hand_calculation import Tiles
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.tile_constants import FIVE_MAN, FIVE_PIN, \
+    FIVE_SOU, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
+from evaluation.hand_calculation.tiles import Tiles
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class Suuankou(Yaku):

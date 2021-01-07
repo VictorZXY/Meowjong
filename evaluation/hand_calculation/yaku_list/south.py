@@ -1,7 +1,7 @@
 from typing import List
 
-from evaluation.hand_calculation import SOUTH
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.tile_constants import SOUTH
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class South(Yaku):

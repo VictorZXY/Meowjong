@@ -1,7 +1,7 @@
 from typing import List
 
-from evaluation.hand_calculation import EAST
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.tile_constants import EAST
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class East(Yaku):

@@ -1,5 +1,6 @@
-from evaluation.hand_calculation import ONE_MAN, FIVE_MAN, SEVEN_MAN, ONE_PIN, \
-    FIVE_PIN, SEVEN_PIN, ONE_SOU, FIVE_SOU, SEVEN_SOU, EAST, RED_DORA_VALUE
+from evaluation.hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, \
+    SEVEN_MAN, ONE_PIN, FIVE_PIN, SEVEN_PIN, ONE_SOU, FIVE_SOU, SEVEN_SOU, \
+    EAST, RED_DORA_VALUE
 
 
 class Tiles:

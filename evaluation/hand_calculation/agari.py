@@ -1,4 +1,4 @@
-from evaluation.hand_calculation import HandDivider
+from evaluation.hand_calculation.hand_divider import HandDivider
 from evaluation.hand_calculation.yaku_list.yakuman import KokushiMusou
 
 

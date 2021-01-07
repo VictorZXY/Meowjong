@@ -1,8 +1,8 @@
-from evaluation.hand_calculation import Meld
-from evaluation.hand_calculation import ONE_MAN, FIVE_MAN, NINE_MAN, ONE_PIN, \
-    FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, RED_FIVE_MAN, \
-    RED_FIVE_PIN, RED_FIVE_SOU, TERMINALS, DRAGONS, YAOCHUUHAI
-from evaluation.hand_calculation import Tiles
+from evaluation.hand_calculation.meld import Meld
+from evaluation.hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, \
+    NINE_MAN, ONE_PIN, FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, \
+    RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU, TERMINALS, DRAGONS, YAOCHUUHAI
+from evaluation.hand_calculation.tiles import Tiles
 
 
 class Fu:

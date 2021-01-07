@@ -1,7 +1,7 @@
 from typing import List
 
-from evaluation.hand_calculation import CHUN
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.tile_constants import CHUN
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class Chun(Yaku):

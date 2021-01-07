@@ -1,9 +1,9 @@
 from math import prod
 from typing import List
 
-from evaluation.hand_calculation import Tiles
-from evaluation.hand_calculation import YAOCHUUHAI
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.tiles import Tiles
+from evaluation.hand_calculation.tile_constants import YAOCHUUHAI
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class KokushiMusou13Men(Yaku):

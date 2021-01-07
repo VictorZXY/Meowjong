@@ -1,7 +1,7 @@
 from typing import List
 
-from evaluation.hand_calculation import Meld
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.meld import Meld
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class Sankantsu(Yaku):

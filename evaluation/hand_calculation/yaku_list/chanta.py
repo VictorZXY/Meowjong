@@ -1,8 +1,8 @@
 from typing import List
 
-from evaluation.hand_calculation import TERMINALS, HONOURS
-from evaluation.hand_calculation import Tiles
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.tile_constants import TERMINALS, HONOURS
+from evaluation.hand_calculation.tiles import Tiles
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class Chanta(Yaku):

@@ -1,10 +1,10 @@
-from evaluation.hand_calculation import FIVE_MAN, FIVE_PIN, FIVE_SOU, \
-    RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU, RED_DORA_VALUE
-from evaluation.hand_calculation import Fu
-from evaluation.hand_calculation import Han
-from evaluation.hand_calculation import HandConfig
-from evaluation.hand_calculation import HandDivider
-from evaluation.hand_calculation import Score
+from evaluation.hand_calculation.fu import Fu
+from evaluation.hand_calculation.han import Han
+from evaluation.hand_calculation.hand_config import HandConfig
+from evaluation.hand_calculation.hand_divider import HandDivider
+from evaluation.hand_calculation.score import Score
+from evaluation.hand_calculation.tile_constants import FIVE_MAN, FIVE_PIN, \
+    FIVE_SOU, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU, RED_DORA_VALUE
 
 
 class NoYakuError(Exception):

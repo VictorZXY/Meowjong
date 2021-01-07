@@ -1,8 +1,8 @@
 from typing import List
 
-from evaluation.hand_calculation import DRAGONS
-from evaluation.hand_calculation import Tiles
-from evaluation.hand_calculation import Yaku
+from evaluation.hand_calculation.tile_constants import DRAGONS
+from evaluation.hand_calculation.tiles import Tiles
+from evaluation.hand_calculation.yaku import Yaku
 
 
 class Shousangen(Yaku):
