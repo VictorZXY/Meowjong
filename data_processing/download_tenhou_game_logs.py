@@ -1,8 +1,7 @@
 import os
 import re
-import requests
 
-from multiprocessing import Pool
+import requests
 from tqdm import tqdm
 
 from data_processing.data_preprocessing_constants import HTML_COUNT, \

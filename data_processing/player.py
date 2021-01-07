@@ -1,14 +1,11 @@
-from copy import deepcopy
-
 import numpy as np
 
 from data_processing.data_preprocessing_constants import TILES_SIZE, \
-    SELF_RED_DORA_SIZE, MELDS_SIZE, KITA_SIZE, DISCARDS_SIZE, TENHOU_TILE_INDEX, \
-    ONE_MELD_SIZE, TURN_NUMBER_SIZE
-from hand_calculation.riichi_checker import RiichiChecker
-from hand_calculation.tenpai import Tenpai
-from hand_calculation.tile_constants import FIVE_MAN, FIVE_PIN, FIVE_SOU, \
-    NORTH, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
+    SELF_RED_DORA_SIZE, MELDS_SIZE, KITA_SIZE, DISCARDS_SIZE, \
+    TENHOU_TILE_INDEX, ONE_MELD_SIZE, TURN_NUMBER_SIZE
+from evaluation.hand_calculation import FIVE_MAN, FIVE_PIN, FIVE_SOU, NORTH, \
+    RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
+from evaluation.hand_calculation import RiichiChecker
 
 
 class Player:

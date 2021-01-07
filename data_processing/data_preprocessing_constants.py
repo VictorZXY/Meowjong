@@ -1,4 +1,4 @@
-from hand_calculation.tile_constants import ONE_MAN, TWO_MAN, THREE_MAN, \
+from evaluation.hand_calculation import ONE_MAN, TWO_MAN, THREE_MAN, \
     FOUR_MAN, FIVE_MAN, SIX_MAN, SEVEN_MAN, EIGHT_MAN, NINE_MAN, ONE_PIN, \
     TWO_PIN, THREE_PIN, FOUR_PIN, FIVE_PIN, SIX_PIN, SEVEN_PIN, EIGHT_PIN, \
     NINE_PIN, ONE_SOU, TWO_SOU, THREE_SOU, FOUR_SOU, FIVE_SOU, SIX_SOU, \

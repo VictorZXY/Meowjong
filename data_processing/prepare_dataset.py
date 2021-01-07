@@ -1,25 +1,20 @@
 import json
+import os
+import pickle
 from collections import deque
 
 import numpy as np
-import os
-import pickle
-
-from multiprocessing import Pool
 from tqdm import tqdm
 
 from data_processing.data_preprocessing_constants import JSON_COUNTS_BY_YEAR, \
     RAW_GAME_LOGS_PATH, EXTRACTED_GAME_LOGS_PATH, SELECTED_YEARS, \
     GAME_LOGS_COUNT, TENHOU_TILE_INDEX, ROUND_NUMBER_SIZE, HONBA_NUMBER_SIZE, \
-    DEPOSIT_NUMBER_SIZE, TURN_NUMBER_SIZE, SCORES_SIZE, ONE_SCORE_SIZE, \
-    DORA_INDICATORS_SIZE, SELF_RED_DORA_SIZE, MELDS_SIZE, ONE_MELD_SIZE, \
-    TILES_SIZE, RIICHI_PLAYERS_SIZE, TOTAL_COLUMNS_SIZE, TOTAL_FEATURES_COUNT, \
-    GAME_LOGS_COUNTS_BY_YEAR, DATASET_PATH
-
+    DEPOSIT_NUMBER_SIZE, SCORES_SIZE, ONE_SCORE_SIZE, \
+    DORA_INDICATORS_SIZE, TOTAL_COLUMNS_SIZE, TOTAL_FEATURES_COUNT, \
+    DATASET_PATH
 from data_processing.player import Player
-
-from hand_calculation.tile_constants import FIVE_MAN, FIVE_PIN, FIVE_SOU, \
-    NORTH, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
+from evaluation.hand_calculation import FIVE_MAN, FIVE_PIN, FIVE_SOU, \
+    RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
 
 SEATING_INDEX = {  # use discard-player-index - pon-player-index
     -1: 0,  # left-hand-side player
