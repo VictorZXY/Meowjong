@@ -13,8 +13,8 @@ from data_processing.data_preprocessing_constants import JSON_COUNTS_BY_YEAR, \
     DORA_INDICATORS_SIZE, TOTAL_COLUMNS_SIZE, TOTAL_FEATURES_COUNT, \
     DATASET_PATH
 from data_processing.player import Player
-from evaluation.hand_calculation import FIVE_MAN, FIVE_PIN, FIVE_SOU, \
-    RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
+from evaluation.hand_calculation.tile_constants import FIVE_MAN, FIVE_PIN, \
+    FIVE_SOU, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
 
 SEATING_INDEX = {  # use discard-player-index - pon-player-index
     -1: 0,  # left-hand-side player

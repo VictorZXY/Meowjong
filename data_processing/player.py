@@ -3,9 +3,9 @@ import numpy as np
 from data_processing.data_preprocessing_constants import TILES_SIZE, \
     SELF_RED_DORA_SIZE, MELDS_SIZE, KITA_SIZE, DISCARDS_SIZE, \
     TENHOU_TILE_INDEX, ONE_MELD_SIZE, TURN_NUMBER_SIZE
-from evaluation.hand_calculation import FIVE_MAN, FIVE_PIN, FIVE_SOU, NORTH, \
-    RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
-from evaluation.hand_calculation import RiichiChecker
+from evaluation.hand_calculation.tile_constants import FIVE_MAN, FIVE_PIN, \
+    FIVE_SOU, NORTH, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
+from evaluation.hand_calculation.riichi_checker import RiichiChecker
 
 
 class Player:
@@ -25,7 +25,7 @@ class Player:
     @staticmethod
     def __encode_number(number, size):
         """
-        :param round_number: Integer
+        :param number: Integer
         :return: (34, size) np.array
         """
         output = np.empty((34, size))
@@ -224,22 +224,22 @@ class Player:
         self.kita[NORTH, index] = 1
         self.discard_tile_from_hand(44)
 
-    def add_meld(self, type, tile, turn_number):
+    def add_meld(self, meld_type, tile, turn_number):
         """
-        :param type: String, 'pon' or 'kan'
+        :param meld_type: String, 'pon' or 'kan'
         :param tile: Tenhou-encoded integer index of a tile
         :param turn_number: Integer
         """
         if TENHOU_TILE_INDEX[tile] == RED_FIVE_MAN:
             if FIVE_MAN not in self.meld_tiles:
-                if type == 'pon':
+                if meld_type == 'pon':
                     self.melds[FIVE_MAN, len(self.meld_tiles) * ONE_MELD_SIZE:
                                          len(self.meld_tiles) * ONE_MELD_SIZE
                                          + 3] = 1
                     self.discard_tile_from_hand(51)
                     self.discard_tile_from_hand(15)
                     self.discard_tile_from_hand(15)
-                elif type == 'kan':
+                elif meld_type == 'kan':
                     self.melds[FIVE_MAN, len(self.meld_tiles) * ONE_MELD_SIZE:
                                          len(self.meld_tiles) * ONE_MELD_SIZE
                                          + 4] = 1
@@ -251,7 +251,7 @@ class Player:
                 self.meld_tiles.append(FIVE_MAN)
 
             else:
-                if type == 'kan':
+                if meld_type == 'kan':
                     self.melds[FIVE_MAN, self.meld_tiles.index(FIVE_MAN)
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(51)
@@ -260,14 +260,14 @@ class Player:
 
         elif TENHOU_TILE_INDEX[tile] == RED_FIVE_PIN:
             if FIVE_PIN not in self.meld_tiles:
-                if type == 'pon':
+                if meld_type == 'pon':
                     self.melds[FIVE_PIN, len(self.meld_tiles) * ONE_MELD_SIZE:
                                          len(self.meld_tiles) * ONE_MELD_SIZE
                                          + 3] = 1
                     self.discard_tile_from_hand(52)
                     self.discard_tile_from_hand(25)
                     self.discard_tile_from_hand(25)
-                elif type == 'kan':
+                elif meld_type == 'kan':
                     self.melds[FIVE_PIN, len(self.meld_tiles) * ONE_MELD_SIZE:
                                          len(self.meld_tiles) * ONE_MELD_SIZE
                                          + 4] = 1
@@ -279,7 +279,7 @@ class Player:
                 self.meld_tiles.append(FIVE_PIN)
 
             else:
-                if type == 'kan':
+                if meld_type == 'kan':
                     self.melds[FIVE_PIN, self.meld_tiles.index(FIVE_PIN)
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(52)
@@ -288,14 +288,14 @@ class Player:
 
         elif TENHOU_TILE_INDEX[tile] == RED_FIVE_SOU:
             if FIVE_SOU not in self.meld_tiles:
-                if type == 'pon':
+                if meld_type == 'pon':
                     self.melds[FIVE_SOU, len(self.meld_tiles) * ONE_MELD_SIZE:
                                          len(self.meld_tiles) * ONE_MELD_SIZE
                                          + 3] = 1
                     self.discard_tile_from_hand(53)
                     self.discard_tile_from_hand(35)
                     self.discard_tile_from_hand(35)
-                elif type == 'kan':
+                elif meld_type == 'kan':
                     self.melds[FIVE_SOU, len(self.meld_tiles) * ONE_MELD_SIZE:
                                          len(self.meld_tiles) * ONE_MELD_SIZE
                                          + 4] = 1
@@ -307,7 +307,7 @@ class Player:
                 self.meld_tiles.append(FIVE_SOU)
 
             else:
-                if type == 'kan':
+                if meld_type == 'kan':
                     self.melds[FIVE_SOU, self.meld_tiles.index(FIVE_SOU)
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(53)
@@ -317,7 +317,7 @@ class Player:
         else:
             converted_tile = TENHOU_TILE_INDEX[tile]
             if converted_tile not in self.meld_tiles:
-                if type == 'pon':
+                if meld_type == 'pon':
                     self.melds[converted_tile, len(self.meld_tiles)
                                                * ONE_MELD_SIZE:
                                                len(self.meld_tiles)
@@ -325,7 +325,7 @@ class Player:
                     self.discard_tile_from_hand(tile)
                     self.discard_tile_from_hand(tile)
                     self.discard_tile_from_hand(tile)
-                elif type == 'kan':
+                elif meld_type == 'kan':
                     self.melds[converted_tile, len(self.meld_tiles)
                                                * ONE_MELD_SIZE:
                                                len(self.meld_tiles)
@@ -338,7 +338,7 @@ class Player:
                 self.meld_tiles.append(converted_tile)
 
             else:
-                if type == 'kan':
+                if meld_type == 'kan':
                     self.melds[converted_tile,
                                self.meld_tiles.index(converted_tile)
                                * ONE_MELD_SIZE + 3] = 1
@@ -351,7 +351,6 @@ class Player:
     def encode_start_hand(self, start_hand):
         """
         :param start_hand: list of Tenhou-encoded integer indices
-        :param player: Player object
         :return: hand: (34, 4) np.array; red_dora: (34, 1) np.array
         """
         self.hand = np.zeros((34, TILES_SIZE))

@@ -10,5 +10,13 @@ def connect_bit(x, y):
 connect_bit = np.frompyfunc(connect_bit, 2, 1)
 
 if __name__ == '__main__':
-    a = np.ones(TOTAL_FEATURES_COUNT, dtype='int')
-    print(connect_bit.reduce(a))
+    a = np.array([
+        [1, 1, 0, 0],
+        [1, 0, 0, 0],
+        [1, 1, 1, 0],
+        [0, 0, 0, 0],
+        [1, 0, 1, 0],
+        [0, 1, 1, 1]
+    ])
+    print(a.shape)
+    print(np.sum(a, axis=1).tolist())
