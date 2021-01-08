@@ -1,6 +1,10 @@
+import numpy as np
+
+from data_processing.data_preprocessing_constants import TILES_SIZE, \
+    SELF_RED_DORA_SIZE
 from evaluation.hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, \
     SEVEN_MAN, ONE_PIN, FIVE_PIN, SEVEN_PIN, ONE_SOU, FIVE_SOU, SEVEN_SOU, \
-    EAST, RED_DORA_VALUE
+    EAST, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU, RED_DORA_VALUE
 
 
 class Tiles:
@@ -70,6 +74,54 @@ class Tiles:
         return False
 
     @staticmethod
+    def indices_to_matrices(indices):
+        """
+        Convert a list of indices into a (34, 4) numpy array, and a (34, 1)
+        numpy array indicating the red dora.
+        :param indices: Input tiles represented by a list of integer indices
+        :return: A tuple of (34, 4) numpy array and a (34, 1) numpy array
+        """
+        hand = np.zeros((34, TILES_SIZE))
+        red_dora = np.zeros((34, SELF_RED_DORA_SIZE))
+
+        for tile in indices:
+            if tile == RED_FIVE_MAN:
+                index = 0
+                while hand[FIVE_MAN, index] != 0:
+                    index += 1
+                hand[FIVE_MAN, index] = 1
+                red_dora[FIVE_MAN] = 1
+            elif tile == RED_FIVE_PIN:
+                index = 0
+                while hand[FIVE_PIN, index] != 0:
+                    index += 1
+                hand[FIVE_PIN, index] = 1
+                red_dora[FIVE_PIN] = 1
+            elif tile == RED_FIVE_SOU:
+                index = 0
+                while hand[FIVE_SOU, index] != 0:
+                    index += 1
+                hand[FIVE_SOU, index] = 1
+                red_dora[FIVE_SOU] = 1
+            else:
+                index = 0
+                while hand[tile, index] != 0:
+                    index += 1
+                hand[tile, index] = 1
+
+        return hand, red_dora
+
+    @staticmethod
+    def matrices_to_array(hand):
+        """
+        Convert tiles represented as a (34, 4) numpy array into a list of
+        integer array indices. Red dora are not counted.
+        :param hand: (34, 4) numpy array
+        :return: A 34-array
+        """
+        return np.sum(hand, axis=1, dtype=np.int32).tolist()
+
+    @staticmethod
     def array_to_indices(tiles, start_index=0, end_index=33,
                          count_red_dora=False):
         """
@@ -78,6 +130,7 @@ class Tiles:
         :param tiles: Input tiles represented by a 34-array
         :param start_index: Start index of the interval (inclusive)
         :param end_index: End index of the interval (inclusive)
+        :param count_red_dora: Whether red dora should be counted
         :return: A list of integer array indices
         """
         indices = []
@@ -97,13 +150,13 @@ class Tiles:
         # Array representation:
         # manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
         # red dora is not taken into count in this method.
-        result = [0] * 34
+        tiles = [0] * 34
         for index in indices:
-            result[index] += 1
+            tiles[index] += 1
         for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
-            if result[index] == 4:
-                result[index] = 7
-        return result
+            if tiles[index] == 4:
+                tiles[index] = 7
+        return tiles
 
     @staticmethod
     def array_to_one_line_string(tiles):
@@ -166,34 +219,34 @@ class Tiles:
         # Array representation:
         # manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
         # red dora count as 4.
-        result = [0] * 34
+        tiles = [0] * 34
 
         # manzu
         for i in man:
             if i == '0':
-                result[FIVE_MAN] += RED_DORA_VALUE
+                tiles[FIVE_MAN] += RED_DORA_VALUE
             else:
-                result[ONE_MAN + int(i) - 1] += 1
+                tiles[ONE_MAN + int(i) - 1] += 1
 
         # pinzu
         for i in pin:
             if i == '0':
-                result[FIVE_PIN] += RED_DORA_VALUE
+                tiles[FIVE_PIN] += RED_DORA_VALUE
             else:
-                result[ONE_PIN + int(i) - 1] += 1
+                tiles[ONE_PIN + int(i) - 1] += 1
 
         # souzu
         for i in sou:
             if i == '0':
-                result[FIVE_SOU] += RED_DORA_VALUE
+                tiles[FIVE_SOU] += RED_DORA_VALUE
             else:
-                result[ONE_SOU + int(i) - 1] += 1
+                tiles[ONE_SOU + int(i) - 1] += 1
 
         # honours
         for i in honours:
-            result[EAST + int(i) - 1] += 1
+            tiles[EAST + int(i) - 1] += 1
 
-        return result
+        return tiles
 
     @staticmethod
     def one_line_string_to_array(string):
