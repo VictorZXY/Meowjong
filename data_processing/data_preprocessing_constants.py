@@ -6,12 +6,12 @@ from evaluation.hand_calculation.tile_constants import ONE_MAN, TWO_MAN, \
     HATSU, CHUN, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
 
 # File directories
-HTML_GAME_LOGS_PATH = '../game_logs\\html'
-GAME_LOG_URLS_PATH = '../game_logs\\html\\game_log_urls'
-JSON_GAME_LOGS_PATH = '../game_logs\\json'
-RAW_GAME_LOGS_PATH = '../game_logs\\json\\raw'
-EXTRACTED_GAME_LOGS_PATH = '../game_logs\\json\\extracted'
-DATASET_PATH = '../game_logs\\dataset'
+HTML_GAME_LOGS_PATH = '../game_logs/html'
+GAME_LOG_URLS_PATH = '../game_logs/html/game_log_urls'
+JSON_GAME_LOGS_PATH = '../game_logs/json'
+RAW_GAME_LOGS_PATH = '../game_logs/json/raw'
+EXTRACTED_GAME_LOGS_PATH = '../game_logs/json/extracted'
+DATASET_PATH = '../game_logs/dataset'
 
 # For downloading game logs from Tenhou.net
 SELECTED_YEARS = ['2009', '2010', '2011', '2012', '2013', '2014', '2015',
