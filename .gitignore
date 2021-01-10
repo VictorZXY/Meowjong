@@ -133,5 +133,7 @@ dmypy.json
 .idea/
 
 # Meowjong-specific (game logs, training data, etc.)
+dataset
+dataset/
 game_logs
 game_logs/
