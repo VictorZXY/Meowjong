@@ -11,7 +11,7 @@ GAME_LOG_URLS_PATH = '../game_logs/html/game_log_urls'
 JSON_GAME_LOGS_PATH = '../game_logs/json'
 RAW_GAME_LOGS_PATH = '../game_logs/json/raw'
 EXTRACTED_GAME_LOGS_PATH = '../game_logs/json/extracted'
-DATASET_PATH = '../game_logs/dataset'
+DATASET_PATH = '../dataset'
 
 # For downloading game logs from Tenhou.net
 SELECTED_YEARS = ['2009', '2010', '2011', '2012', '2013', '2014', '2015',
