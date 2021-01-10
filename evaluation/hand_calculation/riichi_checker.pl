@@ -1,7 +1,3 @@
-:- set_prolog_stack(global, limit(100000000000)).
-:- set_prolog_stack(trail,  limit(100000000000)).
-:- set_prolog_stack(local,  limit(100000000000)).
-
 pair([A, A]).
 taatsu([A, B]) :- B < 27, B is A + 1.
 taatsu([B, A]) :- B < 27, B is A + 1.
