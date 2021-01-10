@@ -1,3 +1,5 @@
+:- set_prolog_flag(stack_limit, 100 000 000 000).
+
 pair([A, A]).
 taatsu([A, B]) :- B < 27, B is A + 1.
 taatsu([B, A]) :- B < 27, B is A + 1.

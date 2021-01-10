@@ -1,3 +1,5 @@
+:- set_prolog_flag(stack_limit, 100 000 000 000).
+
 koutsu([A, A, A]).
 shuntsu([A, B, C]) :- B is A + 1, C is A + 2.
 shuntsu([A, C, B]) :- B is A + 1, C is A + 2.
