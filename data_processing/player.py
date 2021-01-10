@@ -1,11 +1,16 @@
+from itertools import product
+
 import numpy as np
 
 from data_processing.data_preprocessing_constants import TILES_SIZE, \
     SELF_RED_DORA_SIZE, MELDS_SIZE, KITA_SIZE, DISCARDS_SIZE, \
     TENHOU_TILE_INDEX, ONE_MELD_SIZE, TURN_NUMBER_SIZE
-from evaluation.hand_calculation.tile_constants import FIVE_MAN, FIVE_PIN, \
-    FIVE_SOU, NORTH, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
+from evaluation.hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, \
+    NINE_MAN, ONE_PIN, FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, EAST, \
+    NORTH, CHUN, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
+
 from evaluation.hand_calculation.riichi_checker import RiichiChecker
+from evaluation.hand_calculation.tiles import Tiles
 
 
 class Player:
@@ -14,7 +19,9 @@ class Player:
         self.red_dora = np.zeros((34, SELF_RED_DORA_SIZE))
         self.melds = np.zeros((34, MELDS_SIZE))
         self.kita = np.zeros((34, KITA_SIZE))
+        self.kita_index = 0
         self.discards = np.zeros((34, DISCARDS_SIZE))
+        self.discard_index = 0
         self.log_draws = None
         self.log_discards = None
         self.meld_tiles = []
@@ -86,8 +93,67 @@ class Player:
         elif tile == RED_FIVE_SOU:
             tile = FIVE_SOU
 
-        return np.sum(self.hand[tile], dtype=np.int32) == 3 \
-               or 4 in self.hand.sum(axis=1)
+        if np.sum(self.hand[tile], dtype=np.int32) == 3 \
+                or 4 in self.hand.sum(axis=1):
+            if not self.riichi_status:
+                return True
+            else:
+                tiles = Tiles.matrices_to_array(self.hand)
+                # manzu
+                man = RiichiChecker.find_combinations(tiles, ONE_MAN, NINE_MAN)
+                # pinzu
+                pin = RiichiChecker.find_combinations(tiles, ONE_PIN, NINE_PIN)
+                # souzu
+                sou = RiichiChecker.find_combinations(tiles, ONE_SOU, NINE_SOU)
+                # honours
+                honours = RiichiChecker.find_combinations(tiles, EAST, CHUN)
+
+                combinations_sets = [[]]
+                if man:
+                    combinations_sets.append(man)
+                if pin:
+                    combinations_sets.append(pin)
+                if sou:
+                    combinations_sets.append(sou)
+                if honours:
+                    combinations_sets.append(honours)
+                combinations_sets.pop(0)
+
+                for combinations in product(*combinations_sets):
+                    has_koutsu = False
+                    mentsu_count = 0
+                    pair_count = 0
+                    taatsu_count = 0
+                    singleton_count = 0
+
+                    if self.closed_kan:
+                        mentsu_count += len(self.closed_kan)
+
+                    for combination in list(combinations):
+                        for item in combination:
+                            if len(item) == 3:
+                                mentsu_count += 1
+                                if item[0] == item[1] == item[2] == tile:
+                                    has_koutsu = True
+                            elif len(item) == 2:
+                                if item[0] == item[1]:
+                                    pair_count += 1
+                                else:
+                                    taatsu_count += 1
+                            else:  # len(item) == 1
+                                singleton_count += 1
+
+                    counts = (mentsu_count, pair_count, taatsu_count,
+                              singleton_count)
+                    if counts == (4, 0, 0, 1) \
+                            or counts == (3, 2, 0, 0) \
+                            or counts == (3, 1, 1, 0):
+                        if has_koutsu:
+                            return True
+
+                return False
+        else:
+            return False
 
     def can_open_kan(self, target_tile):
         """
@@ -217,12 +283,26 @@ class Player:
                 index += 1
             self.hand[converted_tile, index - 1] = 0
 
+    def add_discard(self, tile):
+        """
+        :param tile: Tenhou-encoded integer index of a tile
+        """
+        converted_tile = TENHOU_TILE_INDEX[tile]
+        if converted_tile == RED_FIVE_MAN:
+            converted_tile = FIVE_MAN
+        elif converted_tile == RED_FIVE_PIN:
+            converted_tile = FIVE_PIN
+        elif converted_tile == RED_FIVE_SOU:
+            converted_tile = FIVE_SOU
+
+        self.discards[converted_tile, self.discard_index] = 1
+        self.discard_index += 1
+        self.discard_tile_from_hand(tile)
+
     def add_kita(self):
-        index = 0
-        while self.kita[NORTH, index] != 0:
-            index += 1
-        self.kita[NORTH, index] = 1
-        self.discard_tile_from_hand(44)
+        self.kita[NORTH, self.kita_index] = 1
+        self.kita_index += 1
+        self.discard_tile_from_hand(44)  # 44 is Tenhou-encoded index for North
 
     def add_meld(self, meld_type, tile, turn_number):
         """

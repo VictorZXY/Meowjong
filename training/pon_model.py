@@ -102,7 +102,7 @@ history = model.fit(X_train, y_train, batch_size=32, epochs=500,
 with open(os.path.join(cnn_path, 'history.pickle'), 'wb') as f_history:
     pickle.dump(history, f_history)
 
-model.save(os.path.join(cnn_path, 'pon_model.h5'))
+model.save(os.path.join(cnn_path, 'pon_model_01.h5'))
 
 eval_train = model.evaluate(X_train, y_train)
 print('final training loss:', eval_train[0])

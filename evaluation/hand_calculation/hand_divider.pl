@@ -1,4 +1,6 @@
-:- set_prolog_flag(stack_limit, 100 000 000 000).
+:- set_prolog_stack(global, limit(100000000000)).
+:- set_prolog_stack(trail,  limit(100000000000)).
+:- set_prolog_stack(local,  limit(100000000000)).
 
 koutsu([A, A, A]).
 shuntsu([A, B, C]) :- B is A + 1, C is A + 2.

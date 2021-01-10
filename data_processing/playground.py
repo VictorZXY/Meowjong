@@ -3,20 +3,23 @@ import numpy as np
 from data_processing.data_preprocessing_constants import TOTAL_FEATURES_COUNT
 
 
-def connect_bit(x, y):
-    return (x << 1) | y
+def foo(a, b, c):
+    a += 1
+    b['b'] += 1
+    c['c'] += 1
+    return a
 
-
-connect_bit = np.frompyfunc(connect_bit, 2, 1)
 
 if __name__ == '__main__':
-    a = np.array([
-        [1, 1, 0, 0],
-        [1, 0, 0, 0],
-        [1, 1, 1, 0],
-        [0, 0, 0, 0],
-        [1, 0, 1, 0],
-        [0, 1, 1, 1]
-    ])
-    print(a.shape)
-    print(np.sum(a, axis=1).tolist())
+    a = 0
+    b = {
+        'a': 0, 'b': 0, 'c': 0
+    }
+    c = {
+        'a': 0, 'b': 0, 'c': 0
+    }
+    a = foo(a, b, c)
+    a = foo(a, b, c)
+    print(a)
+    print(b)
+    print(c)

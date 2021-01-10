@@ -100,8 +100,8 @@ class Agent(ABC):
                         for item in combination:
                             if len(item) == 3:
                                 mentsu_count += 1
-                                has_koutsu = (item[0] == item[1] == item[2]
-                                              == target_tile)
+                                if item[0] == item[1] == item[2] == target_tile:
+                                    has_koutsu = True
                             elif len(item) == 2:
                                 if item[0] == item[1]:
                                     pair_count += 1

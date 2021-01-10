@@ -1,9 +1,12 @@
 import json
 import os
 import pickle
-from collections import deque
+import traceback
 
 import numpy as np
+
+from collections import deque
+from PIL import Image
 from tqdm import tqdm
 
 from data_processing.data_preprocessing_constants import JSON_COUNTS_BY_YEAR, \
@@ -11,7 +14,7 @@ from data_processing.data_preprocessing_constants import JSON_COUNTS_BY_YEAR, \
     GAME_LOGS_COUNT, TENHOU_TILE_INDEX, ROUND_NUMBER_SIZE, HONBA_NUMBER_SIZE, \
     DEPOSIT_NUMBER_SIZE, SCORES_SIZE, ONE_SCORE_SIZE, \
     DORA_INDICATORS_SIZE, TOTAL_COLUMNS_SIZE, TOTAL_FEATURES_COUNT, \
-    DATASET_PATH
+    DATASET_PATH, GAME_LOGS_COUNTS_BY_YEAR
 from data_processing.player import Player
 from evaluation.hand_calculation.tile_constants import FIVE_MAN, FIVE_PIN, \
     FIVE_SOU, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
@@ -182,8 +185,24 @@ def to_array(binary):
         .reshape((34, TOTAL_COLUMNS_SIZE)).astype(float)
 
 
-def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
-                    ignore_last_discard=False):
+def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
+                    riichi_dir, discard_count, pon_count, kan_count, kita_count,
+                    riichi_count):
+    """
+    :param year: String
+    :param log: Tenhou JSON game log object
+    :param discard_dir: Discard directory
+    :param pon_dir: Pon directory
+    :param kan_dir: Kan directory
+    :param kita_dir: Kita directory
+    :param riichi_dir: Riichi directory
+    :param discard_count: Integer
+    :param pon_count: Dictionary
+    :param kan_count: Dictionary
+    :param kita_count: Dictionary
+    :param riichi_count: Dictionary
+    :return: discard_count
+    """
     round_number = encode_round_number(log[0][0])
     honba_number = encode_honba_number(log[0][1])
     deposit_number = encode_deposit_number(log[0][2])
@@ -236,37 +255,45 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                 draw_flag = False
                 if player_self.can_kita(drawn_tile):
                     # add state to the the Kita dataset
-                    pickle.dump(
-                        to_binary(np.concatenate((
-                            encode_tile(drawn_tile),
-                            player_self.hand,
-                            player_self.red_dora,
-                            player_self.melds,
-                            player_self.kita,
-                            player_self.discards,
-                            dora_indicators,
-                            player1.encode_riichi_status(),
-                            player2.encode_riichi_status(),
-                            player3.encode_riichi_status(),
-                            scores,
-                            round_number,
-                            honba_number,
-                            deposit_number,
-                            self_wind,
-                            player1.melds,
-                            player1.kita,
-                            player1.discards,
-                            player2.melds,
-                            player2.kita,
-                            player2.discards,
-                            player3.melds,
-                            player3.kita,
-                            player3.discards
-                        ), axis=1)), f_kita)
+                    kita_count['total'] += 1
+                    state = np.concatenate((
+                        encode_tile(drawn_tile),
+                        player_self.hand,
+                        player_self.red_dora,
+                        player_self.melds,
+                        player_self.kita,
+                        player_self.discards,
+                        dora_indicators,
+                        player1.encode_riichi_status(),
+                        player2.encode_riichi_status(),
+                        player3.encode_riichi_status(),
+                        scores,
+                        round_number,
+                        honba_number,
+                        deposit_number,
+                        self_wind,
+                        player1.melds,
+                        player1.kita,
+                        player1.discards,
+                        player2.melds,
+                        player2.kita,
+                        player2.discards,
+                        player3.melds,
+                        player3.kita,
+                        player3.discards
+                    ), axis=1).astype(np.uint8)
+                    filename = 'kita_' + year + "_" \
+                               + str(kita_count['total']) + '.png'
+                    Image.fromarray(state * 255, 'L') \
+                        .save(os.path.join(kita_dir, filename))
 
                     if 'f' in str(action):
                         # add action to the Kita dataset
-                        pickle.dump(1, f_kita)
+                        filename = 'kita_actions_' + year + '.txt'
+                        with open(os.path.join(kita_dir, filename), 'a') \
+                                as f_kita:
+                            f_kita.write('1\n')
+                        kita_count['yes'] += 1
 
                         # Update state
                         player_self.add_tile_to_hand(drawn_tile)
@@ -288,41 +315,53 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             break
                     else:
                         # add action to the Kita dataset
-                        pickle.dump(0, f_kita)
+                        filename = 'kita_actions_' + year + '.txt'
+                        with open(os.path.join(kita_dir, filename), 'a') \
+                                as f_kita:
+                            f_kita.write('0\n')
+                        kita_count['no'] += 1
 
                 if player_self.can_closed_kan(drawn_tile):
                     # add state to the Kan dataset
-                    pickle.dump(
-                        to_binary(np.concatenate((
-                            encode_tile(drawn_tile),
-                            player_self.hand,
-                            player_self.red_dora,
-                            player_self.melds,
-                            player_self.kita,
-                            player_self.discards,
-                            dora_indicators,
-                            player1.encode_riichi_status(),
-                            player2.encode_riichi_status(),
-                            player3.encode_riichi_status(),
-                            scores,
-                            round_number,
-                            honba_number,
-                            deposit_number,
-                            self_wind,
-                            player1.melds,
-                            player1.kita,
-                            player1.discards,
-                            player2.melds,
-                            player2.kita,
-                            player2.discards,
-                            player3.melds,
-                            player3.kita,
-                            player3.discards
-                        ), axis=1)), f_kan)
+                    kan_count['total'] += 1
+                    state = np.concatenate((
+                        encode_tile(drawn_tile),
+                        player_self.hand,
+                        player_self.red_dora,
+                        player_self.melds,
+                        player_self.kita,
+                        player_self.discards,
+                        dora_indicators,
+                        player1.encode_riichi_status(),
+                        player2.encode_riichi_status(),
+                        player3.encode_riichi_status(),
+                        scores,
+                        round_number,
+                        honba_number,
+                        deposit_number,
+                        self_wind,
+                        player1.melds,
+                        player1.kita,
+                        player1.discards,
+                        player2.melds,
+                        player2.kita,
+                        player2.discards,
+                        player3.melds,
+                        player3.kita,
+                        player3.discards
+                    ), axis=1).astype(np.uint8)
+                    filename = 'kan_' + year + "_" \
+                               + str(kan_count['total']) + '.png'
+                    Image.fromarray(state * 255, 'L') \
+                        .save(os.path.join(kan_dir, filename))
 
                     if 'a' in str(action):
                         # add action to the Kan dataset
-                        pickle.dump(1, f_kan)
+                        filename = 'kan_actions_' + year + '.txt'
+                        with open(os.path.join(kan_dir, filename), 'a') \
+                                as f_kan:
+                            f_kan.write('1\n')
+                        kan_count['yes'] += 1
 
                         # Update state
                         player_self.add_tile_to_hand(drawn_tile)
@@ -356,41 +395,53 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             break
                     else:
                         # add action to the Kita dataset
-                        pickle.dump(0, f_kan)
+                        filename = 'kan_actions_' + year + '.txt'
+                        with open(os.path.join(kan_dir, filename), 'a') \
+                                as f_kan:
+                            f_kan.write('0\n')
+                        kan_count['no'] += 1
 
                 if player_self.can_add_kan(drawn_tile):
                     # add state to the Kan dataset
-                    pickle.dump(
-                        to_binary(np.concatenate((
-                            encode_tile(drawn_tile),
-                            player_self.hand,
-                            player_self.red_dora,
-                            player_self.melds,
-                            player_self.kita,
-                            player_self.discards,
-                            dora_indicators,
-                            player1.encode_riichi_status(),
-                            player2.encode_riichi_status(),
-                            player3.encode_riichi_status(),
-                            scores,
-                            round_number,
-                            honba_number,
-                            deposit_number,
-                            self_wind,
-                            player1.melds,
-                            player1.kita,
-                            player1.discards,
-                            player2.melds,
-                            player2.kita,
-                            player2.discards,
-                            player3.melds,
-                            player3.kita,
-                            player3.discards
-                        ), axis=1)), f_kan)
+                    kan_count['total'] += 1
+                    state = np.concatenate((
+                        encode_tile(drawn_tile),
+                        player_self.hand,
+                        player_self.red_dora,
+                        player_self.melds,
+                        player_self.kita,
+                        player_self.discards,
+                        dora_indicators,
+                        player1.encode_riichi_status(),
+                        player2.encode_riichi_status(),
+                        player3.encode_riichi_status(),
+                        scores,
+                        round_number,
+                        honba_number,
+                        deposit_number,
+                        self_wind,
+                        player1.melds,
+                        player1.kita,
+                        player1.discards,
+                        player2.melds,
+                        player2.kita,
+                        player2.discards,
+                        player3.melds,
+                        player3.kita,
+                        player3.discards
+                    ), axis=1).astype(np.uint8)
+                    filename = 'kan_' + year + "_" \
+                               + str(kan_count['total']) + '.png'
+                    Image.fromarray(state * 255, 'L') \
+                        .save(os.path.join(kan_dir, filename))
 
                     if 'k' in str(action):
                         # add action to the Kan dataset
-                        pickle.dump(1, f_kan)
+                        filename = 'kan_actions_' + year + '.txt'
+                        with open(os.path.join(kan_dir, filename), 'a') \
+                                as f_kan:
+                            f_kan.write('1\n')
+                        kan_count['yes'] += 1
 
                         # Update state
                         player_self.add_tile_to_hand(drawn_tile)
@@ -414,15 +465,60 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             break
                     else:
                         # add action to the Kita dataset
-                        pickle.dump(0, f_kan)
+                        filename = 'kan_actions_' + year + '.txt'
+                        with open(os.path.join(kan_dir, filename), 'a') \
+                                as f_kan:
+                            f_kan.write('0\n')
+                        kan_count['no'] += 1
 
             if endgame_flag:
                 break
 
             if player_self.can_riichi(drawn_tile):
                 # add state to the Riichi dataset
-                pickle.dump(
-                    to_binary(np.concatenate((
+                riichi_count['total'] += 1
+                state = np.concatenate((
+                    encode_tile(drawn_tile),
+                    player_self.hand,
+                    player_self.red_dora,
+                    player_self.melds,
+                    player_self.kita,
+                    player_self.discards,
+                    dora_indicators,
+                    player1.encode_riichi_status(),
+                    player2.encode_riichi_status(),
+                    player3.encode_riichi_status(),
+                    scores,
+                    round_number,
+                    honba_number,
+                    deposit_number,
+                    self_wind,
+                    player1.melds,
+                    player1.kita,
+                    player1.discards,
+                    player2.melds,
+                    player2.kita,
+                    player2.discards,
+                    player3.melds,
+                    player3.kita,
+                    player3.discards
+                ), axis=1).astype(np.uint8)
+                filename = 'riichi_' + year + "_" \
+                           + str(riichi_count['total']) + '.png'
+                Image.fromarray(state * 255, 'L') \
+                    .save(os.path.join(riichi_dir, filename))
+
+                if 'r' in str(action):
+                    # add action to the Riichi dataset
+                    filename = 'riichi_actions_' + year + '.txt'
+                    with open(os.path.join(riichi_dir, filename), 'a') \
+                            as f_riichi:
+                        f_riichi.write('1\n')
+                    riichi_count['yes'] += 1
+
+                    # add state to the discard dataset
+                    discard_count += 1
+                    state = np.concatenate((
                         encode_tile(drawn_tile),
                         player_self.hand,
                         player_self.red_dora,
@@ -447,40 +543,11 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                         player3.melds,
                         player3.kita,
                         player3.discards
-                    ), axis=1)), f_riichi)
-
-                if 'r' in str(action):
-                    # add action to the Riichi dataset
-                    pickle.dump(1, f_riichi)
-
-                    # add state to the discard dataset
-                    pickle.dump(
-                        to_binary(np.concatenate((
-                            encode_tile(drawn_tile),
-                            player_self.hand,
-                            player_self.red_dora,
-                            player_self.melds,
-                            player_self.kita,
-                            player_self.discards,
-                            dora_indicators,
-                            player1.encode_riichi_status(),
-                            player2.encode_riichi_status(),
-                            player3.encode_riichi_status(),
-                            scores,
-                            round_number,
-                            honba_number,
-                            deposit_number,
-                            self_wind,
-                            player1.melds,
-                            player1.kita,
-                            player1.discards,
-                            player2.melds,
-                            player2.kita,
-                            player2.discards,
-                            player3.melds,
-                            player3.kita,
-                            player3.discards
-                        ), axis=1)), f_discard)
+                    ), axis=1).astype(np.uint8)
+                    filename = 'discard_' + year + "_" \
+                               + str(discard_count) + '.png'
+                    Image.fromarray(state * 255, 'L') \
+                        .save(os.path.join(discard_dir, filename))
 
                     # add action to the discard dataset
                     discarded_tile = int(action.replace('r', ''))
@@ -493,120 +560,28 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                         discarded_tile_converted = FIVE_PIN
                     elif discarded_tile_converted == RED_FIVE_SOU:
                         discarded_tile_converted = FIVE_SOU
-                    pickle.dump(discarded_tile_converted, f_discard)
+                    filename = 'discard_actions_' + year + '.txt'
+                    with open(os.path.join(discard_dir, filename), 'a') \
+                            as f_discard:
+                        f_discard.write(str(discarded_tile_converted) + '\n')
 
                     # update state
                     player_self.add_tile_to_hand(drawn_tile)
-                    player_self.discard_tile_from_hand(discarded_tile)
+                    player_self.add_discard(discarded_tile)
                     player_self.riichi_status = True
                     player_self.riichi_turn_number = turn_number
 
                 else:
                     # add action to the Riichi dataset
-                    pickle.dump(0, f_riichi)
+                    filename = 'riichi_actions_' + year + '.txt'
+                    with open(os.path.join(riichi_dir, filename), 'a') \
+                            as f_riichi:
+                        f_riichi.write('0\n')
+                    riichi_count['no'] += 1
 
                     # add state to the discard dataset
-                    pickle.dump(
-                        to_binary(np.concatenate((
-                            encode_tile(drawn_tile),
-                            player_self.hand,
-                            player_self.red_dora,
-                            player_self.melds,
-                            player_self.kita,
-                            player_self.discards,
-                            dora_indicators,
-                            player1.encode_riichi_status(),
-                            player2.encode_riichi_status(),
-                            player3.encode_riichi_status(),
-                            scores,
-                            round_number,
-                            honba_number,
-                            deposit_number,
-                            self_wind,
-                            player1.melds,
-                            player1.kita,
-                            player1.discards,
-                            player2.melds,
-                            player2.kita,
-                            player2.discards,
-                            player3.melds,
-                            player3.kita,
-                            player3.discards
-                        ), axis=1)), f_discard)
-
-                    # add action to the discard dataset
-                    discarded_tile = action
-                    discarded_tile_converted = TENHOU_TILE_INDEX[discarded_tile]
-                    if discarded_tile_converted == RED_FIVE_MAN:
-                        discarded_tile_converted = FIVE_MAN
-                    elif discarded_tile_converted == RED_FIVE_PIN:
-                        discarded_tile_converted = FIVE_PIN
-                    elif discarded_tile_converted == RED_FIVE_SOU:
-                        discarded_tile_converted = FIVE_SOU
-                    pickle.dump(discarded_tile_converted, f_discard)
-
-                    # update state
-                    player_self.add_tile_to_hand(drawn_tile)
-                    player_self.discard_tile_from_hand(discarded_tile)
-
-            else:
-                discarded_tile = action
-
-                # if player hasn't declared Riichi, add data to the
-                # discard dataset
-                if not player_self.riichi_status:
-                    pickle.dump(
-                        to_binary(np.concatenate((
-                            encode_tile(drawn_tile),
-                            player_self.hand,
-                            player_self.red_dora,
-                            player_self.melds,
-                            player_self.kita,
-                            player_self.discards,
-                            dora_indicators,
-                            player1.encode_riichi_status(),
-                            player2.encode_riichi_status(),
-                            player3.encode_riichi_status(),
-                            scores,
-                            round_number,
-                            honba_number,
-                            deposit_number,
-                            self_wind,
-                            player1.melds,
-                            player1.kita,
-                            player1.discards,
-                            player2.melds,
-                            player2.kita,
-                            player2.discards,
-                            player3.melds,
-                            player3.kita,
-                            player3.discards
-                        ), axis=1)), f_discard)
-
-                    discarded_tile_converted = TENHOU_TILE_INDEX[discarded_tile]
-                    if discarded_tile_converted == RED_FIVE_MAN:
-                        discarded_tile_converted = FIVE_MAN
-                    elif discarded_tile_converted == RED_FIVE_PIN:
-                        discarded_tile_converted = FIVE_PIN
-                    elif discarded_tile_converted == RED_FIVE_SOU:
-                        discarded_tile_converted = FIVE_SOU
-                    pickle.dump(discarded_tile_converted, f_discard)
-
-                # update state
-                player_self.add_tile_to_hand(drawn_tile)
-                player_self.discard_tile_from_hand(discarded_tile)
-
-        else:
-            action = player_self.log_discards.popleft()
-            if action == 60:
-                action = drawn_tile
-            discarded_tile = action
-            remaining_discards -= 1
-
-            # if player hasn't declared Riichi, add data to the discard dataset
-            if not player_self.riichi_status:
-                pickle.dump(
-                    to_binary(np.concatenate((
+                    discard_count += 1
+                    state = np.concatenate((
                         encode_tile(drawn_tile),
                         player_self.hand,
                         player_self.red_dora,
@@ -631,7 +606,124 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                         player3.melds,
                         player3.kita,
                         player3.discards
-                    ), axis=1)), f_discard)
+                    ), axis=1).astype(np.uint8)
+                    filename = 'discard_' + year + "_" \
+                               + str(discard_count) + '.png'
+                    Image.fromarray(state * 255, 'L') \
+                        .save(os.path.join(discard_dir, filename))
+
+                    # add action to the discard dataset
+                    discarded_tile = action
+                    discarded_tile_converted = TENHOU_TILE_INDEX[discarded_tile]
+                    if discarded_tile_converted == RED_FIVE_MAN:
+                        discarded_tile_converted = FIVE_MAN
+                    elif discarded_tile_converted == RED_FIVE_PIN:
+                        discarded_tile_converted = FIVE_PIN
+                    elif discarded_tile_converted == RED_FIVE_SOU:
+                        discarded_tile_converted = FIVE_SOU
+                    filename = 'discard_actions_' + year + '.txt'
+                    with open(os.path.join(discard_dir, filename), 'a') \
+                            as f_discard:
+                        f_discard.write(str(discarded_tile_converted) + '\n')
+
+                    # update state
+                    player_self.add_tile_to_hand(drawn_tile)
+                    player_self.add_discard(discarded_tile)
+
+            else:
+                discarded_tile = action
+
+                # if player hasn't declared Riichi, add data to the
+                # discard dataset
+                if not player_self.riichi_status:
+                    discard_count += 1
+                    state = np.concatenate((
+                        encode_tile(drawn_tile),
+                        player_self.hand,
+                        player_self.red_dora,
+                        player_self.melds,
+                        player_self.kita,
+                        player_self.discards,
+                        dora_indicators,
+                        player1.encode_riichi_status(),
+                        player2.encode_riichi_status(),
+                        player3.encode_riichi_status(),
+                        scores,
+                        round_number,
+                        honba_number,
+                        deposit_number,
+                        self_wind,
+                        player1.melds,
+                        player1.kita,
+                        player1.discards,
+                        player2.melds,
+                        player2.kita,
+                        player2.discards,
+                        player3.melds,
+                        player3.kita,
+                        player3.discards
+                    ), axis=1).astype(np.uint8)
+                    filename = 'discard_' + year + "_" \
+                               + str(discard_count) + '.png'
+                    Image.fromarray(state * 255, 'L') \
+                        .save(os.path.join(discard_dir, filename))
+
+                    discarded_tile_converted = TENHOU_TILE_INDEX[discarded_tile]
+                    if discarded_tile_converted == RED_FIVE_MAN:
+                        discarded_tile_converted = FIVE_MAN
+                    elif discarded_tile_converted == RED_FIVE_PIN:
+                        discarded_tile_converted = FIVE_PIN
+                    elif discarded_tile_converted == RED_FIVE_SOU:
+                        discarded_tile_converted = FIVE_SOU
+                    filename = 'discard_actions_' + year + '.txt'
+                    with open(os.path.join(discard_dir, filename), 'a') \
+                            as f_discard:
+                        f_discard.write(str(discarded_tile_converted) + '\n')
+
+                # update state
+                player_self.add_tile_to_hand(drawn_tile)
+                player_self.add_discard(discarded_tile)
+
+        else:
+            action = player_self.log_discards.popleft()
+            if action == 60:
+                action = drawn_tile
+            discarded_tile = action
+            remaining_discards -= 1
+
+            # if player hasn't declared Riichi, add data to the discard dataset
+            if not player_self.riichi_status:
+                discard_count += 1
+                state = np.concatenate((
+                    encode_tile(drawn_tile),
+                    player_self.hand,
+                    player_self.red_dora,
+                    player_self.melds,
+                    player_self.kita,
+                    player_self.discards,
+                    dora_indicators,
+                    player1.encode_riichi_status(),
+                    player2.encode_riichi_status(),
+                    player3.encode_riichi_status(),
+                    scores,
+                    round_number,
+                    honba_number,
+                    deposit_number,
+                    self_wind,
+                    player1.melds,
+                    player1.kita,
+                    player1.discards,
+                    player2.melds,
+                    player2.kita,
+                    player2.discards,
+                    player3.melds,
+                    player3.kita,
+                    player3.discards
+                ), axis=1).astype(np.uint8)
+                filename = 'discard_' + year + "_" \
+                           + str(discard_count) + '.png'
+                Image.fromarray(state * 255, 'L') \
+                    .save(os.path.join(discard_dir, filename))
 
                 discarded_tile_converted = TENHOU_TILE_INDEX[discarded_tile]
                 if discarded_tile_converted == RED_FIVE_MAN:
@@ -640,11 +732,14 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                     discarded_tile_converted = FIVE_PIN
                 elif discarded_tile_converted == RED_FIVE_SOU:
                     discarded_tile_converted = FIVE_SOU
-                pickle.dump(discarded_tile_converted, f_discard)
+                filename = 'discard_actions_' + year + '.txt'
+                with open(os.path.join(discard_dir, filename), 'a') \
+                        as f_discard:
+                    f_discard.write(str(discarded_tile_converted) + '\n')
 
             # update state
             player_self.add_tile_to_hand(drawn_tile)
-            player_self.discard_tile_from_hand(discarded_tile)
+            player_self.add_discard(discarded_tile)
 
         interrupted = False
 
@@ -655,33 +750,37 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                 action = players[i].log_draws[0]
                 if players[i].can_pon(discarded_tile):
                     # add state to the Pon dataset
-                    pickle.dump(
-                        to_binary(np.concatenate((
-                            encode_tile(drawn_tile),
-                            players[i].hand,
-                            players[i].red_dora,
-                            players[i].melds,
-                            players[i].kita,
-                            players[i].discards,
-                            dora_indicators,
-                            players[(i + 1) % 3].encode_riichi_status(),
-                            players[(i + 2) % 3].encode_riichi_status(),
-                            player3.encode_riichi_status(),
-                            scores,
-                            round_number,
-                            honba_number,
-                            deposit_number,
-                            self_wind,
-                            players[(i + 1) % 3].melds,
-                            players[(i + 1) % 3].kita,
-                            players[(i + 1) % 3].discards,
-                            players[(i + 2) % 3].melds,
-                            players[(i + 2) % 3].kita,
-                            players[(i + 2) % 3].discards,
-                            player3.melds,
-                            player3.kita,
-                            player3.discards
-                        ), axis=1)), f_pon)
+                    pon_count['total'] += 1
+                    state = np.concatenate((
+                        encode_tile(drawn_tile),
+                        players[i].hand,
+                        players[i].red_dora,
+                        players[i].melds,
+                        players[i].kita,
+                        players[i].discards,
+                        dora_indicators,
+                        players[(i + 1) % 3].encode_riichi_status(),
+                        players[(i + 2) % 3].encode_riichi_status(),
+                        player3.encode_riichi_status(),
+                        scores,
+                        round_number,
+                        honba_number,
+                        deposit_number,
+                        self_wind,
+                        players[(i + 1) % 3].melds,
+                        players[(i + 1) % 3].kita,
+                        players[(i + 1) % 3].discards,
+                        players[(i + 2) % 3].melds,
+                        players[(i + 2) % 3].kita,
+                        players[(i + 2) % 3].discards,
+                        player3.melds,
+                        player3.kita,
+                        player3.discards
+                    ), axis=1).astype(np.uint8)
+                    filename = 'pon_' + year + "_" \
+                               + str(pon_count['total']) + '.png'
+                    Image.fromarray(state * 255, 'L') \
+                        .save(os.path.join(pon_dir, filename))
 
                     if 'p' in str(action):
                         pon_player = str(action).index('p') / 2
@@ -696,7 +795,11 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             or (pon_tile == 53 and discarded_tile == 35)) \
                                 and SEATING_INDEX[seating_diff] == pon_player:
                             # add action to the Pon dataset
-                            pickle.dump(1, f_pon)
+                            filename = 'pon_actions_' + year + '.txt'
+                            with open(os.path.join(pon_dir, filename), 'a') \
+                                    as f_pon:
+                                f_pon.write('1\n')
+                            pon_count['yes'] += 1
 
                             # update state
                             drawn_tile = discarded_tile
@@ -709,44 +812,56 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             break
                         else:
                             # add action to the Pon dataset
-                            pickle.dump(0, f_pon)
+                            filename = 'pon_actions_' + year + '.txt'
+                            with open(os.path.join(pon_dir, filename), 'a') \
+                                    as f_pon:
+                                f_pon.write('0\n')
+                            pon_count['no'] += 1
                             is_pon = False
                             interrupted = False
                     else:
                         # add action to the Pon dataset
-                        pickle.dump(0, f_pon)
+                        filename = 'pon_actions_' + year + '.txt'
+                        with open(os.path.join(pon_dir, filename), 'a') \
+                                as f_pon:
+                            f_pon.write('0\n')
+                        pon_count['no'] += 1
                         is_pon = False
                         interrupted = False
 
                 if players[i].can_open_kan(discarded_tile):
                     # add state to the Kan dataset
-                    pickle.dump(
-                        to_binary(np.concatenate((
-                            encode_tile(drawn_tile),
-                            players[i].hand,
-                            players[i].red_dora,
-                            players[i].melds,
-                            players[i].kita,
-                            players[i].discards,
-                            dora_indicators,
-                            players[(i + 1) % 3].encode_riichi_status(),
-                            players[(i + 2) % 3].encode_riichi_status(),
-                            player3.encode_riichi_status(),
-                            scores,
-                            round_number,
-                            honba_number,
-                            deposit_number,
-                            self_wind,
-                            players[(i + 1) % 3].melds,
-                            players[(i + 1) % 3].kita,
-                            players[(i + 1) % 3].discards,
-                            players[(i + 2) % 3].melds,
-                            players[(i + 2) % 3].kita,
-                            players[(i + 2) % 3].discards,
-                            player3.melds,
-                            player3.kita,
-                            player3.discards
-                        ), axis=1)), f_kan)
+                    kan_count['total'] += 1
+                    state = np.concatenate((
+                        encode_tile(drawn_tile),
+                        players[i].hand,
+                        players[i].red_dora,
+                        players[i].melds,
+                        players[i].kita,
+                        players[i].discards,
+                        dora_indicators,
+                        players[(i + 1) % 3].encode_riichi_status(),
+                        players[(i + 2) % 3].encode_riichi_status(),
+                        player3.encode_riichi_status(),
+                        scores,
+                        round_number,
+                        honba_number,
+                        deposit_number,
+                        self_wind,
+                        players[(i + 1) % 3].melds,
+                        players[(i + 1) % 3].kita,
+                        players[(i + 1) % 3].discards,
+                        players[(i + 2) % 3].melds,
+                        players[(i + 2) % 3].kita,
+                        players[(i + 2) % 3].discards,
+                        player3.melds,
+                        player3.kita,
+                        player3.discards
+                    ), axis=1).astype(np.uint8)
+                    filename = 'kan_' + year + "_" \
+                               + str(kan_count['total']) + '.png'
+                    Image.fromarray(state * 255, 'L') \
+                        .save(os.path.join(kan_dir, filename))
 
                     if 'm' in str(action):
                         kan_tile = int(str(action).replace('m', '')[:2])
@@ -758,7 +873,11 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                                 or (kan_tile == 52 and discarded_tile == 25) \
                                 or (kan_tile == 53 and discarded_tile == 35):
                             # add action to the Kan dataset
-                            pickle.dump(1, f_kan)
+                            filename = 'kan_actions_' + year + '.txt'
+                            with open(os.path.join(kan_dir, filename), 'a') \
+                                    as f_kan:
+                                f_kan.write('1\n')
+                            kan_count['yes'] += 1
 
                             # update state
                             drawn_tile = discarded_tile
@@ -774,12 +893,20 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
                             break
                         else:
                             # add action to the Kan dataset
-                            pickle.dump(0, f_kan)
+                            filename = 'kan_actions_' + year + '.txt'
+                            with open(os.path.join(kan_dir, filename), 'a') \
+                                    as f_kan:
+                                f_kan.write('0\n')
+                            kan_count['no'] += 1
                             is_pon = False
                             interrupted = False
                     else:
                         # add action to the Kan dataset
-                        pickle.dump(0, f_kan)
+                        filename = 'kan_actions_' + year + '.txt'
+                        with open(os.path.join(kan_dir, filename), 'a') \
+                                as f_kan:
+                            f_kan.write('0\n')
+                        kan_count['no'] += 1
                         is_pon = False
                         interrupted = False
 
@@ -787,50 +914,7 @@ def encode_game_log(log, f_discard, f_pon, f_kan, f_kita, f_riichi,
             self_index = (self_index + 1) % 3
             is_pon = False
 
-
-def summarise_dataset(action, year, files_count):
-    if action == 'discard':
-        discard_count = 0
-        for i in range(files_count):
-            filename = os.path.join(DATASET_PATH + '\\discard',
-                                    'discard_' + str(year)
-                                    + '_{:0>2d}'.format(i + 1) + '.pickle')
-            with open(filename, 'rb') as f_discard:
-                try:
-                    while True:
-                        pickle.load(f_discard)
-                        discard_count += 1
-                except EOFError:
-                    pass
-        print('total discard data:', discard_count / 2)
-    else:
-        count = {
-            'yes': 0,
-            'no': 0,
-            'total': 0
-        }
-        action_flag = False
-        for i in range(files_count):
-            filename = os.path.join(DATASET_PATH + '\\' + action,
-                                    action + '_' + str(year)
-                                    + '_{:0>2d}'.format(i + 1) + '.pickle')
-            with open(filename, 'rb') as fread:
-                try:
-                    while True:
-                        data = pickle.load(fread)
-                        if action_flag:
-                            if data == 1:
-                                count['yes'] += 1
-                            else:
-                                count['no'] += 1
-                        else:
-                            count['total'] += 1
-                        action_flag = not action_flag
-                except EOFError:
-                    pass
-        print('total ' + action + ' data:', count['total'])
-        print(action + ' accepted:', count['yes'])
-        print(action + ' declined:', count['no'])
+    return discard_count
 
 
 if __name__ == '__main__':
@@ -856,66 +940,82 @@ if __name__ == '__main__':
     # for key, val in max_honba_and_deposit_results.items():
     #     print(key + ':', val)
 
-    # with tqdm(desc='Encoding', total=GAME_LOGS_COUNTS_BY_YEAR['2020'],
-    #           initial=7000) as pbar:
-    #     with open(os.path.join(DATASET_PATH, 'discard' + '.pickle'),
-    #               'wb') as f_discard:
-    #         with open(os.path.join(DATASET_PATH, 'pon' + '.pickle'),
-    #                   'wb') as f_pon:
-    #             with open(os.path.join(DATASET_PATH, 'kan' + '.pickle'),
-    #                       'wb') as f_kan:
-    #                 with open(os.path.join(DATASET_PATH, 'kita' + '.pickle'),
-    #                           'wb') as f_kita:
-    #                     with open(os.path.join(DATASET_PATH,
-    #                                            'riichi' + '.pickle'),
-    #                               'wb') as f_riichi:
-    #                         with open(os.path.join(EXTRACTED_GAME_LOGS_PATH,
-    #                                                '2020' + '.pickle'),
-    #                                   'rb') as fread:
-    #                             try:
-    #                                 count = 0
-    #
-    #                                 while log := pickle.load(fread):
-    #                                     count += 1
-    #                                     if count <= 7000:
-    #                                         continue
-    #                                     # elif count == 63813:  # 2019
-    #                                     #     pbar.update(1)
-    #                                     #     continue
-    #                                     elif count == 7628:  # 2020
-    #                                         pbar.update(1)
-    #                                         continue
-    #
-    #                                     encode_game_log(log,
-    #                                                     f_discard=f_discard,
-    #                                                     f_pon=f_pon,
-    #                                                     f_kan=f_kan,
-    #                                                     f_kita=f_kita,
-    #                                                     f_riichi=f_riichi)
-    #                                     pbar.update(1)
-    #                             except EOFError:
-    #                                 pass
+    discard_count = 0
+    pon_count = {
+        'total': 0,
+        'yes': 0,
+        'no': 0
+    }
+    kan_count = {
+        'total': 0,
+        'yes': 0,
+        'no': 0
+    }
+    kita_count = {
+        'total': 0,
+        'yes': 0,
+        'no': 0
+    }
+    riichi_count = {
+        'total': 0,
+        'yes': 0,
+        'no': 0
+    }
 
-    print('2019 dataset:')
-    summarise_dataset(action='discard', year='2019', files_count=20)
-    print()
-    summarise_dataset(action='pon', year='2019', files_count=20)
-    print()
-    summarise_dataset(action='kan', year='2019', files_count=20)
-    print()
-    summarise_dataset(action='kita', year='2019', files_count=20)
-    print()
-    summarise_dataset(action='riichi', year='2019', files_count=20)
-    print()
+    with tqdm(desc='Encoding', total=GAME_LOGS_COUNTS_BY_YEAR['2019']) as pbar:
+        discard_dir = os.path.join(DATASET_PATH, 'discard')
+        pon_dir = os.path.join(DATASET_PATH, 'pon')
+        kan_dir = os.path.join(DATASET_PATH, 'kan')
+        kita_dir = os.path.join(DATASET_PATH, 'kita')
+        riichi_dir = os.path.join(DATASET_PATH, 'riichi')
 
-    print('2020 dataset:')
-    summarise_dataset(action='discard', year='2020', files_count=2)
-    print()
-    summarise_dataset(action='pon', year='2020', files_count=2)
-    print()
-    summarise_dataset(action='kan', year='2020', files_count=2)
-    print()
-    summarise_dataset(action='kita', year='2020', files_count=2)
-    print()
-    summarise_dataset(action='riichi', year='2020', files_count=2)
-    print()
+        with open(os.path.join(EXTRACTED_GAME_LOGS_PATH, '2019' + '.pickle'),
+                  'rb') as fread:
+            try:
+                count = 0
+
+                while log := pickle.load(fread):
+                    count += 1
+                    if count == 63813:  # 2019
+                        pbar.update(1)
+                        continue
+                    # elif count == 7628:  # 2020
+                    #     pbar.update(1)
+                    #     continue
+
+                    discard_count = encode_game_log(year='2019',
+                                                    log=log,
+                                                    discard_dir=discard_dir,
+                                                    pon_dir=pon_dir,
+                                                    kan_dir=kan_dir,
+                                                    kita_dir=kita_dir,
+                                                    riichi_dir=riichi_dir,
+                                                    discard_count=discard_count,
+                                                    pon_count=pon_count,
+                                                    kan_count=kan_count,
+                                                    kita_count=kita_count,
+                                                    riichi_count=riichi_count)
+                    pbar.update(1)
+            except EOFError:
+                pass
+            except Exception:
+                traceback.print_exc()
+            finally:
+                print('total discard data:', discard_count)
+                print()
+                print('total pon data:', pon_count['total'])
+                print('pon accepted:', pon_count['yes'])
+                print('pon declined:', pon_count['no'])
+                print()
+                print('total kan data:', kan_count['total'])
+                print('kan accepted:', kan_count['yes'])
+                print('kan declined:', kan_count['no'])
+                print()
+                print('total kita data:', kita_count['total'])
+                print('kita accepted:', kita_count['yes'])
+                print('kita declined:', kita_count['no'])
+                print()
+                print('total riichi data:', riichi_count['total'])
+                print('riichi accepted:', riichi_count['yes'])
+                print('riichi declined:', riichi_count['no'])
+                print()
