@@ -185,12 +185,13 @@ def to_array(binary):
         .reshape((34, TOTAL_COLUMNS_SIZE)).astype(float)
 
 
-def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
-                    riichi_dir, discard_count, pon_count, kan_count, kita_count,
-                    riichi_count):
+def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
+                    kita_dir, riichi_dir, discard_count, pon_count, kan_count,
+                    kita_count, riichi_count):
     """
     :param year: String
     :param log: Tenhou JSON game log object
+    :param dataset_dir: Dataset directory
     :param discard_dir: Discard directory
     :param pon_dir: Pon directory
     :param kan_dir: Kan directory
@@ -290,7 +291,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                     if 'f' in str(action):
                         # add action to the Kita dataset
                         filename = 'kita_actions_' + year + '.txt'
-                        with open(os.path.join(kita_dir, filename), 'a') \
+                        with open(os.path.join(dataset_dir, filename), 'a') \
                                 as f_kita:
                             f_kita.write('1\n')
                         kita_count['yes'] += 1
@@ -316,7 +317,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                     else:
                         # add action to the Kita dataset
                         filename = 'kita_actions_' + year + '.txt'
-                        with open(os.path.join(kita_dir, filename), 'a') \
+                        with open(os.path.join(dataset_dir, filename), 'a') \
                                 as f_kita:
                             f_kita.write('0\n')
                         kita_count['no'] += 1
@@ -358,7 +359,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                     if 'a' in str(action):
                         # add action to the Kan dataset
                         filename = 'kan_actions_' + year + '.txt'
-                        with open(os.path.join(kan_dir, filename), 'a') \
+                        with open(os.path.join(dataset_dir, filename), 'a') \
                                 as f_kan:
                             f_kan.write('1\n')
                         kan_count['yes'] += 1
@@ -396,7 +397,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                     else:
                         # add action to the Kita dataset
                         filename = 'kan_actions_' + year + '.txt'
-                        with open(os.path.join(kan_dir, filename), 'a') \
+                        with open(os.path.join(dataset_dir, filename), 'a') \
                                 as f_kan:
                             f_kan.write('0\n')
                         kan_count['no'] += 1
@@ -438,7 +439,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                     if 'k' in str(action):
                         # add action to the Kan dataset
                         filename = 'kan_actions_' + year + '.txt'
-                        with open(os.path.join(kan_dir, filename), 'a') \
+                        with open(os.path.join(dataset_dir, filename), 'a') \
                                 as f_kan:
                             f_kan.write('1\n')
                         kan_count['yes'] += 1
@@ -466,7 +467,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                     else:
                         # add action to the Kita dataset
                         filename = 'kan_actions_' + year + '.txt'
-                        with open(os.path.join(kan_dir, filename), 'a') \
+                        with open(os.path.join(dataset_dir, filename), 'a') \
                                 as f_kan:
                             f_kan.write('0\n')
                         kan_count['no'] += 1
@@ -511,7 +512,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                 if 'r' in str(action):
                     # add action to the Riichi dataset
                     filename = 'riichi_actions_' + year + '.txt'
-                    with open(os.path.join(riichi_dir, filename), 'a') \
+                    with open(os.path.join(dataset_dir, filename), 'a') \
                             as f_riichi:
                         f_riichi.write('1\n')
                     riichi_count['yes'] += 1
@@ -561,7 +562,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                     elif discarded_tile_converted == RED_FIVE_SOU:
                         discarded_tile_converted = FIVE_SOU
                     filename = 'discard_actions_' + year + '.txt'
-                    with open(os.path.join(discard_dir, filename), 'a') \
+                    with open(os.path.join(dataset_dir, filename), 'a') \
                             as f_discard:
                         f_discard.write(str(discarded_tile_converted) + '\n')
 
@@ -574,7 +575,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                 else:
                     # add action to the Riichi dataset
                     filename = 'riichi_actions_' + year + '.txt'
-                    with open(os.path.join(riichi_dir, filename), 'a') \
+                    with open(os.path.join(dataset_dir, filename), 'a') \
                             as f_riichi:
                         f_riichi.write('0\n')
                     riichi_count['no'] += 1
@@ -622,7 +623,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                     elif discarded_tile_converted == RED_FIVE_SOU:
                         discarded_tile_converted = FIVE_SOU
                     filename = 'discard_actions_' + year + '.txt'
-                    with open(os.path.join(discard_dir, filename), 'a') \
+                    with open(os.path.join(dataset_dir, filename), 'a') \
                             as f_discard:
                         f_discard.write(str(discarded_tile_converted) + '\n')
 
@@ -676,7 +677,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                     elif discarded_tile_converted == RED_FIVE_SOU:
                         discarded_tile_converted = FIVE_SOU
                     filename = 'discard_actions_' + year + '.txt'
-                    with open(os.path.join(discard_dir, filename), 'a') \
+                    with open(os.path.join(dataset_dir, filename), 'a') \
                             as f_discard:
                         f_discard.write(str(discarded_tile_converted) + '\n')
 
@@ -733,7 +734,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                 elif discarded_tile_converted == RED_FIVE_SOU:
                     discarded_tile_converted = FIVE_SOU
                 filename = 'discard_actions_' + year + '.txt'
-                with open(os.path.join(discard_dir, filename), 'a') \
+                with open(os.path.join(dataset_dir, filename), 'a') \
                         as f_discard:
                     f_discard.write(str(discarded_tile_converted) + '\n')
 
@@ -796,7 +797,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                                 and SEATING_INDEX[seating_diff] == pon_player:
                             # add action to the Pon dataset
                             filename = 'pon_actions_' + year + '.txt'
-                            with open(os.path.join(pon_dir, filename), 'a') \
+                            with open(os.path.join(dataset_dir, filename), 'a') \
                                     as f_pon:
                                 f_pon.write('1\n')
                             pon_count['yes'] += 1
@@ -813,7 +814,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                         else:
                             # add action to the Pon dataset
                             filename = 'pon_actions_' + year + '.txt'
-                            with open(os.path.join(pon_dir, filename), 'a') \
+                            with open(os.path.join(dataset_dir, filename), 'a') \
                                     as f_pon:
                                 f_pon.write('0\n')
                             pon_count['no'] += 1
@@ -822,7 +823,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                     else:
                         # add action to the Pon dataset
                         filename = 'pon_actions_' + year + '.txt'
-                        with open(os.path.join(pon_dir, filename), 'a') \
+                        with open(os.path.join(dataset_dir, filename), 'a') \
                                 as f_pon:
                             f_pon.write('0\n')
                         pon_count['no'] += 1
@@ -874,7 +875,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                                 or (kan_tile == 53 and discarded_tile == 35):
                             # add action to the Kan dataset
                             filename = 'kan_actions_' + year + '.txt'
-                            with open(os.path.join(kan_dir, filename), 'a') \
+                            with open(os.path.join(dataset_dir, filename), 'a') \
                                     as f_kan:
                                 f_kan.write('1\n')
                             kan_count['yes'] += 1
@@ -894,7 +895,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                         else:
                             # add action to the Kan dataset
                             filename = 'kan_actions_' + year + '.txt'
-                            with open(os.path.join(kan_dir, filename), 'a') \
+                            with open(os.path.join(dataset_dir, filename), 'a') \
                                     as f_kan:
                                 f_kan.write('0\n')
                             kan_count['no'] += 1
@@ -903,7 +904,7 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
                     else:
                         # add action to the Kan dataset
                         filename = 'kan_actions_' + year + '.txt'
-                        with open(os.path.join(kan_dir, filename), 'a') \
+                        with open(os.path.join(dataset_dir, filename), 'a') \
                                 as f_kan:
                             f_kan.write('0\n')
                         kan_count['no'] += 1
@@ -918,27 +919,73 @@ def encode_game_log(year, log, discard_dir, pon_dir, kan_dir, kita_dir,
 
 
 if __name__ == '__main__':
-    # assert False  # comment this line to confirm running the scripts
-    #
-    # # Extract game logs from the downloaded JSON objects
-    # pool = Pool(len(SELECTED_YEARS))
-    # for year in SELECTED_YEARS:
-    #     pool.apply_async(extract_game_logs_from_json, args=(year,))
-    # pool.close()
-    # pool.join()
-    #
-    # # Count the number of extracted game logs
-    # total = 0
-    # for year in SELECTED_YEARS:
-    #     count = count_extracted_game_logs(year)
-    #     print(str(count) + ' game logs extracted from ' + year)
-    #     total += count
-    # print('Total no. of game logs extracted: ' + str(total))
-    #
-    # # Find the maximum honba and deposit numbers
-    # max_honba_and_deposit_results = find_max_honba_and_deposit()
-    # for key, val in max_honba_and_deposit_results.items():
-    #     print(key + ':', val)
+    assert False  # comment this line to confirm running the scripts
+
+    # Extract game logs from the downloaded JSON objects
+    pool = Pool(len(SELECTED_YEARS))
+    for year in SELECTED_YEARS:
+        pool.apply_async(extract_game_logs_from_json, args=(year,))
+    pool.close()
+    pool.join()
+
+    # Count the number of extracted game logs
+    total = 0
+    for year in SELECTED_YEARS:
+        count = count_extracted_game_logs(year)
+        print(str(count) + ' game logs extracted from ' + year)
+        total += count
+    print('Total no. of game logs extracted: ' + str(total))
+
+    # Find the maximum honba and deposit numbers
+    max_honba_and_deposit_results = find_max_honba_and_deposit()
+    for key, val in max_honba_and_deposit_results.items():
+        print(key + ':', val)
+
+    # 2019
+    discard_count_2019 = 885873
+    pon_count_2019 = {
+        'total': 101020,
+        'yes': 28462,
+        'no': 72558
+    }
+    kan_count_2019 = {
+        'total': 148186,
+        'yes': 3459,
+        'no': 144727
+    }
+    kita_count_2019 = {
+        'total': 90866,
+        'yes': 76582,
+        'no': 14284
+    }
+    riichi_count_2019 = {
+        'total': 74411,
+        'yes': 21860,
+        'no': 52551
+    }
+
+    # 2020
+    discard_count_2020 = 88785
+    pon_count_2020 = {
+        'total': 10197,
+        'yes': 2798,
+        'no': 7399
+    }
+    kan_count_2020 = {
+        'total': 14335,
+        'yes': 384,
+        'no': 13951
+    }
+    kita_count_2020 = {
+        'total': 9299,
+        'yes': 7702,
+        'no': 1597
+    }
+    riichi_count_2020 = {
+        'total': 7320,
+        'yes': 2283,
+        'no': 5037
+    }
 
     discard_count = 0
     pon_count = {
@@ -962,29 +1009,35 @@ if __name__ == '__main__':
         'no': 0
     }
 
-    with tqdm(desc='Encoding', total=GAME_LOGS_COUNTS_BY_YEAR['2019']) as pbar:
+    with tqdm(desc='Encoding', total=3000) as pbar:
         discard_dir = os.path.join(DATASET_PATH, 'discard')
         pon_dir = os.path.join(DATASET_PATH, 'pon')
         kan_dir = os.path.join(DATASET_PATH, 'kan')
         kita_dir = os.path.join(DATASET_PATH, 'kita')
         riichi_dir = os.path.join(DATASET_PATH, 'riichi')
 
-        with open(os.path.join(EXTRACTED_GAME_LOGS_PATH, '2019' + '.pickle'),
+        with open(os.path.join(EXTRACTED_GAME_LOGS_PATH, '2020' + '.pickle'),
                   'rb') as fread:
             try:
                 count = 0
 
                 while log := pickle.load(fread):
                     count += 1
-                    if count == 63813:  # 2019
-                        pbar.update(1)
+                    if count <= 0:
                         continue
+                    elif count > 3000:
+                        break
+
+                    # if count == 63813:  # 2019
+                    #     pbar.update(1)
+                    #     continue
                     # elif count == 7628:  # 2020
                     #     pbar.update(1)
                     #     continue
 
-                    discard_count = encode_game_log(year='2019',
+                    discard_count = encode_game_log(year='2020',
                                                     log=log,
+                                                    dataset_dir=DATASET_PATH,
                                                     discard_dir=discard_dir,
                                                     pon_dir=pon_dir,
                                                     kan_dir=kan_dir,
@@ -1001,6 +1054,7 @@ if __name__ == '__main__':
             except Exception:
                 traceback.print_exc()
             finally:
+                print()
                 print('total discard data:', discard_count)
                 print()
                 print('total pon data:', pon_count['total'])
@@ -1018,4 +1072,25 @@ if __name__ == '__main__':
                 print('total riichi data:', riichi_count['total'])
                 print('riichi accepted:', riichi_count['yes'])
                 print('riichi declined:', riichi_count['no'])
-                print()
+
+    with open(os.path.join(DATASET_PATH, "discard_actions_2019.txt")) as f:
+        assert len(list(map(int, f))) == discard_count_2019
+    with open(os.path.join(DATASET_PATH, "pon_actions_2019.txt")) as f:
+        assert len(list(map(int, f))) == pon_count_2019['total']
+    with open(os.path.join(DATASET_PATH, "kan_actions_2019.txt")) as f:
+        assert len(list(map(int, f))) == kan_count_2019['total']
+    with open(os.path.join(DATASET_PATH, "kita_actions_2019.txt")) as f:
+        assert len(list(map(int, f))) == kita_count_2019['total']
+    with open(os.path.join(DATASET_PATH, "riichi_actions_2019.txt")) as f:
+        assert len(list(map(int, f))) == riichi_count_2019['total']
+
+    with open(os.path.join(DATASET_PATH, "discard_actions_2020.txt")) as f:
+        assert len(list(map(int, f))) == discard_count_2020
+    with open(os.path.join(DATASET_PATH, "pon_actions_2020.txt")) as f:
+        assert len(list(map(int, f))) == pon_count_2020['total']
+    with open(os.path.join(DATASET_PATH, "kan_actions_2020.txt")) as f:
+        assert len(list(map(int, f))) == kan_count_2020['total']
+    with open(os.path.join(DATASET_PATH, "kita_actions_2020.txt")) as f:
+        assert len(list(map(int, f))) == kita_count_2020['total']
+    with open(os.path.join(DATASET_PATH, "riichi_actions_2020.txt")) as f:
+        assert len(list(map(int, f))) == riichi_count_2020['total']
