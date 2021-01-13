@@ -101,7 +101,8 @@ def encode_tile(tenhou_encoded_tile):
 
 def encode_number(number, size):
     """
-    :param round_number: Integer
+    :param number: Integer
+    :param size: size of the desired np.array
     :return: (34, size) np.array
     """
     output = np.empty((34, size))
