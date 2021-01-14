@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import pickle
@@ -284,7 +285,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                         player3.kita,
                         player3.discards
                     ), axis=1).astype(np.uint8)
-                    filename = 'kita_' + year + "_" \
+                    filename = 'kita_' + year + '_' \
                                + str(kita_count['total']) + '.png'
                     Image.fromarray(state * 255, 'L') \
                         .save(os.path.join(kita_dir, filename))
@@ -352,7 +353,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                         player3.kita,
                         player3.discards
                     ), axis=1).astype(np.uint8)
-                    filename = 'kan_' + year + "_" \
+                    filename = 'kan_' + year + '_' \
                                + str(kan_count['total']) + '.png'
                     Image.fromarray(state * 255, 'L') \
                         .save(os.path.join(kan_dir, filename))
@@ -432,7 +433,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                         player3.kita,
                         player3.discards
                     ), axis=1).astype(np.uint8)
-                    filename = 'kan_' + year + "_" \
+                    filename = 'kan_' + year + '_' \
                                + str(kan_count['total']) + '.png'
                     Image.fromarray(state * 255, 'L') \
                         .save(os.path.join(kan_dir, filename))
@@ -505,7 +506,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                     player3.kita,
                     player3.discards
                 ), axis=1).astype(np.uint8)
-                filename = 'riichi_' + year + "_" \
+                filename = 'riichi_' + year + '_' \
                            + str(riichi_count['total']) + '.png'
                 Image.fromarray(state * 255, 'L') \
                     .save(os.path.join(riichi_dir, filename))
@@ -546,7 +547,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                         player3.kita,
                         player3.discards
                     ), axis=1).astype(np.uint8)
-                    filename = 'discard_' + year + "_" \
+                    filename = 'discard_' + year + '_' \
                                + str(discard_count) + '.png'
                     Image.fromarray(state * 255, 'L') \
                         .save(os.path.join(discard_dir, filename))
@@ -609,7 +610,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                         player3.kita,
                         player3.discards
                     ), axis=1).astype(np.uint8)
-                    filename = 'discard_' + year + "_" \
+                    filename = 'discard_' + year + '_' \
                                + str(discard_count) + '.png'
                     Image.fromarray(state * 255, 'L') \
                         .save(os.path.join(discard_dir, filename))
@@ -665,7 +666,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                         player3.kita,
                         player3.discards
                     ), axis=1).astype(np.uint8)
-                    filename = 'discard_' + year + "_" \
+                    filename = 'discard_' + year + '_' \
                                + str(discard_count) + '.png'
                     Image.fromarray(state * 255, 'L') \
                         .save(os.path.join(discard_dir, filename))
@@ -722,7 +723,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                     player3.kita,
                     player3.discards
                 ), axis=1).astype(np.uint8)
-                filename = 'discard_' + year + "_" \
+                filename = 'discard_' + year + '_' \
                            + str(discard_count) + '.png'
                 Image.fromarray(state * 255, 'L') \
                     .save(os.path.join(discard_dir, filename))
@@ -779,7 +780,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                         player3.kita,
                         player3.discards
                     ), axis=1).astype(np.uint8)
-                    filename = 'pon_' + year + "_" \
+                    filename = 'pon_' + year + '_' \
                                + str(pon_count['total']) + '.png'
                     Image.fromarray(state * 255, 'L') \
                         .save(os.path.join(pon_dir, filename))
@@ -860,7 +861,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                         player3.kita,
                         player3.discards
                     ), axis=1).astype(np.uint8)
-                    filename = 'kan_' + year + "_" \
+                    filename = 'kan_' + year + '_' \
                                + str(kan_count['total']) + '.png'
                     Image.fromarray(state * 255, 'L') \
                         .save(os.path.join(kan_dir, filename))
@@ -917,6 +918,19 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
             is_pon = False
 
     return discard_count
+
+
+def txt_to_csv(year, action_type):
+    filename = action_type + '_actions_' + year
+    with open(os.path.join(DATASET_PATH, filename + '.txt'), 'r') as txt_file:
+        with open(os.path.join(DATASET_PATH, filename + '.csv'), 'w',
+                  newline='') as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow(['image', 'label'])
+            for index, line in enumerate(txt_file):
+                image_name = action_type + '_' + year + '_' + \
+                                 str(index + 1) + '.png'
+                writer.writerow([image_name, line[:-1]])
 
 
 if __name__ == '__main__':
@@ -1074,24 +1088,58 @@ if __name__ == '__main__':
                 print('riichi accepted:', riichi_count['yes'])
                 print('riichi declined:', riichi_count['no'])
 
-    with open(os.path.join(DATASET_PATH, "discard_actions_2019.txt")) as f:
+    with open(os.path.join(DATASET_PATH, 'discard_actions_2019.txt')) as f:
         assert len(list(map(int, f))) == discard_count_2019
-    with open(os.path.join(DATASET_PATH, "pon_actions_2019.txt")) as f:
+    with open(os.path.join(DATASET_PATH, 'pon_actions_2019.txt')) as f:
         assert len(list(map(int, f))) == pon_count_2019['total']
-    with open(os.path.join(DATASET_PATH, "kan_actions_2019.txt")) as f:
+    with open(os.path.join(DATASET_PATH, 'kan_actions_2019.txt')) as f:
         assert len(list(map(int, f))) == kan_count_2019['total']
-    with open(os.path.join(DATASET_PATH, "kita_actions_2019.txt")) as f:
+    with open(os.path.join(DATASET_PATH, 'kita_actions_2019.txt')) as f:
         assert len(list(map(int, f))) == kita_count_2019['total']
-    with open(os.path.join(DATASET_PATH, "riichi_actions_2019.txt")) as f:
+    with open(os.path.join(DATASET_PATH, 'riichi_actions_2019.txt')) as f:
         assert len(list(map(int, f))) == riichi_count_2019['total']
 
-    with open(os.path.join(DATASET_PATH, "discard_actions_2020.txt")) as f:
+    with open(os.path.join(DATASET_PATH, 'discard_actions_2020.txt')) as f:
         assert len(list(map(int, f))) == discard_count_2020
-    with open(os.path.join(DATASET_PATH, "pon_actions_2020.txt")) as f:
+    with open(os.path.join(DATASET_PATH, 'pon_actions_2020.txt')) as f:
         assert len(list(map(int, f))) == pon_count_2020['total']
-    with open(os.path.join(DATASET_PATH, "kan_actions_2020.txt")) as f:
+    with open(os.path.join(DATASET_PATH, 'kan_actions_2020.txt')) as f:
         assert len(list(map(int, f))) == kan_count_2020['total']
-    with open(os.path.join(DATASET_PATH, "kita_actions_2020.txt")) as f:
+    with open(os.path.join(DATASET_PATH, 'kita_actions_2020.txt')) as f:
         assert len(list(map(int, f))) == kita_count_2020['total']
-    with open(os.path.join(DATASET_PATH, "riichi_actions_2020.txt")) as f:
+    with open(os.path.join(DATASET_PATH, 'riichi_actions_2020.txt')) as f:
         assert len(list(map(int, f))) == riichi_count_2020['total']
+
+    txt_to_csv(year='2019', action_type='discard')
+    txt_to_csv(year='2019', action_type='pon')
+    txt_to_csv(year='2019', action_type='kan')
+    txt_to_csv(year='2019', action_type='kita')
+    txt_to_csv(year='2019', action_type='riichi')
+
+    txt_to_csv(year='2020', action_type='discard')
+    txt_to_csv(year='2020', action_type='pon')
+    txt_to_csv(year='2020', action_type='kan')
+    txt_to_csv(year='2020', action_type='kita')
+    txt_to_csv(year='2020', action_type='riichi')
+
+    with open(os.path.join(DATASET_PATH, 'discard_actions_2019.csv')) as f:
+        assert sum(1 for line in f) == discard_count_2019 + 1
+    with open(os.path.join(DATASET_PATH, 'pon_actions_2019.csv')) as f:
+        assert sum(1 for line in f) == pon_count_2019['total'] + 1
+    with open(os.path.join(DATASET_PATH, 'kan_actions_2019.csv')) as f:
+        assert sum(1 for line in f) == kan_count_2019['total'] + 1
+    with open(os.path.join(DATASET_PATH, 'kita_actions_2019.csv')) as f:
+        assert sum(1 for line in f) == kita_count_2019['total'] + 1
+    with open(os.path.join(DATASET_PATH, 'riichi_actions_2019.csv')) as f:
+        assert sum(1 for line in f) == riichi_count_2019['total'] + 1
+
+    with open(os.path.join(DATASET_PATH, 'discard_actions_2020.csv')) as f:
+        assert sum(1 for line in f) == discard_count_2020 + 1
+    with open(os.path.join(DATASET_PATH, 'pon_actions_2020.csv')) as f:
+        assert sum(1 for line in f) == pon_count_2020['total'] + 1
+    with open(os.path.join(DATASET_PATH, 'kan_actions_2020.csv')) as f:
+        assert sum(1 for line in f) == kan_count_2020['total'] + 1
+    with open(os.path.join(DATASET_PATH, 'kita_actions_2020.csv')) as f:
+        assert sum(1 for line in f) == kita_count_2020['total'] + 1
+    with open(os.path.join(DATASET_PATH, 'riichi_actions_2020.csv')) as f:
+        assert sum(1 for line in f) == riichi_count_2020['total'] + 1

@@ -1,25 +1,16 @@
-import numpy as np
-
-from data_processing.data_preprocessing_constants import TOTAL_FEATURES_COUNT
-
-
-def foo(a, b, c):
-    a += 1
-    b['b'] += 1
-    c['c'] += 1
-    return a
-
+import csv
 
 if __name__ == '__main__':
-    a = 0
-    b = {
-        'a': 0, 'b': 0, 'c': 0
-    }
-    c = {
-        'a': 0, 'b': 0, 'c': 0
-    }
-    a = foo(a, b, c)
-    a = foo(a, b, c)
-    print(a)
-    print(b)
-    print(c)
+    with open('test.txt', 'w') as f:
+        f.write('1\n')
+        f.write('3\n')
+        f.write('5\n')
+        f.write('7\n')
+        f.write('9\n')
+
+    with open('test.txt', 'r') as f:
+        with open('test.csv', 'w', newline='') as csv_file:
+            writer = csv.writer(csv_file)
+            writer.writerow(['index', 'label'])
+            for index, line in enumerate(f):
+                writer.writerow([index + 1, line[:-1]])
