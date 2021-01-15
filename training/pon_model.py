@@ -148,6 +148,8 @@ if __name__ == '__main__':
     print()
 
     # Create neural network
+    assert len(tf.config.experimental.list_physical_devices('GPU')) > 0
+
     tf.keras.backend.clear_session()
 
     model = create_model(kernel_size)
