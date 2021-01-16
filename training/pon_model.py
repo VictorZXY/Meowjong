@@ -17,6 +17,7 @@ np.random.seed(42)
 tf.random.set_seed(42)
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
+BATCH_SIZE_PER_REPLICA = 32
 
 TOTAL_FEATURES_COUNT = 12410
 TOTAL_COLUMNS_SIZE = 365
@@ -149,34 +150,47 @@ if __name__ == '__main__':
 
     # Create neural network
     assert len(tf.config.experimental.list_physical_devices('GPU')) > 0
-
     tf.keras.backend.clear_session()
 
-    model = create_model(kernel_size)
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
-                  loss='sparse_categorical_crossentropy',
-                  metrics=['accuracy'])
-    print(model.summary())
+    strategy = tf.distribute.MirroredStrategy()
+    num_of_gpus = strategy.num_replicas_in_sync
+    print('Number of devices:', num_of_gpus)
     print()
+
+    with strategy.scope():
+        model = create_model(kernel_size)
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+                      loss='sparse_categorical_crossentropy',
+                      metrics=['accuracy'])
+        print(model.summary())
+        print()
 
     # Train the neural network
     model_name = 'pon_cnn_' + str(kernel_size[0]) + str(kernel_size[1])
-    log_dir = os.path.join(logs_path + '/' + model_name,
+    log_dir = os.path.join(logs_path + '/' + model_name + '/tensorboard_logs',
                            datetime.now().strftime("%Y%m%d-%H%M%S"))
+    checkpoint_prefix = os.path.join(logs_path + '/' + model_name
+                                     + '/training_checkpoints',
+                                     "checkpoint_{epoch}")
 
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir,
-                                                          histogram_freq=1)
+    callbacks = [
+        tf.keras.callbacks.TensorBoard(log_dir=log_dir),
+        tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_prefix,
+                                           save_weights_only=True)
+    ]
 
-    history = model.fit(X_train, y_train, batch_size=32, epochs=500,
+    BATCH_SIZE = BATCH_SIZE_PER_REPLICA * num_of_gpus
+    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=500,
                         validation_data=(X_dev, y_dev),
-                        callbacks=[tensorboard_callback])
+                        callbacks=callbacks)
 
     # Save the neural network
-    with open(os.path.join(cnn_path, model_name + '_history.pickle'), 'wb') \
+    with open(os.path.join(cnn_path + '/' + model_name,
+                           model_name + '_history.pickle'), 'wb') \
             as f_history:
         pickle.dump(history, f_history)
 
-    model.save(os.path.join(cnn_path, model_name + '.h5'))
+    model.save(os.path.join(cnn_path + '/' + model_name, model_name + '.h5'))
 
     eval_train = model.evaluate(X_train, y_train)
     print('final training loss:', eval_train[0])
