@@ -108,15 +108,15 @@ if __name__ == '__main__':
     kernel_size = args.kernel_size
 
     # Load and validate the dataset
-    validate_dataset(dataset_path)
+    # validate_dataset(dataset_path)
 
     image_files = tf.data.Dataset.list_files(os.path.join(dataset_path,
                                                           'discard_2019/*.png'))
     labels = load_data('discard_actions_2019.csv')
-    for i in range(len(labels)):
-        assert labels['image'][i] == 'discard_2019_' + str(i + 1) + '.png'
-    print('Dataset OK')
-    print()
+    # for i in range(len(labels)):
+    #     assert labels['image'][i] == 'discard_2019_' + str(i + 1) + '.png'
+    # print('Dataset OK')
+    # print()
 
     # Generate (state, action) (i.e. (image, label)) pairs
     X = []
