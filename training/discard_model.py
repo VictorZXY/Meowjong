@@ -49,7 +49,7 @@ def load_data(csv_file):
 def get_label(image_file, labels):
     # image_name = image_file.numpy().decode('utf-8').split('\\')[-1]  # Windows
     image_name = image_file.numpy().decode('utf-8').split('/')[-1]  # Linux
-    image_index = int(image_name[9:-4])
+    image_index = int(image_name[13:-4])
     return tf.constant(labels['label'][image_index - 1])
 
 
