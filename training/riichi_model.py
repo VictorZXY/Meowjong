@@ -114,42 +114,46 @@ if __name__ == '__main__':
     cnn_path = args.cnn_path
     kernel_size = args.kernel_size
 
+    # Test whether there are GPUs available
+    assert len(tf.config.experimental.list_physical_devices('GPU')) > 0
+    tf.debugging.set_log_device_placement(True)
+
     # Load and validate the dataset
-    validate_dataset(dataset_path)
+    with tf.device('/CPU:0'):
+        validate_dataset(dataset_path)
 
-    image_files = tf.data.Dataset.list_files(os.path.join(dataset_path,
-                                                          'riichi_2019/*.png'))
-    labels = load_data('riichi_actions_2019.csv')
-    for i in range(len(labels)):
-        assert labels['image'][i] == 'riichi_2019_' + str(i + 1) + '.png'
-    print('Dataset OK')
-    print()
+        image_files = tf.data.Dataset.list_files(os.path.join(
+            dataset_path, 'riichi_2019/*.png'))
+        labels = load_data('riichi_actions_2019.csv')
+        for i in range(len(labels)):
+            assert labels['image'][i] == 'riichi_2019_' + str(i + 1) + '.png'
+        print('Dataset OK')
+        print()
 
-    # Generate (state, action) (i.e. (image, label)) pairs
-    X = []
-    y = []
+        # Generate (state, action) (i.e. (image, label)) pairs
+        X = []
+        y = []
 
-    for file in image_files:
-        image, label = generate_state_action_pair(file, labels)
-        X.append(image)
-        y.append(label)
+        for file in image_files:
+            image, label = generate_state_action_pair(file, labels)
+            X.append(image)
+            y.append(label)
 
-    X_train, X_dev, y_train, y_dev = train_test_split(X, y, test_size=0.1,
-                                                      train_size=0.9,
-                                                      random_state=42,
-                                                      stratify=y)
-    X_train = tf.stack(X_train)
-    X_dev = tf.stack(X_dev)
-    y_train = tf.stack(y_train)
-    y_dev = tf.stack(y_dev)
-    print('X_train shape:', X_train.shape)
-    print('X_dev.shape:', X_dev.shape)
-    print('y_train shape:', y_train.shape)
-    print('y_dev.shape:', y_dev.shape)
-    print()
+        X_train, X_dev, y_train, y_dev = train_test_split(X, y, test_size=0.1,
+                                                          train_size=0.9,
+                                                          random_state=42,
+                                                          stratify=y)
+        X_train = tf.stack(X_train)
+        X_dev = tf.stack(X_dev)
+        y_train = tf.stack(y_train)
+        y_dev = tf.stack(y_dev)
+        print('X_train shape:', X_train.shape)
+        print('X_dev.shape:', X_dev.shape)
+        print('y_train shape:', y_train.shape)
+        print('y_dev.shape:', y_dev.shape)
+        print()
 
     # Create neural network
-    assert len(tf.config.experimental.list_physical_devices('GPU')) > 0
     tf.keras.backend.clear_session()
 
     strategy = tf.distribute.MirroredStrategy()
