@@ -113,7 +113,7 @@ if __name__ == '__main__':
     tf.debugging.set_log_device_placement(True)
 
     # Load and validate the dataset
-    with tf.device('/physical_device:CPU:0'):
+    with tf.device('/CPU:0'):
         # validate_dataset(dataset_path)
 
         image_files = tf.data.Dataset.list_files(os.path.join(
