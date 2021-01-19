@@ -4,16 +4,12 @@ import pickle
 from datetime import datetime
 from functools import partial
 
-import numpy as np
-import pandas as pd
 import tensorflow as tf
-from sklearn.model_selection import train_test_split
 from tensorflow import keras
 
 assert tf.__version__ >= "2.0"
 
 # To make the output stable across runs
-np.random.seed(42)
 tf.random.set_seed(42)
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
@@ -21,7 +17,6 @@ BATCH_SIZE_PER_REPLICA = 32
 
 TOTAL_FEATURES_COUNT = 12410
 TOTAL_COLUMNS_SIZE = 365
-DISCARD_COUNT_2019 = 885873
 
 
 def kernel(arg):
@@ -32,39 +27,14 @@ def kernel(arg):
         raise argparse.ArgumentTypeError("Kernel size must be x, y")
 
 
-def validate_dataset(dataset_path):
-    path, dirs, files = next(
-        os.walk(os.path.join(dataset_path, 'discard_2019')))
-    assert len(files) == DISCARD_COUNT_2019
+def load_data(dataset_path, filename):
+    with open(os.path.join(dataset_path, filename), 'rb') as fread:
+        X_train = pickle.load(fread)
+        X_dev = pickle.load(fread)
+        y_train = pickle.load(fread)
+        y_dev = pickle.load(fread)
 
-    with open(os.path.join(dataset_path, 'discard_actions_2019.csv')) as f:
-        f.readline()
-        assert sum(1 for line in f) == DISCARD_COUNT_2019
-
-
-def load_data(csv_file):
-    csv_path = os.path.join(dataset_path, csv_file)
-    return pd.read_csv(csv_path, sep=',')
-
-
-def get_label(image_file, labels):
-    # image_name = image_file.numpy().decode('utf-8').split('\\')[-1]  # Windows
-    image_name = image_file.numpy().decode('utf-8').split('/')[-1]  # Linux
-    image_index = int(image_name[13:-4])
-    return tf.constant(labels['label'][image_index - 1])
-
-
-def decode_image(image):
-    image = tf.image.decode_png(image, channels=1)  # grayscale
-    image = tf.image.convert_image_dtype(image, tf.float32)
-    return image
-
-
-def generate_state_action_pair(image_file, labels):
-    label = get_label(image_file, labels)
-    image = tf.io.read_file(image_file)
-    image = decode_image(image)
-    return image, label
+        return X_train, X_dev, y_train, y_dev
 
 
 def create_model(kernel_size):
@@ -110,42 +80,15 @@ if __name__ == '__main__':
 
     # Test whether there are GPUs available
     assert len(tf.config.experimental.list_physical_devices('GPU')) > 0
-    tf.debugging.set_log_device_placement(True)
 
-    # Load and validate the dataset
-    with tf.device('/CPU:0'):
-        # validate_dataset(dataset_path)
-
-        image_files = tf.data.Dataset.list_files(os.path.join(
-            dataset_path, 'discard_2019/*.png'))
-        labels = load_data('discard_actions_2019.csv')
-        # for i in range(len(labels)):
-        #     assert labels['image'][i] == 'discard_2019_' + str(i + 1) + '.png'
-        # print('Dataset OK')
-        # print()
-
-        # Generate (state, action) (i.e. (image, label)) pairs
-        X = []
-        y = []
-
-        for file in image_files:
-            image, label = generate_state_action_pair(file, labels)
-            X.append(image)
-            y.append(label)
-
-        X_train, X_dev, y_train, y_dev = train_test_split(X, y, test_size=0.1,
-                                                          train_size=0.9,
-                                                          random_state=42,
-                                                          stratify=y)
-        X_train = tf.stack(X_train)
-        X_dev = tf.stack(X_dev)
-        y_train = tf.stack(y_train)
-        y_dev = tf.stack(y_dev)
-        print('X_train shape:', X_train.shape)
-        print('X_dev.shape:', X_dev.shape)
-        print('y_train shape:', y_train.shape)
-        print('y_dev.shape:', y_dev.shape)
-        print()
+    # Load the dataset
+    X_train, X_dev, y_train, y_dev = load_data(dataset_path,
+                                               'discard_tensors_2019.pickle')
+    print('X_train shape:', X_train.shape)
+    print('X_dev.shape:', X_dev.shape)
+    print('y_train shape:', y_train.shape)
+    print('y_dev.shape:', y_dev.shape)
+    print()
 
     # Create neural network
     tf.keras.backend.clear_session()
