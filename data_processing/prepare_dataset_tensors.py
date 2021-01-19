@@ -169,14 +169,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset_path', action='store', type=str,
                         required=True)
+    parser.add_argument('--action_type', action='store', type=str,
+                        required=True)
 
     args = parser.parse_args()
     dataset_path = args.dataset_path
+    action_type = args.action_type
 
-    prepare_dataset_tesnors(dataset_path, 'discard')
-    prepare_dataset_tesnors(dataset_path, 'pon')
-    prepare_dataset_tesnors(dataset_path, 'kan')
-    prepare_dataset_tesnors(dataset_path, 'kita')
-    prepare_dataset_tesnors(dataset_path, 'riichi')
+    prepare_dataset_tesnors(dataset_path, action_type)
 
     print('Success')
