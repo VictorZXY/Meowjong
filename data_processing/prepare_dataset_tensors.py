@@ -98,10 +98,12 @@ def load_csv(dataset_path, csv_file):
     return pd.read_csv(csv_path, sep=',')
 
 
-def get_label(image_file, labels):
+def get_label(image_file, labels, action_type):
     # image_name = image_file.numpy().decode('utf-8').split('\\')[-1]  # Windows
     image_name = image_file.numpy().decode('utf-8').split('/')[-1]  # Linux
-    image_index = int(image_name[13:-4])
+    image_file_prefix = action_type + '_2019_'
+    image_index = int(image_name.replace(image_file_prefix, '')
+                      .replace('.png', ''))
     return tf.constant(labels['label'][image_index - 1])
 
 
