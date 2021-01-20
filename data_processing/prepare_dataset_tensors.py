@@ -124,7 +124,7 @@ def prepare_dataset_tesnors(dataset_path, action_type):
     image_folder = action_type + '_2019'
     label_file = action_type + '_actions_2019.csv'
 
-    validate_dataset(dataset_path, action_type)
+    # validate_dataset(dataset_path, action_type)
 
     image_files = tf.data.Dataset.list_files(os.path.join(
         dataset_path, image_folder + '/*.png'))
