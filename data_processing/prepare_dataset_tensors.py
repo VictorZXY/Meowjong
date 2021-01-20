@@ -113,8 +113,8 @@ def decode_image(image):
     return image
 
 
-def generate_state_action_pair(image_file, labels):
-    label = get_label(image_file, labels)
+def generate_state_action_pair(image_file, labels, action_type):
+    label = get_label(image_file, labels, action_type)
     image = tf.io.read_file(image_file)
     image = decode_image(image)
     return image, label
@@ -140,7 +140,7 @@ def prepare_dataset_tesnors(dataset_path, action_type):
     y = []
 
     for file in image_files:
-        image, label = generate_state_action_pair(file, labels)
+        image, label = generate_state_action_pair(file, labels, action_type)
         X.append(image)
         y.append(label)
 
