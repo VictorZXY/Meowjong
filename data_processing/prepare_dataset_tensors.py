@@ -102,8 +102,9 @@ def get_label(image_file, labels, action_type):
     # image_name = image_file.numpy().decode('utf-8').split('\\')[-1]  # Windows
     image_name = image_file.numpy().decode('utf-8').split('/')[-1]  # Linux
     image_file_prefix = action_type + '_2019_'
-    image_index = int(image_name.replace(image_file_prefix, '')
-                      .replace('.png', ''))
+    # image_index = int(image_name.replace(image_file_prefix, '')
+    #                   .replace('.png', ''))
+    image_index = int(image_name[13:-4])  # for discard only
     return tf.constant(labels['label'][image_index - 1])
 
 
