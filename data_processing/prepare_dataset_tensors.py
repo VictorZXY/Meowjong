@@ -1,5 +1,6 @@
 import argparse
 import os
+import joblib
 import pickle
 
 import pandas as pd
@@ -158,12 +159,22 @@ def prepare_dataset_tesnors(dataset_path, action_type):
     y_train = tf.stack(y_train)
     y_dev = tf.stack(y_dev)
 
-    with open(os.path.join(dataset_path, action_type + '_tensors_2019.pickle'),
-              'wb') as fwrite:
-        pickle.dump(X_train, fwrite)
-        pickle.dump(X_dev, fwrite)
-        pickle.dump(y_train, fwrite)
-        pickle.dump(y_dev, fwrite)
+    if action_type == 'discard':
+        with open(os.path.join(dataset_path,
+                               action_type + '_tensors_2019.joblib'), 'wb') \
+                as fwrite:
+            joblib.dump(X_train, fwrite)
+            joblib.dump(X_dev, fwrite)
+            joblib.dump(y_train, fwrite)
+            joblib.dump(y_dev, fwrite)
+    else:
+        with open(os.path.join(dataset_path,
+                               action_type + '_tensors_2019.pickle'), 'wb') \
+                as fwrite:
+            pickle.dump(X_train, fwrite)
+            pickle.dump(X_dev, fwrite)
+            pickle.dump(y_train, fwrite)
+            pickle.dump(y_dev, fwrite)
 
     print(action_type + ' X_train shape:', X_train.shape)
     print(action_type + ' X_dev.shape:', X_dev.shape)
