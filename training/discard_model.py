@@ -135,13 +135,13 @@ if __name__ == '__main__':
         tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_prefix,
                                            save_best_only=True,
                                            save_weights_only=True,
-                                           period=10)
+                                           period=5)  # change to 10 afterwards
     ]
 
     BATCH_SIZE = BATCH_SIZE_PER_REPLICA * num_of_gpus
-    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=300,
+    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=10,
                         validation_data=(X_dev, y_dev),
-                        callbacks=callbacks)
+                        callbacks=callbacks)  # change epochs to 300 afterwards
 
     # Save the neural network
     with open(os.path.join(cnn_path + '/' + model_name,
