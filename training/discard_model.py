@@ -14,7 +14,7 @@ assert tf.__version__ >= "2.0"
 tf.random.set_seed(42)
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
-BATCH_SIZE_PER_REPLICA = 32
+BATCH_SIZE_PER_REPLICA = 256
 
 TOTAL_FEATURES_COUNT = 12410
 TOTAL_COLUMNS_SIZE = 365
@@ -42,23 +42,38 @@ def create_model(kernel_size):
     DefaultConv2D = partial(keras.layers.Conv2D, kernel_size=kernel_size,
                             activation='relu',
                             padding="VALID")
+
     return keras.models.Sequential([
         DefaultConv2D(filters=128, input_shape=[34, 365, 1]),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
+
         DefaultConv2D(filters=128),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
+
         DefaultConv2D(filters=128),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
+
+        DefaultConv2D(filters=128),
+        keras.layers.BatchNormalization(),
+        keras.layers.Dropout(0.5),
+
+        DefaultConv2D(filters=32),
+        keras.layers.BatchNormalization(),
+        keras.layers.Dropout(0.5),
+
         keras.layers.Flatten(),
+
         keras.layers.Dense(units=512, activation='relu'),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
+
         keras.layers.Dense(units=512, activation='relu'),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
+
         keras.layers.Dense(units=34, activation='softmax'),
     ])
 
@@ -112,17 +127,19 @@ if __name__ == '__main__':
     log_dir = os.path.join(logs_path + '/' + model_name + '/tensorboard_logs',
                            datetime.now().strftime("%Y%m%d-%H%M%S"))
     checkpoint_prefix = os.path.join(logs_path + '/' + model_name
-                                     + '/training_checkpoints',
-                                     "checkpoint_{epoch}")
+                                     + '/checkpoints',
+                                     'checkpoint_{epoch}')
 
     callbacks = [
         tf.keras.callbacks.TensorBoard(log_dir=log_dir),
         tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_prefix,
-                                           save_weights_only=True)
+                                           save_best_only=True,
+                                           save_weights_only=True,
+                                           period=10)
     ]
 
     BATCH_SIZE = BATCH_SIZE_PER_REPLICA * num_of_gpus
-    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=500,
+    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=300,
                         validation_data=(X_dev, y_dev),
                         callbacks=callbacks)
 
