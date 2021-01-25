@@ -8,7 +8,7 @@ from data_processing.data_preprocessing_constants import TILES_SIZE, \
 from evaluation.hand_calculation.riichi_checker import RiichiChecker
 from evaluation.hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, \
     NINE_MAN, ONE_PIN, FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, EAST, \
-    NORTH, CHUN, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
+    NORTH, CHUN, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU, YAOCHUUHAI
 from evaluation.hand_calculation.tiles import Tiles
 
 
@@ -25,6 +25,7 @@ class Agent(ABC):
         self.closed_kan = []
         self.riichi_status = False
         self.riichi_turn_number = 0
+        self.naki_status = False
 
     def can_pon(self, target_tile):
         """
@@ -199,3 +200,17 @@ class Agent(ABC):
 
         return RiichiChecker.can_riichi(private_tiles_array, target_tile,
                                         self.closed_kan)
+
+    def has_kyuushu_kyuuhai(self, target_tile, player1, player2, player3=None):
+        yaochuuhai_count = np.sum(self.hand[YAOCHUUHAI, 0], dtype=np.int32)
+        if target_tile in YAOCHUUHAI:
+            yaochuuhai_count += 1
+
+        if player3 is not None:
+            return yaochuuhai_count >= 9 and \
+                   not (self.naki_status or player1.naki_status
+                        or player2.naki_status or player3.naki_status)
+        else:
+            return yaochuuhai_count >= 9 and \
+                   not (self.naki_status or player1.naki_status
+                        or player2.naki_status)
