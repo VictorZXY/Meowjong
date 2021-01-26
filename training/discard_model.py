@@ -44,19 +44,19 @@ def create_model(kernel_size):
                             padding="VALID")
 
     return keras.models.Sequential([
-        DefaultConv2D(filters=128, input_shape=[34, 365, 1]),
+        DefaultConv2D(filters=64, input_shape=[34, 365, 1]),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
 
-        DefaultConv2D(filters=128),
+        DefaultConv2D(filters=64),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
 
-        DefaultConv2D(filters=128),
+        DefaultConv2D(filters=64),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
 
-        DefaultConv2D(filters=128),
+        DefaultConv2D(filters=64),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
 
@@ -70,7 +70,7 @@ def create_model(kernel_size):
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
 
-        keras.layers.Dense(units=512, activation='relu'),
+        keras.layers.Dense(units=256, activation='relu'),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
 
