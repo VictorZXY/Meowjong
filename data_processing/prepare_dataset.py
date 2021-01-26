@@ -956,7 +956,7 @@ if __name__ == '__main__':
     for key, val in max_honba_and_deposit_results.items():
         print(key + ':', val)
 
-    # 2019
+    # 2019 - 30000 games
     discard_count_2019 = 885873
     pon_count_2019 = {
         'total': 101020,
@@ -979,7 +979,7 @@ if __name__ == '__main__':
         'no': 52551
     }
 
-    # 2020
+    # 2020 - 3000 games
     discard_count_2020 = 88785
     pon_count_2020 = {
         'total': 10197,
