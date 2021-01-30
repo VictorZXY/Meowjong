@@ -41,23 +41,38 @@ def create_model(kernel_size):
     DefaultConv2D = partial(keras.layers.Conv2D, kernel_size=kernel_size,
                             activation='relu',
                             padding="VALID")
+
     return keras.models.Sequential([
-        DefaultConv2D(filters=128, input_shape=[34, 365, 1]),
+        DefaultConv2D(filters=64, input_shape=[34, 365, 1]),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
-        DefaultConv2D(filters=128),
+
+        DefaultConv2D(filters=64),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
-        DefaultConv2D(filters=128),
+
+        DefaultConv2D(filters=64),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
+
+        DefaultConv2D(filters=64),
+        keras.layers.BatchNormalization(),
+        keras.layers.Dropout(0.5),
+
+        DefaultConv2D(filters=32),
+        keras.layers.BatchNormalization(),
+        keras.layers.Dropout(0.5),
+
         keras.layers.Flatten(),
+
         keras.layers.Dense(units=512, activation='relu'),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
+
         keras.layers.Dense(units=256, activation='relu'),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
+
         keras.layers.Dense(units=2, activation='softmax'),
     ])
 
@@ -117,21 +132,18 @@ if __name__ == '__main__':
     callbacks = [
         tf.keras.callbacks.TensorBoard(log_dir=log_dir),
         tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_prefix,
-                                           save_weights_only=True)
+                                           save_best_only=True,
+                                           save_weights_only=True,
+                                           period=10)
     ]
 
     BATCH_SIZE = BATCH_SIZE_PER_REPLICA * num_of_gpus
-    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=500,
+    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=300,
                         validation_data=(X_dev, y_dev),
                         callbacks=callbacks)
 
     # Save the neural network
-    with open(os.path.join(cnn_path + '/' + model_name,
-                           model_name + '_history.pickle'), 'wb') \
-            as f_history:
-        pickle.dump(history, f_history)
-
-    model.save(os.path.join(cnn_path + '/' + model_name, model_name + '.h5'))
+    model.save(os.path.join(cnn_path, model_name + '.h5'))
 
     eval_train = model.evaluate(X_train, y_train)
     print('final training loss:', eval_train[0])
