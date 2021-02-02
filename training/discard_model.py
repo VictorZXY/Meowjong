@@ -13,7 +13,7 @@ assert tf.__version__ >= "2.0"
 tf.random.set_seed(42)
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
-BATCH_SIZE_PER_REPLICA = 128
+BATCH_SIZE_PER_REPLICA = 256
 
 TOTAL_FEATURES_COUNT = 12410
 TOTAL_COLUMNS_SIZE = 365
@@ -43,15 +43,15 @@ def create_model(kernel_size):
                             padding="VALID")
 
     return keras.models.Sequential([
-        DefaultConv2D(filters=128, input_shape=[34, 365, 1]),
+        DefaultConv2D(filters=64, input_shape=[34, 365, 1]),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
 
-        DefaultConv2D(filters=128),
+        DefaultConv2D(filters=64),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
 
-        DefaultConv2D(filters=128),
+        DefaultConv2D(filters=64),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
 
@@ -61,43 +61,11 @@ def create_model(kernel_size):
 
         keras.layers.Flatten(),
 
-        keras.layers.Dense(units=512, activation='relu'),
+        keras.layers.Dense(units=256, activation='relu'),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
 
         keras.layers.Dense(units=34, activation='softmax'),
-
-        # DefaultConv2D(filters=64, input_shape=[34, 365, 1]),
-        # keras.layers.BatchNormalization(),
-        # keras.layers.Dropout(0.5),
-        #
-        # DefaultConv2D(filters=64),
-        # keras.layers.BatchNormalization(),
-        # keras.layers.Dropout(0.5),
-        #
-        # DefaultConv2D(filters=64),
-        # keras.layers.BatchNormalization(),
-        # keras.layers.Dropout(0.5),
-        #
-        # DefaultConv2D(filters=64),
-        # keras.layers.BatchNormalization(),
-        # keras.layers.Dropout(0.5),
-        #
-        # DefaultConv2D(filters=32),
-        # keras.layers.BatchNormalization(),
-        # keras.layers.Dropout(0.5),
-        #
-        # keras.layers.Flatten(),
-        #
-        # keras.layers.Dense(units=512, activation='relu'),
-        # keras.layers.BatchNormalization(),
-        # keras.layers.Dropout(0.5),
-        #
-        # keras.layers.Dense(units=256, activation='relu'),
-        # keras.layers.BatchNormalization(),
-        # keras.layers.Dropout(0.5),
-        #
-        # keras.layers.Dense(units=34, activation='softmax'),
     ])
 
 
