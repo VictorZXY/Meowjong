@@ -34,8 +34,8 @@ def load_data(dataset_path, filename):
         y_train = joblib.load(fread)
         y_dev = joblib.load(fread)
 
-        X_mean = X_train.mean(axis=0, keepdims=True)
-        X_std = X_train.std(axis=0, keepdims=True) + 1e-7
+        X_mean = X_train.numpy().mean(axis=0, keepdims=True)
+        X_std = X_train.numpy().std(axis=0, keepdims=True) + 1e-7
         X_train = (X_train - X_mean) / X_std
         X_dev = (X_dev - X_mean) / X_std
 
