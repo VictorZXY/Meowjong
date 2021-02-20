@@ -5,7 +5,6 @@ from functools import partial
 
 import joblib
 import tensorflow as tf
-from sklearn.preprocessing import StandardScaler
 from tensorflow import keras
 
 assert tf.__version__ >= "2.0"
@@ -34,6 +33,11 @@ def load_data(dataset_path, filename):
         X_dev = joblib.load(fread)
         y_train = joblib.load(fread)
         y_dev = joblib.load(fread)
+
+        X_mean = X_train.mean(axis=0, keepdims=True)
+        X_std = X_train.std(axis=0, keepdims=True) + 1e-7
+        X_train = (X_train - X_mean) / X_std
+        X_dev = (X_dev - X_mean) / X_std
 
         return X_train, X_dev, y_train, y_dev
 
@@ -92,9 +96,6 @@ if __name__ == '__main__':
     # Load the dataset
     X_train, X_dev, y_train, y_dev = load_data(dataset_path,
                                                'discard_tensors_2019.joblib')
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_dev = scaler.fit_transform(X_dev)
     print('X_train shape:', X_train.shape)
     print('X_dev.shape:', X_dev.shape)
     print('y_train shape:', y_train.shape)
