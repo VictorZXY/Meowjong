@@ -166,17 +166,20 @@ def prepare_dataset_tesnors(dataset_path, action_type, scaled=False):
     y_train = tf.stack(y_train)
     y_dev = tf.stack(y_dev)
 
+    if scaled:
+        filename = action_type + '_tensors_2019_scaled'
+    else:
+        filename = action_type + '_tensors_2019'
+
     if action_type == 'discard':
-        with open(os.path.join(dataset_path,
-                               action_type + '_tensors_2019.joblib'), 'wb') \
+        with open(os.path.join(dataset_path, filename + '.joblib'), 'wb') \
                 as fwrite:
             joblib.dump(X_train, fwrite)
             joblib.dump(X_dev, fwrite)
             joblib.dump(y_train, fwrite)
             joblib.dump(y_dev, fwrite)
     else:
-        with open(os.path.join(dataset_path,
-                               action_type + '_tensors_2019.pickle'), 'wb') \
+        with open(os.path.join(dataset_path, filename + '.pickle'), 'wb') \
                 as fwrite:
             pickle.dump(X_train, fwrite)
             pickle.dump(X_dev, fwrite)
