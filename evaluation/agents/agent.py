@@ -5,6 +5,11 @@ import numpy as np
 
 from data_processing.data_preprocessing_constants import TILES_SIZE, \
     SELF_RED_DORA_SIZE, MELDS_SIZE, KITA_SIZE, DISCARDS_SIZE
+from evaluation.hand_calculation.han import Han
+from evaluation.hand_calculation.hand_calculator import HandCalculator
+from evaluation.hand_calculation.hand_config import HandConfig
+from evaluation.hand_calculation.hand_divider import HandDivider
+from evaluation.hand_calculation.meld import Meld
 from evaluation.hand_calculation.riichi_checker import RiichiChecker
 from evaluation.hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, \
     NINE_MAN, ONE_PIN, FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, EAST, \
@@ -22,6 +27,8 @@ class Agent(ABC):
         self.log_draws = None
         self.log_discards = None
         self.meld_tiles = []
+        self.pon_tiles = []
+        self.open_kan = []
         self.closed_kan = []
         self.riichi_status = False
         self.riichi_turn_number = 0
@@ -214,3 +221,100 @@ class Agent(ABC):
             return yaochuuhai_count >= 9 and \
                    not (self.naki_status or player1.naki_status
                         or player2.naki_status)
+
+    def can_win(self, target_tile):
+        """
+        :param target_tile: Integer index of a tile
+        :return: Boolean
+        """
+        if target_tile == RED_FIVE_MAN:
+            target_tile = FIVE_MAN
+        elif target_tile == RED_FIVE_PIN:
+            target_tile = FIVE_PIN
+        elif target_tile == RED_FIVE_SOU:
+            target_tile = FIVE_SOU
+
+        private_tiles_array = Tiles.matrices_to_array(self.hand)
+        meld_objects = []
+        for pon_tile in self.pon_tiles:
+            meld_objects.append(Meld(
+                meld_type=Meld.PON,
+                tiles=Tiles.indices_to_array([pon_tile] * 3)
+            ))
+        for kan_tile in self.open_kan:
+            meld_objects.append(Meld(
+                meld_type=Meld.KAN,
+                tiles=Tiles.indices_to_array([kan_tile] * 4)
+            ))
+        for kan_tile in self.closed_kan:
+            meld_objects.append(Meld(
+                meld_type=Meld.KAN,
+                tiles=Tiles.indices_to_array([kan_tile] * 4),
+                is_open=False
+            ))
+
+        hand_options = HandDivider.divide_hand(
+            private_tiles=private_tiles_array,
+            win_tile=target_tile,
+            melds=meld_objects
+        )
+        hand_config = HandConfig()
+
+        # Kokushi Musou
+        if isinstance(hand_options[0], int):
+            if (hand_config.yaku.kokushi_musou.is_condition_met(
+                    hand_options)
+                    or hand_config.yaku.kokushi_musou_13_men.is_condition_met(
+                        hand_options, target_tile)):
+                return True
+            else:
+                return False
+        # Other winning cases
+        else:
+            for hand in hand_options:
+                win_group_options = HandCalculator.find_all_win_groups(
+                    hand=hand,
+                    win_tile=target_tile,
+                    melds=meld_objects)
+
+                for win_group in win_group_options:
+                    han_details, han, is_yakuman = Han.calculate_han(
+                        hand=hand,
+                        win_tile=target_tile,
+                        win_group=win_group,
+                        melds=meld_objects,
+                        hand_config=hand_config
+                    )
+
+                    if han > 0 or is_yakuman:
+                        return True
+
+            return False
+
+    @abstractmethod
+    def eval_discard(self, target_tile):
+        pass
+
+    @abstractmethod
+    def eval_pon(self, target_tile):
+        pass
+
+    @abstractmethod
+    def eval_kan(self, target_tile):
+        pass
+
+    @abstractmethod
+    def eval_kita(self, target_tile):
+        pass
+
+    @abstractmethod
+    def eval_riichi(self, target_tile):
+        pass
+
+    @abstractmethod
+    def eval_kyuushu_kyuuhai(self, target_tile):
+        pass
+
+    @abstractmethod
+    def eval_win(self, target_tile):
+        pass
