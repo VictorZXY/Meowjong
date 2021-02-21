@@ -126,7 +126,7 @@ def generate_state_action_pair(image_file, labels, action_type):
     return image, label
 
 
-def prepare_dataset_tesnors(dataset_path, action_type):
+def prepare_dataset_tesnors(dataset_path, action_type, scaled=False):
     image_folder = action_type + '_2019'
     label_file = action_type + '_actions_2019.csv'
 
@@ -154,6 +154,13 @@ def prepare_dataset_tesnors(dataset_path, action_type):
                                                       train_size=0.9,
                                                       random_state=42,
                                                       stratify=y)
+
+    if scaled:
+        X_mean = X_train.mean(axis=0, keepdims=True)
+        X_std = X_train.std(axis=0, keepdims=True) + 1e-7
+        X_train = (X_train - X_mean) / X_std
+        X_dev = (X_dev - X_mean) / X_std
+
     X_train = tf.stack(X_train)
     X_dev = tf.stack(X_dev)
     y_train = tf.stack(y_train)
@@ -189,11 +196,16 @@ if __name__ == '__main__':
                         required=True)
     parser.add_argument('--action_type', action='store', type=str,
                         required=True)
+    parser.add_argument('--scaled', action='store', type=bool, required=False)
 
     args = parser.parse_args()
     dataset_path = args.dataset_path
     action_type = args.action_type
+    if args.scaled:
+        scaled = args.scaled
+    else:
+        scaled = False
 
-    prepare_dataset_tesnors(dataset_path, action_type)
+    prepare_dataset_tesnors(dataset_path, action_type, scaled)
 
     print('Success')
