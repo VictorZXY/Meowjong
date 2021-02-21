@@ -36,8 +36,10 @@ def load_data(dataset_path, filename):
 
         X_mean = X_train.numpy().mean(axis=0, keepdims=True)
         X_std = X_train.numpy().std(axis=0, keepdims=True) + 1e-7
-        X_train = (X_train - X_mean) / X_std
-        X_dev = (X_dev - X_mean) / X_std
+        X_train[:50000] = (X_train[:50000] - X_mean) / X_std
+        X_train[50000:] = (X_train[50000:] - X_mean) / X_std
+        X_dev[:50000] = (X_dev[:50000] - X_mean) / X_std
+        X_dev[50000:] = (X_dev[50000:] - X_mean) / X_std
 
         return X_train, X_dev, y_train, y_dev
 
