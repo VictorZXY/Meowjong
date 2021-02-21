@@ -34,12 +34,20 @@ def load_data(dataset_path, filename):
         y_train = pickle.load(fread)
         y_dev = pickle.load(fread)
 
-        X_mean = X_train.numpy().mean(axis=0, keepdims=True)
-        X_std = X_train.numpy().std(axis=0, keepdims=True) + 1e-7
-        X_train[:50000] = (X_train[:50000] - X_mean) / X_std
-        X_train[50000:] = (X_train[50000:] - X_mean) / X_std
-        X_dev[:50000] = (X_dev[:50000] - X_mean) / X_std
-        X_dev[50000:] = (X_dev[50000:] - X_mean) / X_std
+        X_train = X_train.numpy()
+        X_dev = X_dev.numpy()
+
+        X_mean = X_train.mean(axis=0, keepdims=True)
+        X_std = X_train.std(axis=0, keepdims=True) + 1e-7
+        X_train = (X_train - X_mean) / X_std
+        X_dev = (X_dev - X_mean) / X_std
+        # X_train[:50000] = (X_train[:50000] - X_mean) / X_std
+        # X_train[50000:] = (X_train[50000:] - X_mean) / X_std
+        # X_dev[:50000] = (X_dev[:50000] - X_mean) / X_std
+        # X_dev[50000:] = (X_dev[50000:] - X_mean) / X_std
+
+        X_train = tf.convert_to_tensor(X_train)
+        X_dev = tf.convert_to_tensor(X_dev)
 
         return X_train, X_dev, y_train, y_dev
 
