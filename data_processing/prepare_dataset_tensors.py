@@ -136,11 +136,11 @@ def prepare_dataset_tesnors(dataset_path, action_type, scaled=False):
     image_files = tf.data.Dataset.list_files(os.path.join(
         dataset_path, image_folder + '/*.png'))
     labels = load_csv(dataset_path, label_file)
-    for i in range(len(labels)):
-        assert labels['image'][i] == action_type + \
-               '_2019_' + str(i + 1) + '.png'
-    print(action_type + ' dataset OK')
-    print()
+    # for i in range(len(labels)):
+    #     assert labels['image'][i] == action_type + \
+    #            '_2019_' + str(i + 1) + '.png'
+    # print(action_type + ' dataset OK')
+    # print()
 
     # Generate (state, action) (i.e. (image, label)) pairs
     X = []
