@@ -3,7 +3,7 @@ import os
 import joblib
 import pickle
 
-import numpy as np
+import cupy as cp
 import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
@@ -157,8 +157,8 @@ def prepare_dataset_tesnors(dataset_path, action_type, scaled=False):
                                                       stratify=y)
 
     if scaled:
-        X_mean = np.mean(X_train, axis=0, keepdims=True)
-        X_std = np.std(X_train, axis=0, keepdims=True) + 1e-7
+        X_mean = cp.mean(X_train, axis=0, keepdims=True)
+        X_std = cp.std(X_train, axis=0, keepdims=True) + 1e-7
         X_train = (X_train - X_mean) / X_std
         X_dev = (X_dev - X_mean) / X_std
 
