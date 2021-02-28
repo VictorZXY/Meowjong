@@ -4,7 +4,8 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 from data_processing.data_preprocessing_constants import TILES_SIZE, \
-    SELF_RED_DORA_SIZE, MELDS_SIZE, KITA_SIZE, DISCARDS_SIZE
+    SELF_RED_DORA_SIZE, MELDS_SIZE, KITA_SIZE, DISCARDS_SIZE, ONE_MELD_SIZE, \
+    TURN_NUMBER_SIZE
 from evaluation.hand_calculation.han import Han
 from evaluation.hand_calculation.hand_calculator import HandCalculator
 from evaluation.hand_calculation.hand_config import HandConfig
@@ -23,9 +24,9 @@ class Agent(ABC):
         self.red_dora = np.zeros((34, SELF_RED_DORA_SIZE))
         self.melds = np.zeros((34, MELDS_SIZE))
         self.kita = np.zeros((34, KITA_SIZE))
+        self.kita_index = 0
         self.discards = np.zeros((34, DISCARDS_SIZE))
-        self.log_draws = None
-        self.log_discards = None
+        self.discard_index = 0
         self.meld_tiles = []
         self.pon_tiles = []
         self.open_kan = []
@@ -33,6 +34,39 @@ class Agent(ABC):
         self.riichi_status = False
         self.riichi_turn_number = 0
         self.naki_status = False
+
+    @staticmethod
+    def __encode_number(number, size):
+        """
+        :param number: Integer
+        :return: (34, size) np.array
+        """
+        output = np.empty((34, size))
+        for bit, val in enumerate(bin(number)[2:].zfill(size)):
+            if val == '1':
+                output[:, bit] = 1
+            else:
+                output[:, bit] = 0
+        return output
+
+    @staticmethod
+    def __encode_turn_number(turn_number):
+        """
+        :param turn_number: integer
+        :return: (34, 5) np.array
+        """
+        return Agent.__encode_number(turn_number, TURN_NUMBER_SIZE)
+
+    def encode_riichi_status(self):
+        if self.riichi_status:
+            riichi_status_encoded = np.ones((34, 1))
+        else:
+            riichi_status_encoded = np.zeros((34, 1))
+
+        return np.concatenate((
+            riichi_status_encoded,
+            Agent.__encode_turn_number(self.riichi_turn_number)
+        ), axis=1)
 
     def can_pon(self, target_tile):
         """
@@ -290,6 +324,215 @@ class Agent(ABC):
                         return True
 
             return False
+
+    def add_tile_to_hand(self, tile):
+        """
+        :param tile: Tenhou-encoded integer index of a tile
+        """
+        if tile == RED_FIVE_MAN:
+            index = 0
+            while self.hand[FIVE_MAN, index] != 0:
+                index += 1
+            self.hand[FIVE_MAN, index] = 1
+            self.red_dora[FIVE_MAN] = 1
+        elif tile == RED_FIVE_PIN:
+            index = 0
+            while self.hand[FIVE_PIN, index] != 0:
+                index += 1
+            self.hand[FIVE_PIN, index] = 1
+            self.red_dora[FIVE_PIN] = 1
+        elif tile == RED_FIVE_SOU:
+            index = 0
+            while self.hand[FIVE_SOU, index] != 0:
+                index += 1
+            self.hand[FIVE_SOU, index] = 1
+            self.red_dora[FIVE_SOU] = 1
+        else:
+            converted_tile = tile
+            index = 0
+            while self.hand[converted_tile, index] != 0:
+                index += 1
+            self.hand[converted_tile, index] = 1
+
+    def discard_tile_from_hand(self, tile):
+        """
+        :param tile: Tenhou-encoded integer index of a tile
+        """
+        if tile == RED_FIVE_MAN:
+            index = 0
+            while index < 4 and self.hand[FIVE_MAN, index] != 0:
+                index += 1
+            self.hand[FIVE_MAN, index - 1] = 0
+            self.red_dora[FIVE_MAN] = 0
+        elif tile == RED_FIVE_PIN:
+            index = 0
+            while index < 4 and self.hand[FIVE_PIN, index] != 0:
+                index += 1
+            self.hand[FIVE_PIN, index - 1] = 0
+            self.red_dora[FIVE_PIN] = 0
+        elif tile == RED_FIVE_SOU:
+            index = 0
+            while index < 4 and self.hand[FIVE_SOU, index] != 0:
+                index += 1
+            self.hand[FIVE_SOU, index - 1] = 0
+            self.red_dora[FIVE_SOU] = 0
+        else:
+            converted_tile = tile
+            index = 0
+            while index < 4 and self.hand[converted_tile, index] != 0:
+                index += 1
+            self.hand[converted_tile, index - 1] = 0
+
+    def add_discard(self, tile):
+        """
+        :param tile: Tenhou-encoded integer index of a tile
+        """
+        if tile == RED_FIVE_MAN:
+            tile = FIVE_MAN
+        elif tile == RED_FIVE_PIN:
+            tile = FIVE_PIN
+        elif tile == RED_FIVE_SOU:
+            tile = FIVE_SOU
+
+        self.discards[tile, self.discard_index] = 1
+        self.discard_index += 1
+        self.discard_tile_from_hand(tile)
+
+    def add_kita(self):
+        self.kita[NORTH, self.kita_index] = 1
+        self.kita_index += 1
+        self.discard_tile_from_hand(NORTH)
+
+    def add_meld(self, meld_type, tile, turn_number):
+        """
+        :param meld_type: String, 'pon' or 'kan'
+        :param tile: Tenhou-encoded integer index of a tile
+        :param turn_number: Integer
+        """
+        if tile == RED_FIVE_MAN:
+            if FIVE_MAN not in self.meld_tiles:
+                if meld_type == 'pon':
+                    self.melds[FIVE_MAN, len(self.meld_tiles) * ONE_MELD_SIZE:
+                                         len(self.meld_tiles) * ONE_MELD_SIZE
+                                         + 3] = 1
+                    self.discard_tile_from_hand(RED_FIVE_MAN)
+                    self.discard_tile_from_hand(FIVE_MAN)
+                    self.discard_tile_from_hand(FIVE_MAN)
+                elif meld_type == 'kan':
+                    self.melds[FIVE_MAN, len(self.meld_tiles) * ONE_MELD_SIZE:
+                                         len(self.meld_tiles) * ONE_MELD_SIZE
+                                         + 4] = 1
+                    self.discard_tile_from_hand(RED_FIVE_MAN)
+                    self.discard_tile_from_hand(FIVE_MAN)
+                    self.discard_tile_from_hand(FIVE_MAN)
+                    self.discard_tile_from_hand(FIVE_MAN)
+
+                self.meld_tiles.append(FIVE_MAN)
+
+            else:
+                if meld_type == 'kan':
+                    self.melds[FIVE_MAN, self.meld_tiles.index(FIVE_MAN)
+                               * ONE_MELD_SIZE + 3] = 1
+                    self.discard_tile_from_hand(FIVE_MAN)
+
+            self.red_dora[FIVE_MAN] = 1
+
+        elif tile == RED_FIVE_PIN:
+            if FIVE_PIN not in self.meld_tiles:
+                if meld_type == 'pon':
+                    self.melds[FIVE_PIN, len(self.meld_tiles) * ONE_MELD_SIZE:
+                                         len(self.meld_tiles) * ONE_MELD_SIZE
+                                         + 3] = 1
+                    self.discard_tile_from_hand(RED_FIVE_PIN)
+                    self.discard_tile_from_hand(FIVE_PIN)
+                    self.discard_tile_from_hand(FIVE_PIN)
+                elif meld_type == 'kan':
+                    self.melds[FIVE_PIN, len(self.meld_tiles) * ONE_MELD_SIZE:
+                                         len(self.meld_tiles) * ONE_MELD_SIZE
+                                         + 4] = 1
+                    self.discard_tile_from_hand(RED_FIVE_PIN)
+                    self.discard_tile_from_hand(FIVE_PIN)
+                    self.discard_tile_from_hand(FIVE_PIN)
+                    self.discard_tile_from_hand(FIVE_PIN)
+
+                self.meld_tiles.append(FIVE_PIN)
+
+            else:
+                if meld_type == 'kan':
+                    self.melds[FIVE_PIN, self.meld_tiles.index(FIVE_PIN)
+                               * ONE_MELD_SIZE + 3] = 1
+                    self.discard_tile_from_hand(FIVE_PIN)
+
+            self.red_dora[FIVE_PIN] = 1
+
+        elif tile == RED_FIVE_SOU:
+            if FIVE_SOU not in self.meld_tiles:
+                if meld_type == 'pon':
+                    self.melds[FIVE_SOU, len(self.meld_tiles) * ONE_MELD_SIZE:
+                                         len(self.meld_tiles) * ONE_MELD_SIZE
+                                         + 3] = 1
+                    self.discard_tile_from_hand(RED_FIVE_SOU)
+                    self.discard_tile_from_hand(FIVE_SOU)
+                    self.discard_tile_from_hand(FIVE_SOU)
+                elif meld_type == 'kan':
+                    self.melds[FIVE_SOU, len(self.meld_tiles) * ONE_MELD_SIZE:
+                                         len(self.meld_tiles) * ONE_MELD_SIZE
+                                         + 4] = 1
+                    self.discard_tile_from_hand(RED_FIVE_SOU)
+                    self.discard_tile_from_hand(FIVE_SOU)
+                    self.discard_tile_from_hand(FIVE_SOU)
+                    self.discard_tile_from_hand(FIVE_SOU)
+
+                self.meld_tiles.append(FIVE_SOU)
+
+            else:
+                if meld_type == 'kan':
+                    self.melds[FIVE_SOU, self.meld_tiles.index(FIVE_SOU)
+                               * ONE_MELD_SIZE + 3] = 1
+                    self.discard_tile_from_hand(FIVE_SOU)
+
+            self.red_dora[FIVE_SOU] = 1
+
+        else:
+            if tile not in self.meld_tiles:
+                if meld_type == 'pon':
+                    self.melds[tile, len(self.meld_tiles) * ONE_MELD_SIZE:
+                                     len(self.meld_tiles) * ONE_MELD_SIZE + 3] \
+                        = 1
+                    self.discard_tile_from_hand(tile)
+                    self.discard_tile_from_hand(tile)
+                    self.discard_tile_from_hand(tile)
+                elif meld_type == 'kan':
+                    self.melds[tile, len(self.meld_tiles) * ONE_MELD_SIZE:
+                                     len(self.meld_tiles) * ONE_MELD_SIZE + 4] \
+                        = 1
+                    self.discard_tile_from_hand(tile)
+                    self.discard_tile_from_hand(tile)
+                    self.discard_tile_from_hand(tile)
+                    self.discard_tile_from_hand(tile)
+
+                self.meld_tiles.append(tile)
+
+            else:
+                if meld_type == 'kan':
+                    self.melds[tile,
+                               self.meld_tiles.index(tile)
+                               * ONE_MELD_SIZE + 3] = 1
+                    self.discard_tile_from_hand(tile)
+
+        self.melds[:, len(self.meld_tiles) * ONE_MELD_SIZE - 5:
+                      len(self.meld_tiles) * ONE_MELD_SIZE] = \
+            Agent.__encode_turn_number(turn_number)
+
+    def encode_start_hand(self, start_hand):
+        """
+        :param start_hand: list of Tenhou-encoded integer indices
+        :return: hand: (34, 4) np.array; red_dora: (34, 1) np.array
+        """
+        self.hand = np.zeros((34, TILES_SIZE))
+        self.red_dora = np.zeros((34, SELF_RED_DORA_SIZE))
+        for tile in start_hand:
+            self.add_tile_to_hand(tile)
 
     @abstractmethod
     def eval_discard(self, target_tile):
