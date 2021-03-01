@@ -19,7 +19,7 @@ from evaluation.hand_calculation.tiles import Tiles
 
 
 class Agent(ABC):
-    def __init__(self):
+    def __init__(self, wind):
         self.hand = np.zeros((34, TILES_SIZE))
         self.red_dora = np.zeros((34, SELF_RED_DORA_SIZE))
         self.melds = np.zeros((34, MELDS_SIZE))
@@ -34,6 +34,32 @@ class Agent(ABC):
         self.riichi_status = False
         self.riichi_turn_number = 0
         self.naki_status = False
+        self.wind = wind
+        self.score = 0
+
+    def set_wind(self, wind):
+        self.wind = wind
+
+    def set_score(self, score):
+        self.score = score
+
+    @staticmethod
+    def encode_tile(tile):
+        """
+        :param tile: Integer index of a tile
+        :return: (34, 1) np.array
+        """
+        output = np.zeros((34, 1))
+
+        if tile == RED_FIVE_MAN:
+            tile = FIVE_MAN
+        elif tile == RED_FIVE_PIN:
+            tile = FIVE_PIN
+        elif tile == RED_FIVE_SOU:
+            tile = FIVE_SOU
+
+        output[tile, :] = 1
+        return output
 
     @staticmethod
     def __encode_number(number, size):
@@ -244,7 +270,7 @@ class Agent(ABC):
 
     def has_kyuushu_kyuuhai(self, target_tile, player1, player2, player3=None):
         yaochuuhai_count = np.sum(self.hand[YAOCHUUHAI, 0], dtype=np.int32)
-        if target_tile in YAOCHUUHAI:
+        if target_tile in YAOCHUUHAI and self.hand[target_tile, 0] == 0:
             yaochuuhai_count += 1
 
         if player3 is not None:
@@ -535,29 +561,42 @@ class Agent(ABC):
             self.add_tile_to_hand(tile)
 
     @abstractmethod
-    def eval_discard(self, target_tile):
+    def eval_discard(self, target_tile, player1, player2, player3,
+                     scores, round_number, honba_number, deposit_number,
+                     dora_indicators):
         pass
 
     @abstractmethod
-    def eval_pon(self, target_tile):
+    def eval_pon(self, target_tile, player1, player2, player3,
+                 scores, round_number, honba_number, deposit_number,
+                 dora_indicators):
         pass
 
     @abstractmethod
-    def eval_kan(self, target_tile):
+    def eval_kan(self, target_tile, player1, player2, player3,
+                 scores, round_number, honba_number, deposit_number,
+                 dora_indicators):
         pass
 
     @abstractmethod
-    def eval_kita(self, target_tile):
+    def eval_kita(self, target_tile, player1, player2, player3,
+                  scores, round_number, honba_number, deposit_number,
+                  dora_indicators):
         pass
 
     @abstractmethod
-    def eval_riichi(self, target_tile):
+    def eval_riichi(self, target_tile, player1, player2, player3,
+                    scores, round_number, honba_number, deposit_number,
+                    dora_indicators):
         pass
 
     @abstractmethod
-    def eval_kyuushu_kyuuhai(self, target_tile):
+    def eval_kyuushu_kyuuhai(self, target_tile, player1, player2, player3,
+                             scores, round_number, honba_number, deposit_number,
+                             dora_indicators):
         pass
 
-    @abstractmethod
-    def eval_win(self, target_tile):
-        pass
+    def eval_win(self, target_tile, player1, player2, player3,
+                 scores, round_number, honba_number, deposit_number,
+                 dora_indicators):
+        return 1.0
