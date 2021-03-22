@@ -65,3 +65,6 @@ GREEN_TILES = [TWO_SOU, THREE_SOU, FOUR_SOU, SIX_SOU, EIGHT_SOU, HATSU]
 
 # red dora value
 RED_DORA_VALUE = 4
+
+# tiles count
+TILES_COUNT = 34
