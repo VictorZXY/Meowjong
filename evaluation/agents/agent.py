@@ -19,7 +19,7 @@ from evaluation.hand_calculation.tiles import Tiles
 
 
 class Agent(ABC):
-    def __init__(self, wind):
+    def __init__(self, wind=None, score=35000):
         self.hand = np.zeros((34, TILES_SIZE))
         self.red_dora = np.zeros((34, SELF_RED_DORA_SIZE))
         self.melds = np.zeros((34, MELDS_SIZE))
@@ -35,7 +35,7 @@ class Agent(ABC):
         self.riichi_turn_number = 0
         self.naki_status = False
         self.wind = wind
-        self.score = 0
+        self.score = score
 
     def set_wind(self, wind):
         self.wind = wind
@@ -353,7 +353,7 @@ class Agent(ABC):
 
     def add_tile_to_hand(self, tile):
         """
-        :param tile: Tenhou-encoded integer index of a tile
+        :param tile: integer index of a tile
         """
         if tile == RED_FIVE_MAN:
             index = 0
@@ -382,7 +382,7 @@ class Agent(ABC):
 
     def discard_tile_from_hand(self, tile):
         """
-        :param tile: Tenhou-encoded integer index of a tile
+        :param tile: integer index of a tile
         """
         if tile == RED_FIVE_MAN:
             index = 0
@@ -411,7 +411,7 @@ class Agent(ABC):
 
     def add_discard(self, tile):
         """
-        :param tile: Tenhou-encoded integer index of a tile
+        :param tile: integer index of a tile
         """
         if tile == RED_FIVE_MAN:
             tile = FIVE_MAN
@@ -429,10 +429,10 @@ class Agent(ABC):
         self.kita_index += 1
         self.discard_tile_from_hand(NORTH)
 
-    def add_meld(self, meld_type, tile, turn_number):
+    def __add_meld(self, meld_type, tile, turn_number):
         """
         :param meld_type: String, 'pon' or 'kan'
-        :param tile: Tenhou-encoded integer index of a tile
+        :param tile: integer index of a tile
         :param turn_number: Integer
         """
         if tile == RED_FIVE_MAN:
@@ -546,14 +546,63 @@ class Agent(ABC):
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(tile)
 
+        # TODO: Incorrect place to update turn number when adding kan
         self.melds[:, len(self.meld_tiles) * ONE_MELD_SIZE - 5:
                       len(self.meld_tiles) * ONE_MELD_SIZE] = \
             Agent.__encode_turn_number(turn_number)
 
+    def make_pon(self, tile, turn_number):
+        self.__add_meld('pon', tile, turn_number)
+
+        if tile == RED_FIVE_MAN:
+            self.pon_tiles.append(FIVE_MAN)
+        elif tile == RED_FIVE_PIN:
+            self.pon_tiles.append(FIVE_PIN)
+        elif tile == RED_FIVE_SOU:
+            self.pon_tiles.append(FIVE_SOU)
+        else:
+            self.pon_tiles.append(tile)
+
+    def make_open_kan(self, tile, turn_number):
+        self.__add_meld('kan', tile, turn_number)
+
+        if tile == RED_FIVE_MAN:
+            self.open_kan.append(FIVE_MAN)
+        elif tile == RED_FIVE_PIN:
+            self.open_kan.append(FIVE_PIN)
+        elif tile == RED_FIVE_SOU:
+            self.open_kan.append(FIVE_SOU)
+        else:
+            self.open_kan.append(tile)
+
+    def make_closed_kan(self, tile, turn_number):
+        self.__add_meld('kan', tile, turn_number)
+
+        if tile == RED_FIVE_MAN:
+            self.closed_kan.append(FIVE_MAN)
+        elif tile == RED_FIVE_PIN:
+            self.closed_kan.append(FIVE_PIN)
+        elif tile == RED_FIVE_SOU:
+            self.closed_kan.append(FIVE_SOU)
+        else:
+            self.closed_kan.append(tile)
+
+    def make_added_kan(self, tile, turn_number):
+        self.__add_meld('kan', tile, turn_number)
+
+        if tile == RED_FIVE_MAN:
+            tile = FIVE_MAN
+        elif tile == RED_FIVE_PIN:
+            tile = FIVE_PIN
+        elif tile == RED_FIVE_SOU:
+            tile = FIVE_SOU
+
+        self.pon_tiles.remove(tile)
+        self.open_kan.append(tile)
+
     def encode_start_hand(self, start_hand):
         """
-        :param start_hand: list of Tenhou-encoded integer indices
-        :return: hand: (34, 4) np.array; red_dora: (34, 1) np.array
+        :param start_hand: list of integer indices
         """
         self.hand = np.zeros((34, TILES_SIZE))
         self.red_dora = np.zeros((34, SELF_RED_DORA_SIZE))
