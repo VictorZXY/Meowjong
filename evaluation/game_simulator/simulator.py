@@ -1,13 +1,16 @@
 import numpy as np
 from collections import deque
 
+from typing import List
+
 from data_processing.data_preprocessing_constants import ROUND_NUMBER_SIZE, \
     HONBA_NUMBER_SIZE, DEPOSIT_NUMBER_SIZE, SCORES_SIZE, ONE_SCORE_SIZE, \
     DORA_INDICATORS_SIZE
+from evaluation.agents.agent import Agent
 from evaluation.agents.random_agent import RandomAgent
 from evaluation.hand_calculation.tile_constants import TILES_COUNT, TWO_MAN, \
-    FIVE_MAN, NINE_MAN, FIVE_PIN, FIVE_SOU, RED_FIVE_MAN, RED_FIVE_PIN, \
-    RED_FIVE_SOU
+    FIVE_MAN, NINE_MAN, FIVE_PIN, FIVE_SOU, NORTH, RED_FIVE_MAN, RED_FIVE_PIN, \
+    RED_FIVE_SOU, YAOCHUUHAI
 
 
 def encode_tile(tile):
@@ -130,7 +133,7 @@ def deal(wall, player_east, player_south, player_west):
     player_west.encode_start_hand(sorted(player_west_hand))
 
 
-def simulate(players, round_number=0, honba_number=0, deposit_number=0,
+def simulate(players: List[Agent], round_number=0, honba_number=0, deposit_number=0,
              seed=None):
     """
     :param players: list of Agent
@@ -157,8 +160,15 @@ def simulate(players, round_number=0, honba_number=0, deposit_number=0,
     east_index = 0
     self_index = east_index
     turn_number = 0
+    kan_count = 0
     is_pon = False
     end_game = False
+    is_ron = False
+    is_tsumo = False
+    is_ryuukyoku = False
+    win_tile = -1
+    win_players = []
+    lose_player = -1
 
     while len(wall) > 14 or not end_game:
         if self_index == east_index:
@@ -176,29 +186,130 @@ def simulate(players, round_number=0, honba_number=0, deposit_number=0,
 
             while draw_flag:
                 draw_flag = False
-                if player_self.can_kita(len(wall), drawn_tile):
+                max_confidence = -1.0
+                final_action = 'skip'
+
+                closed_kan_tile, can_closed_kan = player_self.can_closed_kan(
+                    kan_count, len(wall) - 14, drawn_tile)
+                if can_closed_kan:
+                    kan_decision = player_self.eval_kan(
+                        drawn_tile, player1, player2, player3, scores,
+                        round_number, honba_number, deposit_number,
+                        dora_indicators)
+                    if kan_decision > 0.5:
+                        if kan_decision > max_confidence:
+                            max_confidence = kan_decision
+                            final_action = 'closed_kan'
+                add_kan_tile, can_add_kan = player_self.can_add_kan(
+                    kan_count, len(wall) - 14, drawn_tile)
+                if can_add_kan:
+                    kan_decision = player_self.eval_kan(
+                        drawn_tile, player1, player2, player3, scores,
+                        round_number, honba_number, deposit_number,
+                        dora_indicators)
+                    if kan_decision > 0.5:
+                        if kan_decision > max_confidence:
+                            max_confidence = kan_decision
+                            final_action = 'add_kan'
+                if player_self.can_kita(len(wall) - 14, drawn_tile):
                     kita_decision = player_self.eval_kita(
                         drawn_tile, player1, player2, player3, scores,
                         round_number, honba_number, deposit_number,
                         dora_indicators)
                     if kita_decision > 0.5:
-                        player_self.add_tile_to_hand(drawn_tile)
-                        player_self.add_kita()
+                        if kita_decision > max_confidence:
+                            max_confidence = kita_decision
+                            final_action = 'kita'
+
+                if final_action == 'closed_kan':
+                    draw_flag = True
+                    player_self.add_tile_to_hand(drawn_tile)
+                    player_self.make_closed_kan(closed_kan_tile, turn_number)
+                    if closed_kan_tile in YAOCHUUHAI:
+                        for player in player1, player2:
+                            if player.can_win(closed_kan_tile):
+                                win_decision = player_self.eval_win(
+                                    closed_kan_tile, player1, player2, player3,
+                                    scores, round_number, honba_number,
+                                    deposit_number, dora_indicators)
+                                if win_decision > 0.5:
+                                    end_game = True
+                                    is_ron = True
+                                    win_players.append(player)
+                                    win_tile = closed_kan_tile
+                                    lose_player = player_self
+                elif final_action == 'add_kan':
+                    draw_flag = True
+                    player_self.add_tile_to_hand(drawn_tile)
+                    player_self.make_closed_kan(add_kan_tile, turn_number)
+                    for player in player1, player2:
+                        if player.can_win(add_kan_tile):
+                            win_decision = player_self.eval_win(
+                                add_kan_tile, player1, player2, player3,
+                                scores, round_number, honba_number,
+                                deposit_number, dora_indicators)
+                            if win_decision > 0.5:
+                                end_game = True
+                                is_ron = True
+                                win_players.append(player)
+                                win_tile = add_kan_tile
+                                lose_player = player_self
+                elif final_action == 'kita':
+                    draw_flag = True
+                    player_self.add_tile_to_hand(drawn_tile)
+                    player_self.add_kita()
+                    for player in player1, player2:
+                        if player.can_win(NORTH):
+                            win_decision = player_self.eval_win(
+                                NORTH, player1, player2, player3,
+                                scores, round_number, honba_number,
+                                deposit_number, dora_indicators)
+                            if win_decision > 0.5:
+                                end_game = True
+                                is_ron = True
+                                win_players.append(player)
+                                win_tile = NORTH
+                                lose_player = player_self
+                else:  # if final_action == 'skip':
+                    player_self.add_tile_to_hand(drawn_tile)
+
+                if end_game:
+                    break
+
+            if end_game:
+                break
+
+            if player_self.can_riichi(drawn_tile):
+                riichi_decision = player_self.eval_riichi(
+                    drawn_tile, player1, player2, player3, scores,
+                    round_number, honba_number, deposit_number,
+                    dora_indicators)
+                if riichi_decision > 0.5:
+                    player_self.riichi_status = True
+                    player_self.riichi_turn_number = turn_number
+
+            discarded_tile = player_self.eval_riichi(
+                drawn_tile, player1, player2, player3, scores,
+                round_number, honba_number, deposit_number,
+                dora_indicators)
+            player_self.add_discard(discarded_tile)
+
+        else:
+            pass
+
+
+
+
 
 
 
 if __name__ == '__main__':
-    # tiles = shuffle(0)
-    # print(tiles)
-    # deal(tiles, RandomAgent(), RandomAgent(), RandomAgent())
-    # tiles = deque(tiles[39:])
-    # print(tiles)
-    # possible_dora_indicators = [tiles[-6], tiles[-8], tiles[-10], tiles[-12]]
-    # possible_uradora_indicators = [tiles[-5], tiles[-7], tiles[-9], tiles[-11]]
-    # print(possible_dora_indicators)
-    # print(possible_uradora_indicators)
-    # tiles.pop()
-    # print(tiles)
-    # print(possible_dora_indicators)
-    # print(possible_uradora_indicators)
-    print(0)
+    a = np.array([
+        [1,1,1,1],
+        [1,1,1,0],
+        [1,1,0,0],
+        [1,0,0,0],
+        [0,0,0,0],
+        [1,1,1,1]
+    ])
+    print(np.where(a.sum(axis=1) == 4)[0][0])

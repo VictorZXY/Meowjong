@@ -116,10 +116,10 @@ class Agent(ABC):
         :param kan_count: Integer count of all kan
         :param remaining_tiles: Integer count of remaining tiles
         :param target_tile: Integer index of a tile
-        :return: Boolean
+        :return: (integer, Boolean)
         """
         if kan_count == 4 or remaining_tiles == 0:
-            return False
+            return -1, False
 
         if target_tile == RED_FIVE_MAN:
             target_tile = FIVE_MAN
@@ -130,8 +130,13 @@ class Agent(ABC):
 
         if np.sum(self.hand[target_tile], dtype=np.int32) == 3 \
                 or 4 in self.hand.sum(axis=1):
+            if np.sum(self.hand[target_tile], dtype=np.int32) == 3:
+                kan_tile = target_tile
+            else:  # if 4 in self.hand.sum(axis=1):
+                kan_tile = np.where(self.hand.sum(axis=1) == 4)[0][0]
+
             if not self.riichi_status:
-                return True
+                return kan_tile, True
             else:
                 tiles = Tiles.matrices_to_array(self.hand)
                 # manzu
@@ -184,21 +189,21 @@ class Agent(ABC):
                             or counts == (3, 2, 0, 0) \
                             or counts == (3, 1, 1, 0):
                         if has_koutsu:
-                            return True
+                            return kan_tile, True
 
-                return False
+                return -1, False
         else:
-            return False
+            return -1, False
 
     def can_open_kan(self, kan_count, remaining_tiles, target_tile):
         """
         :param kan_count: Integer count of all kan
         :param remaining_tiles: Integer count of remaining tiles
         :param target_tile: Integer index of a tile
-        :return: Boolean
+        :return: (integer, Boolean)
         """
         if kan_count == 4 or remaining_tiles == 0 or self.riichi_status:
-            return False
+            return -1, False
 
         if target_tile == RED_FIVE_MAN:
             target_tile = FIVE_MAN
@@ -207,17 +212,17 @@ class Agent(ABC):
         elif target_tile == RED_FIVE_SOU:
             target_tile = FIVE_SOU
 
-        return np.sum(self.hand[target_tile], dtype=np.int32) == 3
+        return target_tile, np.sum(self.hand[target_tile], dtype=np.int32) == 3
 
     def can_add_kan(self, kan_count, remaining_tiles, target_tile):
         """
         :param kan_count: Integer count of all kan
         :param remaining_tiles: Integer count of remaining tiles
         :param target_tile: Integer index of a tile
-        :return: Boolean
+        :return: (integer, Boolean)
         """
         if kan_count == 4 or remaining_tiles == 0 or self.riichi_status:
-            return False
+            return -1, False
 
         if target_tile == RED_FIVE_MAN:
             target_tile = FIVE_MAN
@@ -228,8 +233,8 @@ class Agent(ABC):
 
         for meld in self.meld_tiles:
             if meld == target_tile or self.hand[meld, 0] == 1:
-                return True
-        return False
+                return meld, True
+        return -1, False
 
     def can_kita(self, remaining_tiles, target_tile):
         """
