@@ -397,7 +397,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                             endgame_flag = True
                             break
                     else:
-                        # add action to the Kita dataset
+                        # add action to the Kan dataset
                         filename = 'kan_actions_' + year + '.txt'
                         with open(os.path.join(dataset_dir, filename), 'a') \
                                 as f_kan:
