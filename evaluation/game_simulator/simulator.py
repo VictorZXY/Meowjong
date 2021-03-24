@@ -133,7 +133,8 @@ def deal(wall, player_east, player_south, player_west):
     player_west.encode_start_hand(sorted(player_west_hand))
 
 
-def simulate(players: List[Agent], round_number=0, honba_number=0, deposit_number=0,
+def simulate(players: List[Agent], round_number=0, honba_number=0,
+             deposit_number=0,
              seed=None):
     """
     :param players: list of Agent
@@ -182,12 +183,15 @@ def simulate(players: List[Agent], round_number=0, honba_number=0, deposit_numbe
 
         if not is_pon:
             draw_flag = True
-            drawn_tile = wall.pop()
+            drawn_tile = wall.popleft()
+            final_action = 'skip'
 
             while draw_flag:
                 draw_flag = False
                 max_confidence = -1.0
                 final_action = 'skip'
+
+                ################################################################
 
                 closed_kan_tile, can_closed_kan = player_self.can_closed_kan(
                     kan_count, len(wall) - 14, drawn_tile)
@@ -200,6 +204,7 @@ def simulate(players: List[Agent], round_number=0, honba_number=0, deposit_numbe
                         if kan_decision > max_confidence:
                             max_confidence = kan_decision
                             final_action = 'closed_kan'
+
                 add_kan_tile, can_add_kan = player_self.can_add_kan(
                     kan_count, len(wall) - 14, drawn_tile)
                 if can_add_kan:
@@ -211,6 +216,7 @@ def simulate(players: List[Agent], round_number=0, honba_number=0, deposit_numbe
                         if kan_decision > max_confidence:
                             max_confidence = kan_decision
                             final_action = 'add_kan'
+
                 if player_self.can_kita(len(wall) - 14, drawn_tile):
                     kita_decision = player_self.eval_kita(
                         drawn_tile, player1, player2, player3, scores,
@@ -220,6 +226,8 @@ def simulate(players: List[Agent], round_number=0, honba_number=0, deposit_numbe
                         if kita_decision > max_confidence:
                             max_confidence = kita_decision
                             final_action = 'kita'
+
+                ################################################################
 
                 if final_action == 'closed_kan':
                     draw_flag = True
@@ -238,10 +246,21 @@ def simulate(players: List[Agent], round_number=0, honba_number=0, deposit_numbe
                                     win_players.append(player)
                                     win_tile = closed_kan_tile
                                     lose_player = player_self
+                    if not end_game:
+                        kan_count += 1
+                        if kan_count == 4 \
+                                and len(player_self.open_kan) \
+                                + len(player_self.closed_kan) != 4:
+                            end_game = True
+                            is_ryuukyoku = True
+                        else:
+                            # TODO: reveal dora here
+                            drawn_tile = wall.pop()
+
                 elif final_action == 'add_kan':
                     draw_flag = True
                     player_self.add_tile_to_hand(drawn_tile)
-                    player_self.make_closed_kan(add_kan_tile, turn_number)
+                    player_self.make_added_kan(add_kan_tile, turn_number)
                     for player in player1, player2:
                         if player.can_win(add_kan_tile):
                             win_decision = player_self.eval_win(
@@ -254,6 +273,16 @@ def simulate(players: List[Agent], round_number=0, honba_number=0, deposit_numbe
                                 win_players.append(player)
                                 win_tile = add_kan_tile
                                 lose_player = player_self
+                    if not end_game:
+                        kan_count += 1
+                        if kan_count == 4 \
+                                and len(player_self.open_kan) \
+                                + len(player_self.closed_kan) != 4:
+                            end_game = True
+                            is_ryuukyoku = True
+                        else:
+                            drawn_tile = wall.pop()
+
                 elif final_action == 'kita':
                     draw_flag = True
                     player_self.add_tile_to_hand(drawn_tile)
@@ -270,8 +299,10 @@ def simulate(players: List[Agent], round_number=0, honba_number=0, deposit_numbe
                                 win_players.append(player)
                                 win_tile = NORTH
                                 lose_player = player_self
+
                 else:  # if final_action == 'skip':
                     player_self.add_tile_to_hand(drawn_tile)
+                    draw_flag = False
 
                 if end_game:
                     break
@@ -293,23 +324,55 @@ def simulate(players: List[Agent], round_number=0, honba_number=0, deposit_numbe
                 round_number, honba_number, deposit_number,
                 dora_indicators)
             player_self.add_discard(discarded_tile)
+            if final_action == 'add_kan':
+                # TODO: reveal dora here
+                pass
 
         else:
-            pass
+            discarded_tile = player_self.eval_riichi(
+                drawn_tile, player1, player2, player3, scores,
+                round_number, honba_number, deposit_number,
+                dora_indicators)
+            player_self.add_discard(discarded_tile)
 
+        interrupted = False
 
+        for i in (self_index + 1) % 3, (self_index + 2) % 3:
+            player = players[i]
+            if i == (self_index + 1) % 3:
+                next_player = player2
+                prev_player = player_self
+            else:  # if i == (self_index + 2) % 3:
+                next_player = player_self
+                prev_player = player1
 
+            if player.can_pon(discarded_tile):
+                pon_decision = player.eval_pon(
+                    discarded_tile, next_player, prev_player, player3, scores,
+                    round_number, honba_number, deposit_number,
+                    dora_indicators)
+                if pon_decision > 0.5:
+                    drawn_tile = discarded_tile
+                    player.add_tile_to_hand(drawn_tile)
+                    player.make_pon(drawn_tile, turn_number)
+                    self_index = i
+                    is_pon = True
+                    interrupted = True
+                    break
+                else:
+                    is_pon = False
+                    interrupted = False
+            else:
+                is_pon = False
+                interrupted = False
 
-
+            if player.can_open_kan(kan_count, len(wall) - 14, discarded_tile):
+                kan_decision = player.eval_kan(
+                    discarded_tile, next_player, prev_player, player3, scores,
+                    round_number, honba_number, deposit_number,
+                    dora_indicators)
+                # TODO: finish
 
 
 if __name__ == '__main__':
-    a = np.array([
-        [1,1,1,1],
-        [1,1,1,0],
-        [1,1,0,0],
-        [1,0,0,0],
-        [0,0,0,0],
-        [1,1,1,1]
-    ])
-    print(np.where(a.sum(axis=1) == 4)[0][0])
+    print(0)
