@@ -741,7 +741,6 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                     f_discard.write(str(discarded_tile_converted) + '\n')
 
             # update state
-            player_self.add_tile_to_hand(drawn_tile)
             player_self.add_discard(discarded_tile)
 
         interrupted = False
@@ -755,7 +754,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                     # add state to the Pon dataset
                     pon_count['total'] += 1
                     state = np.concatenate((
-                        encode_tile(drawn_tile),
+                        encode_tile(discarded_tile),
                         players[i].hand,
                         players[i].red_dora,
                         players[i].melds,
@@ -836,7 +835,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                     # add state to the Kan dataset
                     kan_count['total'] += 1
                     state = np.concatenate((
-                        encode_tile(drawn_tile),
+                        encode_tile(discarded_tile),
                         players[i].hand,
                         players[i].red_dora,
                         players[i].melds,

@@ -424,6 +424,7 @@ class Player:
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(tile)
 
+        # TODO: Incorrect place to update turn number when adding kan
         self.melds[:, len(self.meld_tiles) * ONE_MELD_SIZE - 5:
                       len(self.meld_tiles) * ONE_MELD_SIZE] = \
             Player.__encode_turn_number(turn_number)
