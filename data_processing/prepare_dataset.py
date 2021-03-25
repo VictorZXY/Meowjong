@@ -211,6 +211,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
     deposit_number = encode_deposit_number(log[0][2])
     scores = encode_scores(log[1])
     dora_indicators = np.zeros((34, DORA_INDICATORS_SIZE))
+    dora_indicator_index = 0
     encode_dora_indicator(dora_indicators, log[2], 0)
 
     players = [Player(), Player(), Player()]
@@ -247,6 +248,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
         endgame_flag = False
 
         if not is_pon:
+            is_open_kan = False
             draw_flag = True
             drawn_tile = player_self.log_draws.popleft()
             action = player_self.log_discards.popleft()
@@ -383,6 +385,9 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
 
                         if player_self.log_draws:
                             draw_flag = True
+                            dora_indicator_index += 1
+                            encode_dora_indicator(dora_indicators, log[2],
+                                                  dora_indicator_index)
                             drawn_tile = player_self.log_draws.popleft()
                             if remaining_discards > 0:
                                 action = player_self.log_discards.popleft()
@@ -453,6 +458,7 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
 
                         if player_self.log_draws:
                             draw_flag = True
+                            is_open_kan = True
                             drawn_tile = player_self.log_draws.popleft()
                             if remaining_discards > 0:
                                 action = player_self.log_discards.popleft()
@@ -686,6 +692,10 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                 # update state
                 player_self.add_tile_to_hand(drawn_tile)
                 player_self.add_discard(discarded_tile)
+                if is_open_kan:
+                    dora_indicator_index += 1
+                    encode_dora_indicator(dora_indicators, log[2],
+                                          dora_indicator_index)
 
         else:
             action = player_self.log_discards.popleft()
@@ -886,6 +896,9 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                             players[i].log_draws.popleft()
                             players[i].add_tile_to_hand(drawn_tile)
                             players[i].add_meld('kan', drawn_tile, turn_number)
+                            dora_indicator_index += 1
+                            encode_dora_indicator(dora_indicators, log[2],
+                                                  dora_indicator_index)
                             if players[i].log_discards:
                                 players[i].log_discards.popleft()
                                 remaining_discards -= 1
