@@ -44,7 +44,7 @@ class HandConfig:
                  is_chiihou=False,
                  is_sanma=False,
                  seat_wind=None,
-                 prevalent_wind=None,
+                 prevalent_wind=EAST,
                  deposit_counter=0,
                  honba_counter=0):
         self.yaku = YakuConfig()

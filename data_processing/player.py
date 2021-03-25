@@ -210,7 +210,8 @@ class Player:
         if self.riichi_status:
             return False
         if self.meld_tiles:
-            return False
+            if sorted(self.meld_tiles) != sorted(self.closed_kan):
+                return False
 
         tile = TENHOU_TILE_INDEX[target_tile]
         if tile == RED_FIVE_MAN:

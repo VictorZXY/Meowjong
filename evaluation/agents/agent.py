@@ -5,7 +5,7 @@ import numpy as np
 
 from data_processing.data_preprocessing_constants import TILES_SIZE, \
     SELF_RED_DORA_SIZE, MELDS_SIZE, KITA_SIZE, DISCARDS_SIZE, ONE_MELD_SIZE, \
-    TURN_NUMBER_SIZE
+    TURN_NUMBER_SIZE, ROUND_NUMBER_SIZE, HONBA_NUMBER_SIZE, DEPOSIT_NUMBER_SIZE
 from evaluation.hand_calculation.han import Han
 from evaluation.hand_calculation.hand_calculator import HandCalculator
 from evaluation.hand_calculation.hand_config import HandConfig
@@ -32,6 +32,7 @@ class Agent(ABC):
         self.open_kan = []
         self.closed_kan = []
         self.riichi_status = False
+        self.double_riichi_status = False
         self.riichi_turn_number = 0
         self.naki_status = False
         self.wind = wind
@@ -62,7 +63,7 @@ class Agent(ABC):
         return output
 
     @staticmethod
-    def __encode_number(number, size):
+    def encode_number(number, size):
         """
         :param number: Integer
         :return: (34, size) np.array
@@ -76,12 +77,36 @@ class Agent(ABC):
         return output
 
     @staticmethod
-    def __encode_turn_number(turn_number):
+    def encode_turn_number(turn_number):
         """
         :param turn_number: integer
         :return: (34, 5) np.array
         """
-        return Agent.__encode_number(turn_number, TURN_NUMBER_SIZE)
+        return Agent.encode_number(turn_number, TURN_NUMBER_SIZE)
+
+    @staticmethod
+    def encode_round_number(round_number):
+        """
+        :param round_number: integer
+        :return: (34, 3) np.array
+        """
+        return Agent.encode_number(round_number, ROUND_NUMBER_SIZE)
+
+    @staticmethod
+    def encode_honba_number(honba_number):
+        """
+        :param honba_number: integer
+        :return: (34, 4) np.array
+        """
+        return Agent.encode_number(honba_number, HONBA_NUMBER_SIZE)
+
+    @staticmethod
+    def encode_deposit_number(deposit_number):
+        """
+        :param deposit_number: integer
+        :return: (34, 4) np.array
+        """
+        return Agent.encode_number(deposit_number, DEPOSIT_NUMBER_SIZE)
 
     def encode_riichi_status(self):
         if self.riichi_status:
@@ -91,7 +116,7 @@ class Agent(ABC):
 
         return np.concatenate((
             riichi_status_encoded,
-            Agent.__encode_turn_number(self.riichi_turn_number)
+            Agent.encode_turn_number(self.riichi_turn_number)
         ), axis=1)
 
     def can_pon(self, target_tile):
@@ -256,9 +281,7 @@ class Agent(ABC):
         :param target_tile: Integer index of a tile
         :return: Boolean
         """
-        if self.riichi_status:
-            return False
-        if self.meld_tiles:
+        if self.riichi_status or self.pon_tiles or self.open_kan:
             return False
 
         if target_tile == RED_FIVE_MAN:
@@ -286,6 +309,56 @@ class Agent(ABC):
             return yaochuuhai_count >= 9 and \
                    not (self.naki_status or player1.naki_status
                         or player2.naki_status)
+
+    def can_kokushi_musou(self, target_tile):
+        """
+        :param target_tile: Integer index of a tile
+        :return: Boolean
+        """
+        if target_tile == RED_FIVE_MAN:
+            target_tile = FIVE_MAN
+        elif target_tile == RED_FIVE_PIN:
+            target_tile = FIVE_PIN
+        elif target_tile == RED_FIVE_SOU:
+            target_tile = FIVE_SOU
+
+        private_tiles_array = Tiles.matrices_to_array(self.hand)
+        meld_objects = []
+        for pon_tile in self.pon_tiles:
+            meld_objects.append(Meld(
+                meld_type=Meld.PON,
+                tiles=Tiles.indices_to_array([pon_tile] * 3)
+            ))
+        for kan_tile in self.open_kan:
+            meld_objects.append(Meld(
+                meld_type=Meld.KAN,
+                tiles=Tiles.indices_to_array([kan_tile] * 4)
+            ))
+        for kan_tile in self.closed_kan:
+            meld_objects.append(Meld(
+                meld_type=Meld.KAN,
+                tiles=Tiles.indices_to_array([kan_tile] * 4),
+                is_open=False
+            ))
+
+        hand_options = HandDivider.divide_hand(
+            private_tiles=private_tiles_array,
+            win_tile=target_tile,
+            melds=meld_objects
+        )
+        hand_config = HandConfig()
+
+        # Kokushi Musou
+        if isinstance(hand_options[0], int):
+            if (hand_config.yaku.kokushi_musou.is_condition_met(
+                    hand_options)
+                    or hand_config.yaku.kokushi_musou_13_men.is_condition_met(
+                        hand_options, target_tile)):
+                return True
+            else:
+                return False
+        else:
+            return False
 
     def can_win(self, target_tile):
         """
@@ -430,6 +503,7 @@ class Agent(ABC):
         self.discard_tile_from_hand(tile)
 
     def add_kita(self):
+        self.naki_status = True
         self.kita[NORTH, self.kita_index] = 1
         self.kita_index += 1
         self.discard_tile_from_hand(NORTH)
@@ -440,6 +514,7 @@ class Agent(ABC):
         :param tile: integer index of a tile
         :param turn_number: Integer
         """
+        self.naki_status = True
         if tile == RED_FIVE_MAN:
             if FIVE_MAN not in self.meld_tiles:
                 if meld_type == 'pon':
@@ -554,7 +629,7 @@ class Agent(ABC):
         # TODO: Incorrect place to update turn number when adding kan
         self.melds[:, len(self.meld_tiles) * ONE_MELD_SIZE - 5:
                       len(self.meld_tiles) * ONE_MELD_SIZE] = \
-            Agent.__encode_turn_number(turn_number)
+            Agent.encode_turn_number(turn_number)
 
     def make_pon(self, tile, turn_number):
         self.__add_meld('pon', tile, turn_number)
