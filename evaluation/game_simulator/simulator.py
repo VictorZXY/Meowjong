@@ -3,14 +3,15 @@ from collections import deque
 
 from typing import List
 
-from data_processing.data_preprocessing_constants import ROUND_NUMBER_SIZE, \
-    HONBA_NUMBER_SIZE, DEPOSIT_NUMBER_SIZE, SCORES_SIZE, ONE_SCORE_SIZE, \
+from data_processing.data_preprocessing_constants import SCORES_SIZE, \
+    ONE_SCORE_SIZE, \
     DORA_INDICATORS_SIZE
 from evaluation.agents.agent import Agent
 from evaluation.agents.random_agent import RandomAgent
+from evaluation.hand_calculation.hand_config import HandConfig
 from evaluation.hand_calculation.tile_constants import TILES_COUNT, TWO_MAN, \
-    FIVE_MAN, NINE_MAN, FIVE_PIN, FIVE_SOU, NORTH, RED_FIVE_MAN, RED_FIVE_PIN, \
-    RED_FIVE_SOU, YAOCHUUHAI
+    FIVE_MAN, NINE_MAN, FIVE_PIN, FIVE_SOU, EAST, SOUTH, WEST, NORTH, \
+    RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU, YAOCHUUHAI
 
 
 def encode_tile(tile):
@@ -29,45 +30,6 @@ def encode_tile(tile):
 
     output[tile, :] = 1
     return output
-
-
-def encode_number(number, size):
-    """
-    :param number: Integer
-    :param size: size of the desired np.array
-    :return: (34, size) np.array
-    """
-    output = np.empty((34, size))
-    for bit, val in enumerate(bin(number)[2:].zfill(size)):
-        if val == '1':
-            output[:, bit] = 1
-        else:
-            output[:, bit] = 0
-    return output
-
-
-def encode_round_number(round_number):
-    """
-    :param round_number: integer
-    :return: (34, 3) np.array
-    """
-    return encode_number(round_number, ROUND_NUMBER_SIZE)
-
-
-def encode_honba_number(honba_number):
-    """
-    :param honba_number: integer
-    :return: (34, 4) np.array
-    """
-    return encode_number(honba_number, HONBA_NUMBER_SIZE)
-
-
-def encode_deposit_number(deposit_number):
-    """
-    :param deposit_number: integer
-    :return: (34, 4) np.array
-    """
-    return encode_number(deposit_number, DEPOSIT_NUMBER_SIZE)
 
 
 def encode_scores(scores):
@@ -143,12 +105,19 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
     :param deposit_number: integer
     :param seed: integer
     """
-    round_number = encode_round_number(round_number)
-    honba_number = encode_honba_number(honba_number)
-    deposit_number = encode_deposit_number(deposit_number)
     scores = encode_scores([
         players[0].score, players[1].score, players[2].score, 0
     ])
+    hand_configs = [
+        HandConfig(is_sanma=True, seat_wind=EAST, honba_counter=honba_number),
+        HandConfig(is_sanma=True, seat_wind=SOUTH, honba_counter=honba_number),
+        HandConfig(is_sanma=True, seat_wind=WEST, honba_counter=honba_number)
+    ]
+    player_hand_config_dict = {
+        players[0]: hand_configs[0],
+        players[1]: hand_configs[1],
+        players[2]: hand_configs[2]
+    }
 
     wall = shuffle(seed)
     deal(wall, players[0], players[1], players[2])
@@ -179,7 +148,6 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
         player1 = players[(self_index + 1) % 3]
         player2 = players[(self_index + 2) % 3]
         player3 = RandomAgent()
-        self_wind = encode_tile(self_index % 4 + 41)
 
         if not is_pon:
             draw_flag = True
@@ -190,6 +158,47 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                 draw_flag = False
                 max_confidence = -1.0
                 final_action = 'skip'
+
+                ################################################################
+
+                if player_self.can_win(drawn_tile):
+                    win_decision = player_self.eval_win(
+                        drawn_tile, player1, player2, player3,
+                        scores, round_number, honba_number,
+                        deposit_number, dora_indicators)
+                    if win_decision > 0.5:
+                        end_game = True
+                        is_tsumo = True
+                        win_players.append(player_self)
+                        win_tile = drawn_tile
+                        win_hand_config = hand_configs[self_index]
+                        win_hand_config.deposit_counter = deposit_number
+                        win_hand_config.is_tsumo = True
+                        if turn_number == 1:
+                            if player_self.discard_index == 0 \
+                                    and not player_self.naki_status:
+                                win_hand_config.is_menzen = True
+                                if self_index == east_index:
+                                    win_hand_config.is_tenhou = True
+                                else:
+                                    if not player1.naki_status \
+                                            and not player2.naki_status:
+                                        win_hand_config.is_chiihou = True
+                        else:
+                            if player_self.double_riichi_status:
+                                win_hand_config.is_double_riichi = True
+                            elif player_self.riichi_status:
+                                win_hand_config.is_riichi = True
+
+                            if not player_self.pon_tiles \
+                                    and not player_self.open_kan:
+                                win_hand_config.is_menzen = True
+
+                            if final_action == 'closed_kan' or 'add_kan' \
+                                    or 'kita':
+                                win_hand_config.is_rinshan = True
+                            elif len(wall) == 14:
+                                win_hand_config.is_haitei = True
 
                 ################################################################
 
@@ -234,18 +243,39 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                     player_self.add_tile_to_hand(drawn_tile)
                     player_self.make_closed_kan(closed_kan_tile, turn_number)
                     if closed_kan_tile in YAOCHUUHAI:
-                        for player in player1, player2:
-                            if player.can_win(closed_kan_tile):
+                        for i in (self_index + 1) % 3, (self_index + 2) % 3:
+                            player = players[i]
+                            if i == (self_index + 1) % 3:
+                                next_player = player2
+                                prev_player = player_self
+                            else:  # if i == (self_index + 2) % 3:
+                                next_player = player_self
+                                prev_player = player1
+
+                            if player.can_kokushi_musou(closed_kan_tile):
                                 win_decision = player_self.eval_win(
-                                    closed_kan_tile, player1, player2, player3,
-                                    scores, round_number, honba_number,
+                                    closed_kan_tile, next_player, prev_player,
+                                    player3, scores, round_number, honba_number,
                                     deposit_number, dora_indicators)
                                 if win_decision > 0.5:
                                     end_game = True
                                     is_ron = True
                                     win_players.append(player)
-                                    win_tile = closed_kan_tile
                                     lose_player = player_self
+                                    win_tile = closed_kan_tile
+                                    win_hand_config = hand_configs[i]
+                                    win_hand_config.deposit_counter = deposit_number
+                                    win_hand_config.is_chankan = True
+
+                                    if player_self.double_riichi_status:
+                                        win_hand_config.is_double_riichi = True
+                                    elif player_self.riichi_status:
+                                        win_hand_config.is_riichi = True
+
+                                    if not player_self.pon_tiles \
+                                            and not player_self.open_kan:
+                                        win_hand_config.is_menzen = True
+
                     if not end_game:
                         kan_count += 1
                         if kan_count == 4 \
@@ -254,25 +284,48 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                             end_game = True
                             is_ryuukyoku = True
                         else:
-                            # TODO: reveal dora here
+                            update_dora_indicators(
+                                dora_indicators,
+                                possible_dora_indicators[kan_count], kan_count)
                             drawn_tile = wall.pop()
 
                 elif final_action == 'add_kan':
                     draw_flag = True
                     player_self.add_tile_to_hand(drawn_tile)
                     player_self.make_added_kan(add_kan_tile, turn_number)
-                    for player in player1, player2:
+                    for i in (self_index + 1) % 3, (self_index + 2) % 3:
+                        player = players[i]
+                        if i == (self_index + 1) % 3:
+                            next_player = player2
+                            prev_player = player_self
+                        else:  # if i == (self_index + 2) % 3:
+                            next_player = player_self
+                            prev_player = player1
+
                         if player.can_win(add_kan_tile):
                             win_decision = player_self.eval_win(
-                                add_kan_tile, player1, player2, player3,
-                                scores, round_number, honba_number,
+                                add_kan_tile, next_player, prev_player,
+                                player3, scores, round_number, honba_number,
                                 deposit_number, dora_indicators)
                             if win_decision > 0.5:
                                 end_game = True
                                 is_ron = True
                                 win_players.append(player)
-                                win_tile = add_kan_tile
                                 lose_player = player_self
+                                win_tile = add_kan_tile
+                                win_hand_config = hand_configs[i]
+                                win_hand_config.deposit_counter = deposit_number
+                                win_hand_config.is_chankan = True
+
+                                if player_self.double_riichi_status:
+                                    win_hand_config.is_double_riichi = True
+                                elif player_self.riichi_status:
+                                    win_hand_config.is_riichi = True
+
+                                if not player_self.pon_tiles \
+                                        and not player_self.open_kan:
+                                    win_hand_config.is_menzen = True
+
                     if not end_game:
                         kan_count += 1
                         if kan_count == 4 \
@@ -287,18 +340,37 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                     draw_flag = True
                     player_self.add_tile_to_hand(drawn_tile)
                     player_self.add_kita()
-                    for player in player1, player2:
+                    for i in (self_index + 1) % 3, (self_index + 2) % 3:
+                        player = players[i]
+                        if i == (self_index + 1) % 3:
+                            next_player = player2
+                            prev_player = player_self
+                        else:  # if i == (self_index + 2) % 3:
+                            next_player = player_self
+                            prev_player = player1
+
                         if player.can_win(NORTH):
                             win_decision = player_self.eval_win(
-                                NORTH, player1, player2, player3,
+                                NORTH, next_player, prev_player, player3,
                                 scores, round_number, honba_number,
                                 deposit_number, dora_indicators)
                             if win_decision > 0.5:
                                 end_game = True
                                 is_ron = True
                                 win_players.append(player)
-                                win_tile = NORTH
                                 lose_player = player_self
+                                win_tile = NORTH
+                                win_hand_config = hand_configs[i]
+                                win_hand_config.deposit_counter = deposit_number
+
+                                if player_self.double_riichi_status:
+                                    win_hand_config.is_double_riichi = True
+                                elif player_self.riichi_status:
+                                    win_hand_config.is_riichi = True
+
+                                if not player_self.pon_tiles \
+                                        and not player_self.open_kan:
+                                    win_hand_config.is_menzen = True
 
                 else:  # if final_action == 'skip':
                     player_self.add_tile_to_hand(drawn_tile)
@@ -325,8 +397,9 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                 dora_indicators)
             player_self.add_discard(discarded_tile)
             if final_action == 'add_kan':
-                # TODO: reveal dora here
-                pass
+                update_dora_indicators(dora_indicators,
+                                       possible_dora_indicators[kan_count],
+                                       kan_count)
 
         else:
             discarded_tile = player_self.eval_riichi(
@@ -345,6 +418,94 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
             else:  # if i == (self_index + 2) % 3:
                 next_player = player_self
                 prev_player = player1
+
+            if player.can_win(discarded_tile):
+                win_decision = player.eval_win(
+                    discarded_tile, next_player, prev_player, player3, scores,
+                    round_number, honba_number, deposit_number,
+                    dora_indicators)
+                if win_decision > 0.5:
+                    end_game = True
+                    is_ron = True
+                    win_players.append(player)
+                    lose_player = player_self
+                    win_tile = discarded_tile
+                    win_hand_config = hand_configs[i]
+                    win_hand_config.deposit_counter = deposit_number
+
+                    if player_self.double_riichi_status:
+                        win_hand_config.is_double_riichi = True
+                    elif player_self.riichi_status:
+                        win_hand_config.is_riichi = True
+
+                    if not player_self.pon_tiles \
+                            and not player_self.open_kan:
+                        win_hand_config.is_menzen = True
+
+                    if len(wall) == 14:
+                        win_hand_config.is_houtei = True
+
+            if player.can_open_kan(kan_count, len(wall) - 14, discarded_tile):
+                kan_decision = player.eval_kan(
+                    discarded_tile, next_player, prev_player, player3, scores,
+                    round_number, honba_number, deposit_number,
+                    dora_indicators)
+                if kan_decision > 0.5:
+                    drawn_tile = discarded_tile
+                    player.add_tile_to_hand(drawn_tile)
+                    player.make_open_kan(drawn_tile, turn_number)
+                    self_index = i
+                    is_pon = False
+                    interrupted = True
+
+                    for j, chankan_player in next_player, prev_player:
+                        if j == 0:
+                            chankan_next_player = prev_player
+                            chankan_prev_player = player
+                        else:
+                            chankan_next_player = player
+                            chankan_prev_player = next_player
+
+                        if chankan_player.can_win(drawn_tile):
+                            win_decision = chankan_player.eval_win(
+                                drawn_tile, chankan_next_player,
+                                chankan_prev_player, player3, scores,
+                                round_number, honba_number, deposit_number,
+                                dora_indicators)
+                            if win_decision > 0.5:
+                                end_game = True
+                                is_ron = True
+                                win_players.append(chankan_player)
+                                lose_player.append(player)
+                                win_tile = drawn_tile
+                                win_hand_config = player_hand_config_dict[chankan_player]
+                                win_hand_config.deposit_counter = deposit_number
+                                win_hand_config.is_chankan = True
+
+                                if player_self.double_riichi_status:
+                                    win_hand_config.is_double_riichi = True
+                                elif player_self.riichi_status:
+                                    win_hand_config.is_riichi = True
+
+                                if not player_self.pon_tiles \
+                                        and not player_self.open_kan:
+                                    win_hand_config.is_menzen = True
+
+                    if not end_game:
+                        kan_count += 1
+                        if kan_count == 4 \
+                                and len(player_self.open_kan) \
+                                + len(player_self.closed_kan) != 4:
+                            end_game = True
+                            is_ryuukyoku = True
+                        else:
+                            update_dora_indicators(
+                                dora_indicators,
+                                possible_dora_indicators[kan_count], kan_count)
+                            drawn_tile = wall.pop()
+                else:
+                    is_pon = False
+                    interrupted = False
 
             if player.can_pon(discarded_tile):
                 pon_decision = player.eval_pon(
@@ -366,13 +527,15 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                 is_pon = False
                 interrupted = False
 
-            if player.can_open_kan(kan_count, len(wall) - 14, discarded_tile):
-                kan_decision = player.eval_kan(
-                    discarded_tile, next_player, prev_player, player3, scores,
-                    round_number, honba_number, deposit_number,
-                    dora_indicators)
-                # TODO: finish
+        if not end_game or not interrupted:
+            self_index = (self_index + 1) % 3
+            is_pon = False
+
+    # TODO: finish score calculation
 
 
 if __name__ == '__main__':
-    print(0)
+    a = 'a'
+    b = 'b'
+    for i, c in enumerate([a,b]):
+        print(i, c)
