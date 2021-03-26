@@ -137,5 +137,7 @@ playground.*
 dataset
 dataset/
 dataset.tar.gz
+dataset-old
+dataset-old/
 game_logs
 game_logs/
