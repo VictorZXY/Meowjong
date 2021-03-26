@@ -161,6 +161,20 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
 
                 ################################################################
 
+                if turn_number == 1:
+                    if player_self.has_kyuushu_kyuuhai(drawn_tile,
+                                                       player1, player2):
+                        ryuukyoku_decision = player_self.eval_kyuushu_kyuuhai(
+                            drawn_tile, player1, player2, player3,
+                            scores, round_number, honba_number, deposit_number,
+                            dora_indicators)
+                        if ryuukyoku_decision > 0.5:
+                            end_game = True
+                            is_ryuukyoku = True
+                            break
+
+                ################################################################
+
                 if player_self.can_win(drawn_tile):
                     win_decision = player_self.eval_win(
                         drawn_tile, player1, player2, player3,
