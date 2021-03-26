@@ -515,6 +515,7 @@ class Agent(ABC):
         :param turn_number: Integer
         """
         self.naki_status = True
+        meld_index = len(self.meld_tiles)
         if tile == RED_FIVE_MAN:
             if FIVE_MAN not in self.meld_tiles:
                 if meld_type == 'pon':
@@ -537,6 +538,7 @@ class Agent(ABC):
 
             else:
                 if meld_type == 'kan':
+                    meld_index = self.meld_tiles.index(FIVE_MAN) + 1
                     self.melds[FIVE_MAN, self.meld_tiles.index(FIVE_MAN)
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(FIVE_MAN)
@@ -565,6 +567,7 @@ class Agent(ABC):
 
             else:
                 if meld_type == 'kan':
+                    meld_index = self.meld_tiles.index(FIVE_PIN) + 1
                     self.melds[FIVE_PIN, self.meld_tiles.index(FIVE_PIN)
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(FIVE_PIN)
@@ -593,6 +596,7 @@ class Agent(ABC):
 
             else:
                 if meld_type == 'kan':
+                    meld_index = self.meld_tiles.index(FIVE_SOU) + 1
                     self.melds[FIVE_SOU, self.meld_tiles.index(FIVE_SOU)
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(FIVE_SOU)
@@ -621,14 +625,13 @@ class Agent(ABC):
 
             else:
                 if meld_type == 'kan':
-                    self.melds[tile,
-                               self.meld_tiles.index(tile)
+                    meld_index = self.meld_tiles.index(tile) + 1
+                    self.melds[tile, self.meld_tiles.index(tile)
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(tile)
 
-        # TODO: Incorrect place to update turn number when adding kan
-        self.melds[:, len(self.meld_tiles) * ONE_MELD_SIZE - 5:
-                      len(self.meld_tiles) * ONE_MELD_SIZE] = \
+        self.melds[:, meld_index * ONE_MELD_SIZE - 5:
+                      meld_index * ONE_MELD_SIZE] = \
             Agent.encode_turn_number(turn_number)
 
     def make_pon(self, tile, turn_number):

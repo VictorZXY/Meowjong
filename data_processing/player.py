@@ -311,6 +311,7 @@ class Player:
         :param tile: Tenhou-encoded integer index of a tile
         :param turn_number: Integer
         """
+        meld_index = len(self.meld_tiles)
         if TENHOU_TILE_INDEX[tile] == RED_FIVE_MAN:
             if FIVE_MAN not in self.meld_tiles:
                 if meld_type == 'pon':
@@ -333,6 +334,7 @@ class Player:
 
             else:
                 if meld_type == 'kan':
+                    meld_index = self.meld_tiles.index(FIVE_MAN) + 1
                     self.melds[FIVE_MAN, self.meld_tiles.index(FIVE_MAN)
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(51)
@@ -361,6 +363,7 @@ class Player:
 
             else:
                 if meld_type == 'kan':
+                    meld_index = self.meld_tiles.index(FIVE_PIN) + 1
                     self.melds[FIVE_PIN, self.meld_tiles.index(FIVE_PIN)
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(52)
@@ -389,6 +392,7 @@ class Player:
 
             else:
                 if meld_type == 'kan':
+                    meld_index = self.meld_tiles.index(FIVE_SOU) + 1
                     self.melds[FIVE_SOU, self.meld_tiles.index(FIVE_SOU)
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(53)
@@ -420,14 +424,14 @@ class Player:
 
             else:
                 if meld_type == 'kan':
+                    meld_index = self.meld_tiles.index(converted_tile) + 1
                     self.melds[converted_tile,
                                self.meld_tiles.index(converted_tile)
                                * ONE_MELD_SIZE + 3] = 1
                     self.discard_tile_from_hand(tile)
 
-        # TODO: Incorrect place to update turn number when adding kan
-        self.melds[:, len(self.meld_tiles) * ONE_MELD_SIZE - 5:
-                      len(self.meld_tiles) * ONE_MELD_SIZE] = \
+        self.melds[:, meld_index * ONE_MELD_SIZE - 5:
+                      meld_index * ONE_MELD_SIZE] = \
             Player.__encode_turn_number(turn_number)
 
     def encode_start_hand(self, start_hand):
