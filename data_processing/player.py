@@ -98,7 +98,7 @@ class Player:
             if not self.riichi_status:
                 return True
             else:
-                tiles = Tiles.matrices_to_array(self.hand)
+                tiles = Tiles.matrix_to_array(self.hand)
                 # manzu
                 man = RiichiChecker.find_combinations(tiles, ONE_MAN, NINE_MAN)
                 # pinzu
@@ -311,7 +311,7 @@ class Player:
         :param tile: Tenhou-encoded integer index of a tile
         :param turn_number: Integer
         """
-        meld_index = len(self.meld_tiles)
+        meld_index = len(self.meld_tiles) + 1
         if TENHOU_TILE_INDEX[tile] == RED_FIVE_MAN:
             if FIVE_MAN not in self.meld_tiles:
                 if meld_type == 'pon':
