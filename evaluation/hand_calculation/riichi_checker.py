@@ -133,7 +133,7 @@ class RiichiChecker:
                        + '/Part II Project/Source Code/meowjong'
                        + '/evaluation/hand_calculation/riichi_checker.pl')
         for solution in prolog.query(
-                'combination(' + str(indices) + ', Combination)'):
+                'combination_(' + str(indices) + ', Combination)'):
             combination = sorted(solution['Combination'])
             if combination not in combinations:
                 combinations.append(combination)
