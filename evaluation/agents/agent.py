@@ -27,6 +27,7 @@ class Agent(ABC):
         self.kita_count = 0
         self.discards = np.zeros((34, DISCARDS_SIZE))
         self.discard_index = 0
+        self.discard_tiles = []
         self.meld_tiles = []
         self.pon_tiles = []
         self.open_kan = []
@@ -372,6 +373,9 @@ class Agent(ABC):
         elif target_tile == RED_FIVE_SOU:
             target_tile = FIVE_SOU
 
+        if target_tile in self.discard_tiles:
+            return False
+
         private_tiles_array = Tiles.matrices_to_array(self.hand)
         meld_objects = []
         for pon_tile in self.pon_tiles:
@@ -498,6 +502,7 @@ class Agent(ABC):
         elif tile == RED_FIVE_SOU:
             tile = FIVE_SOU
 
+        self.discard_tiles.append(tile)
         self.discards[tile, self.discard_index] = 1
         self.discard_index += 1
         self.discard_tile_from_hand(tile)
