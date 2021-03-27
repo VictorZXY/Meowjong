@@ -12,6 +12,7 @@ from evaluation.hand_calculation.hand_config import HandConfig
 from evaluation.hand_calculation.hand_divider import HandDivider
 from evaluation.hand_calculation.meld import Meld
 from evaluation.hand_calculation.riichi_checker import RiichiChecker
+from evaluation.hand_calculation.tenpai import Tenpai
 from evaluation.hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, \
     NINE_MAN, ONE_PIN, FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, EAST, \
     NORTH, CHUN, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU, YAOCHUUHAI
@@ -164,7 +165,7 @@ class Agent(ABC):
             if not self.riichi_status:
                 return kan_tile, True
             else:
-                tiles = Tiles.matrices_to_array(self.hand)
+                tiles = Tiles.matrix_to_array(self.hand)
                 # manzu
                 man = RiichiChecker.find_combinations(tiles, ONE_MAN, NINE_MAN)
                 # pinzu
@@ -226,10 +227,10 @@ class Agent(ABC):
         :param kan_count: Integer count of all kan
         :param remaining_tiles: Integer count of remaining tiles
         :param target_tile: Integer index of a tile
-        :return: (integer, Boolean)
+        :return: Boolean
         """
         if kan_count == 4 or remaining_tiles == 0 or self.riichi_status:
-            return -1, False
+            return False
 
         if target_tile == RED_FIVE_MAN:
             target_tile = FIVE_MAN
@@ -238,7 +239,7 @@ class Agent(ABC):
         elif target_tile == RED_FIVE_SOU:
             target_tile = FIVE_SOU
 
-        return target_tile, np.sum(self.hand[target_tile], dtype=np.int32) == 3
+        return np.sum(self.hand[target_tile], dtype=np.int32) == 3
 
     def can_add_kan(self, kan_count, remaining_tiles, target_tile):
         """
@@ -293,7 +294,7 @@ class Agent(ABC):
         elif target_tile == RED_FIVE_SOU:
             target_tile = FIVE_SOU
 
-        private_tiles_array = Tiles.matrices_to_array(self.hand)
+        private_tiles_array = Tiles.matrix_to_array(self.hand)
 
         return RiichiChecker.can_riichi(private_tiles_array, target_tile,
                                         self.closed_kan)
@@ -312,19 +313,9 @@ class Agent(ABC):
                    not (self.naki_status or player1.naki_status
                         or player2.naki_status)
 
-    def can_kokushi_musou(self, target_tile):
-        """
-        :param target_tile: Integer index of a tile
-        :return: Boolean
-        """
-        if target_tile == RED_FIVE_MAN:
-            target_tile = FIVE_MAN
-        elif target_tile == RED_FIVE_PIN:
-            target_tile = FIVE_PIN
-        elif target_tile == RED_FIVE_SOU:
-            target_tile = FIVE_SOU
+    def is_tenpai(self):
+        private_tiles_array = Tiles.matrix_to_array(self.hand)
 
-        private_tiles_array = Tiles.matrices_to_array(self.hand)
         meld_objects = []
         for pon_tile in self.pon_tiles:
             meld_objects.append(Meld(
@@ -343,24 +334,8 @@ class Agent(ABC):
                 is_open=False
             ))
 
-        hand_options = HandDivider.divide_hand(
-            private_tiles=private_tiles_array,
-            win_tile=target_tile,
-            melds=meld_objects
-        )
-        hand_config = HandConfig()
-
-        # Kokushi Musou
-        if isinstance(hand_options[0], int):
-            if (hand_config.yaku.kokushi_musou.is_condition_met(
-                    hand_options)
-                    or hand_config.yaku.kokushi_musou_13_men.is_condition_met(
-                        hand_options, target_tile)):
-                return True
-            else:
-                return False
-        else:
-            return False
+        tenpai = Tenpai.calculate_tenpai(private_tiles_array, meld_objects)
+        return len(tenpai) > 0
 
     def can_win(self, target_tile):
         """
@@ -377,7 +352,8 @@ class Agent(ABC):
         if target_tile in self.discard_tiles:
             return False
 
-        private_tiles_array = Tiles.matrices_to_array(self.hand)
+        private_tiles_array = Tiles.matrix_to_array(self.hand)
+
         meld_objects = []
         for pon_tile in self.pon_tiles:
             meld_objects.append(Meld(
@@ -432,6 +408,57 @@ class Agent(ABC):
                     if han > 0 or is_yakuman:
                         return True
 
+            return False
+
+    def can_kokushi_musou(self, target_tile):
+        """
+        :param target_tile: Integer index of a tile
+        :return: Boolean
+        """
+        if target_tile == RED_FIVE_MAN:
+            target_tile = FIVE_MAN
+        elif target_tile == RED_FIVE_PIN:
+            target_tile = FIVE_PIN
+        elif target_tile == RED_FIVE_SOU:
+            target_tile = FIVE_SOU
+
+        private_tiles_array = Tiles.matrix_to_array(self.hand)
+
+        meld_objects = []
+        for pon_tile in self.pon_tiles:
+            meld_objects.append(Meld(
+                meld_type=Meld.PON,
+                tiles=Tiles.indices_to_array([pon_tile] * 3)
+            ))
+        for kan_tile in self.open_kan:
+            meld_objects.append(Meld(
+                meld_type=Meld.KAN,
+                tiles=Tiles.indices_to_array([kan_tile] * 4)
+            ))
+        for kan_tile in self.closed_kan:
+            meld_objects.append(Meld(
+                meld_type=Meld.KAN,
+                tiles=Tiles.indices_to_array([kan_tile] * 4),
+                is_open=False
+            ))
+
+        hand_options = HandDivider.divide_hand(
+            private_tiles=private_tiles_array,
+            win_tile=target_tile,
+            melds=meld_objects
+        )
+        hand_config = HandConfig()
+
+        # Kokushi Musou
+        if isinstance(hand_options[0], int):
+            if (hand_config.yaku.kokushi_musou.is_condition_met(
+                    hand_options)
+                    or hand_config.yaku.kokushi_musou_13_men.is_condition_met(
+                        hand_options, target_tile)):
+                return True
+            else:
+                return False
+        else:
             return False
 
     def add_tile_to_hand(self, tile):
@@ -521,7 +548,7 @@ class Agent(ABC):
         :param turn_number: Integer
         """
         self.naki_status = True
-        meld_index = len(self.meld_tiles)
+        meld_index = len(self.meld_tiles) + 1
         if tile == RED_FIVE_MAN:
             if FIVE_MAN not in self.meld_tiles:
                 if meld_type == 'pon':
@@ -699,7 +726,7 @@ class Agent(ABC):
             self.add_tile_to_hand(tile)
 
     def calculate_hand(self, win_tile, hand_config, dora_indicators):
-        private_tiles_array = Tiles.matrices_to_array(self.hand)
+        private_tiles_array = Tiles.matrix_to_array(self.hand)
 
         meld_objects = []
         for pon_tile in self.pon_tiles:
