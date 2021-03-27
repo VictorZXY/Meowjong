@@ -282,7 +282,8 @@ class Agent(ABC):
         :param target_tile: Integer index of a tile
         :return: Boolean
         """
-        if self.riichi_status or self.pon_tiles or self.open_kan:
+        if self.riichi_status or self.pon_tiles or self.open_kan \
+                or self.score < 1000:
             return False
 
         if target_tile == RED_FIVE_MAN:
