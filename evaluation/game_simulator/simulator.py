@@ -567,11 +567,10 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                 is_pon = False
                 interrupted = False
 
-        if not end_game or not interrupted:
+        if not end_game and not interrupted:
             self_index = (self_index + 1) % 3
             is_pon = False
 
-    # TODO: finish score calculation
     if is_ron:
         for win_player in win_players:
             win_hand_config = player_hand_config_dict[win_player]
