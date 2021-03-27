@@ -8,7 +8,7 @@ class RandomAgent(Agent):
     def eval_discard(self, target_tile, player1, player2, player3,
                      scores, round_number, honba_number, deposit_number,
                      dora_indicators):
-        return np.random.choice(Tiles.matrices_to_array(self.hand)
+        return np.random.choice(Tiles.matrix_to_indices(self.hand)
                                 + [target_tile])
 
     def eval_pon(self, target_tile, player1, player2, player3,
