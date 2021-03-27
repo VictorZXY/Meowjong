@@ -105,6 +105,13 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
     :param deposit_number: integer
     :param seed: integer
     """
+    player3 = RandomAgent()  # player3 is not needed in 3-player mahjong
+
+    round_scores = {
+        players[0]: 0,
+        players[1]: 0,
+        players[2]: 0
+    }
     scores = encode_scores([
         players[0].score, players[1].score, players[2].score, 0
     ])
@@ -123,8 +130,10 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
     deal(wall, players[0], players[1], players[2])
     wall = deque(wall[39:])
     dora_indicators = np.zeros((TILES_COUNT, DORA_INDICATORS_SIZE))
-    possible_dora_indicators = [wall[-6], wall[-8], wall[-10], wall[-12]]
-    possible_uradora_indicators = [wall[-5], wall[-7], wall[-9], wall[-11]]
+    possible_dora_indicators = \
+        [wall[-6], wall[-8], wall[-10], wall[-12], wall[-14]]
+    possible_uradora_indicators = \
+        [wall[-5], wall[-7], wall[-9], wall[-11], wall[-13]]
     update_dora_indicators(dora_indicators, possible_dora_indicators[0], 0)
 
     east_index = 0
@@ -138,16 +147,15 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
     is_ryuukyoku = False
     win_tile = -1
     win_players = []
-    lose_player = -1
+    lose_player = None
 
-    while len(wall) > 14 or not end_game:
+    while len(wall) > 14 and not end_game:
         if self_index == east_index:
             turn_number += 1
 
         player_self = players[self_index]
         player1 = players[(self_index + 1) % 3]
         player2 = players[(self_index + 2) % 3]
-        player3 = RandomAgent()
 
         if not is_pon:
             draw_flag = True
@@ -386,6 +394,10 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                                         and not player_self.open_kan:
                                     win_hand_config.is_menzen = True
 
+                    if not end_game:
+                        drawn_tile = wall.pop()
+
+
                 else:  # if final_action == 'skip':
                     player_self.add_tile_to_hand(drawn_tile)
                     draw_flag = False
@@ -404,11 +416,20 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                 if riichi_decision > 0.5:
                     player_self.riichi_status = True
                     player_self.riichi_turn_number = turn_number
+                    player_self.score -= 1000
+                    round_scores[player_self] -= 1000
+                    deposit_number += 1
+                    scores = encode_scores([
+                        players[0].score, players[1].score, players[2].score, 0
+                    ])
 
-            discarded_tile = player_self.eval_riichi(
-                drawn_tile, player1, player2, player3, scores,
-                round_number, honba_number, deposit_number,
-                dora_indicators)
+            if player_self.riichi_status:
+                discarded_tile = drawn_tile
+            else:
+                discarded_tile = player_self.eval_discard(
+                    drawn_tile, player1, player2, player3, scores,
+                    round_number, honba_number, deposit_number,
+                    dora_indicators)
             player_self.add_discard(discarded_tile)
             if final_action == 'add_kan':
                 update_dora_indicators(dora_indicators,
@@ -416,7 +437,8 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                                        kan_count)
 
         else:
-            discarded_tile = player_self.eval_riichi(
+            assert not (player_self.riichi_status)
+            discarded_tile = player_self.eval_discard(
                 drawn_tile, player1, player2, player3, scores,
                 round_number, honba_number, deposit_number,
                 dora_indicators)
@@ -472,7 +494,8 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                     is_pon = False
                     interrupted = True
 
-                    for j, chankan_player in next_player, prev_player:
+                    for j, chankan_player in enumerate(
+                            [next_player, prev_player]):
                         if j == 0:
                             chankan_next_player = prev_player
                             chankan_prev_player = player
@@ -490,9 +513,10 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                                 end_game = True
                                 is_ron = True
                                 win_players.append(chankan_player)
-                                lose_player.append(player)
+                                lose_player = player
                                 win_tile = drawn_tile
-                                win_hand_config = player_hand_config_dict[chankan_player]
+                                win_hand_config = player_hand_config_dict[
+                                    chankan_player]
                                 win_hand_config.deposit_counter = deposit_number
                                 win_hand_config.is_chankan = True
 
@@ -546,10 +570,70 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
             is_pon = False
 
     # TODO: finish score calculation
+    if is_ron:
+        for win_player in win_players:
+            win_hand_config = player_hand_config_dict[win_player]
+            final_dora_indicators = possible_dora_indicators[:kan_count + 1]
+            if win_player.riichi_status:
+                final_dora_indicators += \
+                    possible_uradora_indicators[:kan_count + 1]
+            win_result = win_player.calculate_hand(
+                win_tile=win_tile, hand_config=win_hand_config,
+                dora_indicators=final_dora_indicators)
+            round_scores[win_player] += win_result['total_score']
+            round_scores[lose_player] -= win_result['split_scores'][0]
+    elif is_tsumo:
+        assert len(win_players) == 1
+        win_player = win_players[0]
+        win_hand_config = player_hand_config_dict[win_player]
+        final_dora_indicators = possible_dora_indicators[:kan_count + 1]
+        if win_player.riichi_status:
+            final_dora_indicators += \
+                possible_uradora_indicators[:kan_count + 1]
+        win_result = win_player.calculate_hand(
+            win_tile=win_tile, hand_config=win_hand_config,
+            dora_indicators=final_dora_indicators)
+        round_scores[win_player] += win_result['total_score']
+        if win_player.wind == EAST:
+            for lose_player in players:
+                if lose_player != win_player:
+                    round_scores[lose_player] -= win_result['split_scores'][0]
+        else:
+            for lose_player in players:
+                if lose_player != win_player:
+                    if lose_player.wind == EAST:
+                        round_scores[lose_player] -= \
+                            win_result['split_scores'][0]
+                    else:
+                        round_scores[lose_player] -= \
+                            win_result['split_scores'][1]
+    elif is_ryuukyoku:
+        if len(wall) == 14:
+            tenpai_players = []
+            noten_players = []
+            for player in players:
+                if player.is_tenpai():
+                    tenpai_players.append(player)
+                else:
+                    noten_players.append(player)
+            tenpai_players_count = len(tenpai_players)
+            if tenpai_players_count == 1:
+                round_scores[tenpai_players[0]] += 2000
+                round_scores[noten_players[0]] -= 1000
+                round_scores[noten_players[1]] -= 1000
+            elif tenpai_players_count == 2:
+                round_scores[tenpai_players[0]] += 1000
+                round_scores[tenpai_players[1]] += 1000
+                round_scores[noten_players[0]] -= 2000
+
+    return [
+        round_scores[players[0]],
+        round_scores[players[1]],
+        round_scores[players[2]]
+    ]
 
 
 if __name__ == '__main__':
-    a = 'a'
-    b = 'b'
-    for i, c in enumerate([a,b]):
-        print(i, c)
+    for i in range(1000):
+        players = [RandomAgent(), RandomAgent(), RandomAgent()]
+        print(i, simulate(players, seed=i))
