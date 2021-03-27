@@ -3,6 +3,8 @@ from collections import deque
 
 from typing import List
 
+from tqdm import tqdm
+
 from data_processing.data_preprocessing_constants import SCORES_SIZE, \
     ONE_SCORE_SIZE, \
     DORA_INDICATORS_SIZE
@@ -634,6 +636,13 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
 
 
 if __name__ == '__main__':
-    for i in range(1000):
-        players = [RandomAgent(), RandomAgent(), RandomAgent()]
-        print(i, simulate(players, seed=i))
+    with open('test.txt', 'w') as fwrite:
+        with tqdm(desc='Simulating', total=5000) as pbar:
+            for i in range(5000):
+                players = [RandomAgent(), RandomAgent(), RandomAgent()]
+                round_scores = simulate(players, seed=i)
+                fwrite.write(str(i) + ' '
+                             + str(round_scores[0]) + ' '
+                             + str(round_scores[1]) + ' '
+                             + str(round_scores[2]) + ' \n')
+                pbar.update(1)
