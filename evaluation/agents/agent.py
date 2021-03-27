@@ -24,7 +24,7 @@ class Agent(ABC):
         self.red_dora = np.zeros((34, SELF_RED_DORA_SIZE))
         self.melds = np.zeros((34, MELDS_SIZE))
         self.kita = np.zeros((34, KITA_SIZE))
-        self.kita_index = 0
+        self.kita_count = 0
         self.discards = np.zeros((34, DISCARDS_SIZE))
         self.discard_index = 0
         self.meld_tiles = []
@@ -504,8 +504,8 @@ class Agent(ABC):
 
     def add_kita(self):
         self.naki_status = True
-        self.kita[NORTH, self.kita_index] = 1
-        self.kita_index += 1
+        self.kita[NORTH, self.kita_count] = 1
+        self.kita_count += 1
         self.discard_tile_from_hand(NORTH)
 
     def __add_meld(self, meld_type, tile, turn_number):
@@ -691,6 +691,40 @@ class Agent(ABC):
         self.red_dora = np.zeros((34, SELF_RED_DORA_SIZE))
         for tile in start_hand:
             self.add_tile_to_hand(tile)
+
+    def calculate_hand(self, win_tile, hand_config, dora_indicators):
+        private_tiles_array = Tiles.matrices_to_array(self.hand)
+
+        meld_objects = []
+        for pon_tile in self.pon_tiles:
+            meld_objects.append(Meld(
+                meld_type=Meld.PON,
+                tiles=Tiles.indices_to_array([pon_tile] * 3)
+            ))
+        for kan_tile in self.open_kan:
+            meld_objects.append(Meld(
+                meld_type=Meld.KAN,
+                tiles=Tiles.indices_to_array([kan_tile] * 4)
+            ))
+        for kan_tile in self.closed_kan:
+            meld_objects.append(Meld(
+                meld_type=Meld.KAN,
+                tiles=Tiles.indices_to_array([kan_tile] * 4),
+                is_open=False
+            ))
+        if self.kita_count > 0:
+            kita_string = '4' * self.kita_count + 'z'
+            meld_objects.append(Meld(
+                meld_type=Meld.KITA, tiles=kita_string
+            ))
+
+        hand_result = HandCalculator.calculate_hand_score(
+            private_tiles=private_tiles_array, win_tile=win_tile,
+            melds=meld_objects, hand_config=hand_config,
+            dora_indicators=dora_indicators
+        )
+
+        return hand_result
 
     @abstractmethod
     def eval_discard(self, target_tile, player1, player2, player3,
