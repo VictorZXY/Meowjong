@@ -39,7 +39,9 @@ class Han:
         # count nuki-dora
         nuki_dora_count = sum([Tiles.tiles_count(meld.tiles) for meld in melds
                                if meld.type == Meld.KITA])
-        if nuki_dora_count > 0:
+        if nuki_dora_count > 4:
+            raise IllegalKitaError
+        elif nuki_dora_count > 0:
             if is_sanma:
                 dora_details.append({'han': nuki_dora_count,
                                      'reason': Han.NUKI_DORA})
