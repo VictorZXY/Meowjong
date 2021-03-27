@@ -18,6 +18,8 @@ class Tiles:
                 count += num
         return count
 
+    ############################################################################
+
     @staticmethod
     def is_shuntsu(tiles):
         """
@@ -73,53 +75,7 @@ class Tiles:
                 return indices[0] == indices[1]
         return False
 
-    @staticmethod
-    def indices_to_matrices(indices):
-        """
-        Convert a list of indices into a (34, 4) numpy array, and a (34, 1)
-        numpy array indicating the red dora.
-        :param indices: Input tiles represented by a list of integer indices
-        :return: A tuple of (34, 4) numpy array and a (34, 1) numpy array
-        """
-        hand = np.zeros((34, TILES_SIZE))
-        red_dora = np.zeros((34, SELF_RED_DORA_SIZE))
-
-        for tile in indices:
-            if tile == RED_FIVE_MAN:
-                index = 0
-                while hand[FIVE_MAN, index] != 0:
-                    index += 1
-                hand[FIVE_MAN, index] = 1
-                red_dora[FIVE_MAN] = 1
-            elif tile == RED_FIVE_PIN:
-                index = 0
-                while hand[FIVE_PIN, index] != 0:
-                    index += 1
-                hand[FIVE_PIN, index] = 1
-                red_dora[FIVE_PIN] = 1
-            elif tile == RED_FIVE_SOU:
-                index = 0
-                while hand[FIVE_SOU, index] != 0:
-                    index += 1
-                hand[FIVE_SOU, index] = 1
-                red_dora[FIVE_SOU] = 1
-            else:
-                index = 0
-                while hand[tile, index] != 0:
-                    index += 1
-                hand[tile, index] = 1
-
-        return hand, red_dora
-
-    @staticmethod
-    def matrices_to_array(hand):
-        """
-        Convert tiles represented as a (34, 4) numpy array into a list of
-        integer array indices. Red dora are not counted.
-        :param hand: (34, 4) numpy array
-        :return: A 34-array
-        """
-        return np.sum(hand, axis=1, dtype=np.int32).tolist()
+    ############################################################################
 
     @staticmethod
     def array_to_indices(tiles, start_index=0, end_index=33,
@@ -144,19 +100,6 @@ class Tiles:
                 else:
                     indices.extend([index] * tiles[index])
         return indices
-
-    @staticmethod
-    def indices_to_array(indices):
-        # Array representation:
-        # manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
-        # red dora is not taken into count in this method.
-        tiles = [0] * 34
-        for index in indices:
-            tiles[index] += 1
-        for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
-            if tiles[index] == 4:
-                tiles[index] = 7
-        return tiles
 
     @staticmethod
     def array_to_one_line_string(tiles):
@@ -210,6 +153,71 @@ class Tiles:
             result += honours + 'z'
 
         return result
+
+    @staticmethod
+    def indices_to_array(indices):
+        # Array representation:
+        # manzu = 0-8, pinzu = 9-17, souzu = 18-26, honours = 27-33,
+        # red dora is not taken into count in this method.
+        tiles = [0] * 34
+        for index in indices:
+            tiles[index] += 1
+        for index in [FIVE_MAN, FIVE_PIN, FIVE_SOU]:
+            if tiles[index] == 4:
+                tiles[index] = 7
+        return tiles
+
+    @staticmethod
+    def indices_to_matrix(indices):
+        """
+        Convert a list of indices into a (34, 4) numpy array, and a (34, 1)
+        numpy array indicating the red dora.
+        :param indices: Input tiles represented by a list of integer indices
+        :return: A tuple of (34, 4) numpy array and a (34, 1) numpy array
+        """
+        hand = np.zeros((34, TILES_SIZE))
+        red_dora = np.zeros((34, SELF_RED_DORA_SIZE))
+
+        for tile in indices:
+            if tile == RED_FIVE_MAN:
+                index = 0
+                while hand[FIVE_MAN, index] != 0:
+                    index += 1
+                hand[FIVE_MAN, index] = 1
+                red_dora[FIVE_MAN] = 1
+            elif tile == RED_FIVE_PIN:
+                index = 0
+                while hand[FIVE_PIN, index] != 0:
+                    index += 1
+                hand[FIVE_PIN, index] = 1
+                red_dora[FIVE_PIN] = 1
+            elif tile == RED_FIVE_SOU:
+                index = 0
+                while hand[FIVE_SOU, index] != 0:
+                    index += 1
+                hand[FIVE_SOU, index] = 1
+                red_dora[FIVE_SOU] = 1
+            else:
+                index = 0
+                while hand[tile, index] != 0:
+                    index += 1
+                hand[tile, index] = 1
+
+        return hand, red_dora
+
+    @staticmethod
+    def matrix_to_array(hand):
+        """
+        Convert tiles represented as a (34, 4) numpy array into a list of
+        integer array indices. Red dora are not counted.
+        :param hand: (34, 4) numpy array
+        :return: A 34-array
+        """
+        return np.sum(hand, axis=1, dtype=np.int32).tolist()
+
+    @staticmethod
+    def matrix_to_indices(hand):
+        return Tiles.array_to_indices(list(Tiles.matrix_to_array(hand)))
 
     @staticmethod
     def string_to_array(man='', pin='', sou='', honours=''):
