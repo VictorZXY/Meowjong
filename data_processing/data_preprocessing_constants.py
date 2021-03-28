@@ -77,7 +77,7 @@ MAX_HONBA_YEAR = '2016'
 MAX_DEPOSIT = 7
 MAX_DEPOSIT_YEAR = '2010'
 
-# 2019 - 30000 games
+# 2019 - 30000 games for discard, 50000 games for the others
 DISCARD_COUNT_2019 = 885873
 PON_COUNT_2019 = {
     'total': 101020,
@@ -100,7 +100,7 @@ RIICHI_COUNT_2019 = {
     'no': 52551
 }
 
-# 2020 - 3000 games
+# 2020 - 5000 games
 DISCARD_COUNT_2020 = 88785
 PON_COUNT_2020 = {
     'total': 10197,

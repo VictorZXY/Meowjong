@@ -1004,11 +1004,12 @@ if __name__ == '__main__':
         with open(os.path.join(EXTRACTED_GAME_LOGS_PATH, year + '.pickle'),
                   'rb') as fread:
             try:
-                # (0-6000/30000 games)
                 count = 0
 
                 while log := pickle.load(fread):
                     count += 1
+
+                    # (0-6000/30000 games)
                     if count <= 0:
                         continue
                     elif count > 6000:
