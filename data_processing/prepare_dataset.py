@@ -15,7 +15,8 @@ from data_processing.data_preprocessing_constants import JSON_COUNTS_BY_YEAR, \
     GAME_LOGS_COUNT, TENHOU_TILE_INDEX, ROUND_NUMBER_SIZE, HONBA_NUMBER_SIZE, \
     DEPOSIT_NUMBER_SIZE, SCORES_SIZE, ONE_SCORE_SIZE, \
     DORA_INDICATORS_SIZE, TOTAL_COLUMNS_SIZE, TOTAL_FEATURES_COUNT, \
-    DATASET_PATH, GAME_LOGS_COUNTS_BY_YEAR
+    DATASET_PATH, GAME_LOGS_COUNTS_BY_YEAR, DISCARD_COUNTS, PON_COUNTS, \
+    KAN_COUNTS, KITA_COUNTS, RIICHI_COUNTS
 from data_processing.player import Player
 from evaluation.hand_calculation.tile_constants import FIVE_MAN, FIVE_PIN, \
     FIVE_SOU, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU
@@ -941,78 +942,32 @@ def txt_to_csv(year, action_type):
             writer.writerow(['image', 'label'])
             for index, line in enumerate(txt_file):
                 image_name = action_type + '_' + year + '_' + \
-                                 str(index + 1) + '.png'
+                             str(index + 1) + '.png'
                 writer.writerow([image_name, line[:-1]])
 
 
 if __name__ == '__main__':
-    assert False  # comment this line to confirm running the scripts
-
-    # Extract game logs from the downloaded JSON objects
-    pool = Pool(len(SELECTED_YEARS))
-    for year in SELECTED_YEARS:
-        pool.apply_async(extract_game_logs_from_json, args=(year,))
-    pool.close()
-    pool.join()
-
-    # Count the number of extracted game logs
-    total = 0
-    for year in SELECTED_YEARS:
-        count = count_extracted_game_logs(year)
-        print(str(count) + ' game logs extracted from ' + year)
-        total += count
-    print('Total no. of game logs extracted: ' + str(total))
-
-    # Find the maximum honba and deposit numbers
-    max_honba_and_deposit_results = find_max_honba_and_deposit()
-    for key, val in max_honba_and_deposit_results.items():
-        print(key + ':', val)
-
-    # 2019 - 30000 games
-    discard_count_2019 = 885873
-    pon_count_2019 = {
-        'total': 101020,
-        'yes': 28462,
-        'no': 72558
-    }
-    kan_count_2019 = {
-        'total': 148186,
-        'yes': 3459,
-        'no': 144727
-    }
-    kita_count_2019 = {
-        'total': 90866,
-        'yes': 76582,
-        'no': 14284
-    }
-    riichi_count_2019 = {
-        'total': 74411,
-        'yes': 21860,
-        'no': 52551
-    }
-
-    # 2020 - 3000 games
-    discard_count_2020 = 88785
-    pon_count_2020 = {
-        'total': 10197,
-        'yes': 2798,
-        'no': 7399
-    }
-    kan_count_2020 = {
-        'total': 14335,
-        'yes': 384,
-        'no': 13951
-    }
-    kita_count_2020 = {
-        'total': 9299,
-        'yes': 7702,
-        'no': 1597
-    }
-    riichi_count_2020 = {
-        'total': 7320,
-        'yes': 2283,
-        'no': 5037
-    }
+    # assert False  # comment this line to confirm running the scripts
+    #
+    # # Extract game logs from the downloaded JSON objects
+    # pool = Pool(len(SELECTED_YEARS))
+    # for year in SELECTED_YEARS:
+    #     pool.apply_async(extract_game_logs_from_json, args=(year,))
+    # pool.close()
+    # pool.join()
+    #
+    # # Count the number of extracted game logs
+    # total = 0
+    # for year in SELECTED_YEARS:
+    #     count = count_extracted_game_logs(year)
+    #     print(str(count) + ' game logs extracted from ' + year)
+    #     total += count
+    # print('Total no. of game logs extracted: ' + str(total))
+    #
+    # # Find the maximum honba and deposit numbers
+    # max_honba_and_deposit_results = find_max_honba_and_deposit()
+    # for key, val in max_honba_and_deposit_results.items():
+    #     print(key + ':', val)
 
     discard_count = 0
     pon_count = {
@@ -1036,6 +991,8 @@ if __name__ == '__main__':
         'no': 0
     }
 
+    year = '2019'
+
     with tqdm(desc='Encoding', total=3000) as pbar:
         discard_dir = os.path.join(DATASET_PATH, 'discard')
         pon_dir = os.path.join(DATASET_PATH, 'pon')
@@ -1043,26 +1000,27 @@ if __name__ == '__main__':
         kita_dir = os.path.join(DATASET_PATH, 'kita')
         riichi_dir = os.path.join(DATASET_PATH, 'riichi')
 
-        with open(os.path.join(EXTRACTED_GAME_LOGS_PATH, '2020' + '.pickle'),
+        with open(os.path.join(EXTRACTED_GAME_LOGS_PATH, year + '.pickle'),
                   'rb') as fread:
             try:
+                # (0-6000/30000 games)
                 count = 0
 
                 while log := pickle.load(fread):
                     count += 1
                     if count <= 0:
                         continue
-                    elif count > 3000:
+                    elif count > 6000:
                         break
 
-                    # if count == 63813:  # 2019
-                    #     pbar.update(1)
-                    #     continue
-                    # elif count == 7628:  # 2020
-                    #     pbar.update(1)
-                    #     continue
+                    if year == '2019' and count == 63813:
+                        pbar.update(1)
+                        continue
+                    elif year == '2020' and count == 7628:
+                        pbar.update(1)
+                        continue
 
-                    discard_count = encode_game_log(year='2020',
+                    discard_count = encode_game_log(year=year,
                                                     log=log,
                                                     dataset_dir=DATASET_PATH,
                                                     discard_dir=discard_dir,
@@ -1100,58 +1058,40 @@ if __name__ == '__main__':
                 print('riichi accepted:', riichi_count['yes'])
                 print('riichi declined:', riichi_count['no'])
 
-    with open(os.path.join(DATASET_PATH, 'discard_actions_2019.txt')) as f:
-        assert len(list(map(int, f))) == discard_count_2019
-    with open(os.path.join(DATASET_PATH, 'pon_actions_2019.txt')) as f:
-        assert len(list(map(int, f))) == pon_count_2019['total']
-    with open(os.path.join(DATASET_PATH, 'kan_actions_2019.txt')) as f:
-        assert len(list(map(int, f))) == kan_count_2019['total']
-    with open(os.path.join(DATASET_PATH, 'kita_actions_2019.txt')) as f:
-        assert len(list(map(int, f))) == kita_count_2019['total']
-    with open(os.path.join(DATASET_PATH, 'riichi_actions_2019.txt')) as f:
-        assert len(list(map(int, f))) == riichi_count_2019['total']
+    for year in '2019', '2020':
+        with open(os.path.join(DATASET_PATH,
+                               'discard_actions_' + year + '.txt')) as f:
+            assert len(list(map(int, f))) == DISCARD_COUNTS[year]
+        with open(os.path.join(DATASET_PATH,
+                               'pon_actions_' + year + '.txt')) as f:
+            assert len(list(map(int, f))) == PON_COUNTS[year]['total']
+        with open(os.path.join(DATASET_PATH,
+                               'kan_actions_' + year + '.txt')) as f:
+            assert len(list(map(int, f))) == KAN_COUNTS[year]['total']
+        with open(os.path.join(DATASET_PATH,
+                               'kita_actions_' + year + '.txt')) as f:
+            assert len(list(map(int, f))) == KITA_COUNTS[year]['total']
+        with open(os.path.join(DATASET_PATH,
+                               'riichi_actions_' + year + '.txt')) as f:
+            assert len(list(map(int, f))) == RIICHI_COUNTS[year]['total']
 
-    with open(os.path.join(DATASET_PATH, 'discard_actions_2020.txt')) as f:
-        assert len(list(map(int, f))) == discard_count_2020
-    with open(os.path.join(DATASET_PATH, 'pon_actions_2020.txt')) as f:
-        assert len(list(map(int, f))) == pon_count_2020['total']
-    with open(os.path.join(DATASET_PATH, 'kan_actions_2020.txt')) as f:
-        assert len(list(map(int, f))) == kan_count_2020['total']
-    with open(os.path.join(DATASET_PATH, 'kita_actions_2020.txt')) as f:
-        assert len(list(map(int, f))) == kita_count_2020['total']
-    with open(os.path.join(DATASET_PATH, 'riichi_actions_2020.txt')) as f:
-        assert len(list(map(int, f))) == riichi_count_2020['total']
+    for year in '2019', '2020':
+        for action_type in 'discard', 'pon', 'kan', 'kita', 'riichi':
+            txt_to_csv(year=year, action_type=action_type)
 
-    txt_to_csv(year='2019', action_type='discard')
-    txt_to_csv(year='2019', action_type='pon')
-    txt_to_csv(year='2019', action_type='kan')
-    txt_to_csv(year='2019', action_type='kita')
-    txt_to_csv(year='2019', action_type='riichi')
-
-    txt_to_csv(year='2020', action_type='discard')
-    txt_to_csv(year='2020', action_type='pon')
-    txt_to_csv(year='2020', action_type='kan')
-    txt_to_csv(year='2020', action_type='kita')
-    txt_to_csv(year='2020', action_type='riichi')
-
-    with open(os.path.join(DATASET_PATH, 'discard_actions_2019.csv')) as f:
-        assert sum(1 for line in f) == discard_count_2019 + 1
-    with open(os.path.join(DATASET_PATH, 'pon_actions_2019.csv')) as f:
-        assert sum(1 for line in f) == pon_count_2019['total'] + 1
-    with open(os.path.join(DATASET_PATH, 'kan_actions_2019.csv')) as f:
-        assert sum(1 for line in f) == kan_count_2019['total'] + 1
-    with open(os.path.join(DATASET_PATH, 'kita_actions_2019.csv')) as f:
-        assert sum(1 for line in f) == kita_count_2019['total'] + 1
-    with open(os.path.join(DATASET_PATH, 'riichi_actions_2019.csv')) as f:
-        assert sum(1 for line in f) == riichi_count_2019['total'] + 1
-
-    with open(os.path.join(DATASET_PATH, 'discard_actions_2020.csv')) as f:
-        assert sum(1 for line in f) == discard_count_2020 + 1
-    with open(os.path.join(DATASET_PATH, 'pon_actions_2020.csv')) as f:
-        assert sum(1 for line in f) == pon_count_2020['total'] + 1
-    with open(os.path.join(DATASET_PATH, 'kan_actions_2020.csv')) as f:
-        assert sum(1 for line in f) == kan_count_2020['total'] + 1
-    with open(os.path.join(DATASET_PATH, 'kita_actions_2020.csv')) as f:
-        assert sum(1 for line in f) == kita_count_2020['total'] + 1
-    with open(os.path.join(DATASET_PATH, 'riichi_actions_2020.csv')) as f:
-        assert sum(1 for line in f) == riichi_count_2020['total'] + 1
+    for year in '2019', '2020':
+        with open(os.path.join(DATASET_PATH,
+                               'discard_actions_' + year + '.csv')) as f:
+            assert sum(1 for line in f) == DISCARD_COUNTS[year] + 1
+        with open(os.path.join(DATASET_PATH,
+                               'pon_actions_' + year + '.csv')) as f:
+            assert sum(1 for line in f) == PON_COUNTS[year]['total'] + 1
+        with open(os.path.join(DATASET_PATH,
+                               'kan_actions_' + year + '.csv')) as f:
+            assert sum(1 for line in f) == KAN_COUNTS[year]['total'] + 1
+        with open(os.path.join(DATASET_PATH,
+                               'kita_actions_' + year + '.csv')) as f:
+            assert sum(1 for line in f) == KITA_COUNTS[year]['total'] + 1
+        with open(os.path.join(DATASET_PATH,
+                               'riichi_actions_' + year + '.csv')) as f:
+            assert sum(1 for line in f) == RIICHI_COUNTS[year]['total'] + 1

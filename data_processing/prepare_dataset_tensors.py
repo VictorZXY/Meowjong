@@ -8,91 +8,78 @@ import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
+from data_processing.data_preprocessing_constants import DISCARD_COUNTS, \
+    PON_COUNTS, KAN_COUNTS, KITA_COUNTS, RIICHI_COUNTS
+
 assert tf.__version__ >= "2.0"
 
 # To make the output stable across runs
+cp.random.seed(42)
 tf.random.set_seed(42)
 
-DISCARD_COUNT_2019 = 885873
-PON_COUNT_2019 = {
-    'total': 101020,
-    'yes': 28462,
-    'no': 72558
-}
-KAN_COUNT_2019 = {
-    'total': 148186,
-    'yes': 3459,
-    'no': 144727
-}
-KITA_COUNT_2019 = {
-    'total': 90866,
-    'yes': 76582,
-    'no': 14284
-}
-RIICHI_COUNT_2019 = {
-    'total': 74411,
-    'yes': 21860,
-    'no': 52551
-}
-
-
-def validate_dataset(dataset_path, action_type):
+def validate_dataset(dataset_path, action_type, year):
     if action_type == 'discard':
         path, dirs, files = next(
-            os.walk(os.path.join(dataset_path, 'discard_2019')))
-        assert len(files) == DISCARD_COUNT_2019
+            os.walk(os.path.join(dataset_path, 'discard_' + year)))
+        assert len(files) == DISCARD_COUNTS[year]
 
-        with open(os.path.join(dataset_path, 'discard_actions_2019.csv')) as f:
+        with open(os.path.join(dataset_path,
+                               'discard_actions_' + year + '.csv')) as f:
             f.readline()
-            assert sum(1 for line in f) == DISCARD_COUNT_2019
+            assert sum(1 for line in f) == DISCARD_COUNTS[year]
 
     elif action_type == 'pon':
         path, dirs, files = next(
-            os.walk(os.path.join(dataset_path, 'pon_2019')))
-        assert len(files) == PON_COUNT_2019['total']
+            os.walk(os.path.join(dataset_path, 'pon_' + year)))
+        assert len(files) == PON_COUNTS[year]['total']
 
-        with open(os.path.join(dataset_path, 'pon_actions_2019.csv')) as f:
+        with open(os.path.join(dataset_path,
+                               'pon_actions_' + year + '.csv')) as f:
             f.readline()
-            assert sum(1 for line in f) == PON_COUNT_2019['total']
+            assert sum(1 for line in f) == PON_COUNTS[year]['total']
             f.seek(0)
             f.readline()
-            assert sum(int(line[-2]) for line in f) == PON_COUNT_2019['yes']
+            assert sum(int(line[-2]) for line in f) == PON_COUNTS[year]['yes']
 
     elif action_type == 'kan':
         path, dirs, files = next(
-            os.walk(os.path.join(dataset_path, 'kan_2019')))
-        assert len(files) == KAN_COUNT_2019['total']
+            os.walk(os.path.join(dataset_path, 'kan_' + year)))
+        assert len(files) == KAN_COUNTS[year]['total']
 
-        with open(os.path.join(dataset_path, 'kan_actions_2019.csv')) as f:
+        with open(os.path.join(dataset_path,
+                               'kan_actions_' + year + '.csv')) as f:
             f.readline()
-            assert sum(1 for line in f) == KAN_COUNT_2019['total']
+            assert sum(1 for line in f) == KAN_COUNTS[year]['total']
             f.seek(0)
             f.readline()
-            assert sum(int(line[-2]) for line in f) == KAN_COUNT_2019['yes']
+            assert sum(int(line[-2]) for line in f) == KAN_COUNTS[year]['yes']
 
     elif action_type == 'kita':
         path, dirs, files = next(
-            os.walk(os.path.join(dataset_path, 'kita_2019')))
-        assert len(files) == KITA_COUNT_2019['total']
+            os.walk(os.path.join(dataset_path, 'kita_' + year)))
+        assert len(files) == KITA_COUNTS[year]['total']
 
-        with open(os.path.join(dataset_path, 'kita_actions_2019.csv')) as f:
+        with open(os.path.join(dataset_path,
+                               'kita_actions_' + year + '.csv')) as f:
             f.readline()
-            assert sum(1 for line in f) == KITA_COUNT_2019['total']
+            assert sum(1 for line in f) == KITA_COUNTS[year]['total']
             f.seek(0)
             f.readline()
-            assert sum(int(line[-2]) for line in f) == KITA_COUNT_2019['yes']
+            assert sum(int(line[-2]) for line in f) == KITA_COUNTS[year]['yes']
 
     else:  # action_type == 'riichi'
         path, dirs, files = next(
-            os.walk(os.path.join(dataset_path, 'riichi_2019')))
-        assert len(files) == RIICHI_COUNT_2019['total']
+            os.walk(os.path.join(dataset_path, 'riichi_' + year)))
+        assert len(files) == RIICHI_COUNTS[year]['total']
 
-        with open(os.path.join(dataset_path, 'riichi_actions_2019.csv')) as f:
+        with open(os.path.join(dataset_path,
+                               'riichi_actions_' + year + '.csv')) as f:
             f.readline()
-            assert sum(1 for line in f) == RIICHI_COUNT_2019['total']
+            assert sum(1 for line in f) == RIICHI_COUNTS[year]['total']
             f.seek(0)
             f.readline()
-            assert sum(int(line[-2]) for line in f) == RIICHI_COUNT_2019['yes']
+            assert sum(int(line[-2]) for line in f) == \
+                   RIICHI_COUNTS[year]['yes']
 
 
 def load_csv(dataset_path, csv_file):
@@ -100,11 +87,11 @@ def load_csv(dataset_path, csv_file):
     return pd.read_csv(csv_path, sep=',')
 
 
-def get_label(image_file, labels, action_type):
+def get_label(image_file, labels, action_type, year):
     # image_name = image_file.numpy().decode('utf-8').split('\\')[-1]  # Windows
     image_name = image_file.numpy().decode('utf-8').split('/')[-1]  # Linux
 
-    image_file_prefix = action_type + '_2019_'
+    image_file_prefix = action_type + '_' + year + '_'
     image_file_prefix_len = len(image_file_prefix)
     image_file_extension = '.png'
     image_file_extension_len = len(image_file_extension)
@@ -120,8 +107,8 @@ def decode_image(image):
     return image
 
 
-def generate_state_action_pair(image_file, labels, action_type):
-    label = get_label(image_file, labels, action_type)
+def generate_state_action_pair(image_file, labels, action_type, year):
+    label = get_label(image_file, labels, action_type, year)
     image = tf.io.read_file(image_file)
     image = decode_image(image)
     return image, label
@@ -131,23 +118,26 @@ def prepare_dataset_tensors(dataset_path, action_type, year, scaled=False):
     image_folder = action_type + '_' + year
     label_file = action_type + '_actions_' + year + '.csv'
 
-    validate_dataset(dataset_path, action_type)
+    validate_dataset(dataset_path, action_type, year)  # Only for the first time
 
     image_files = tf.data.Dataset.list_files(os.path.join(
         dataset_path, image_folder + '/*.png'))
     labels = load_csv(dataset_path, label_file)
-    # for i in range(len(labels)):
-    #     assert labels['image'][i] == action_type + \
-    #            '_2019_' + str(i + 1) + '.png'
-    # print(action_type + ' dataset OK')
-    # print()
+
+    # Only for the first time
+    for i in range(len(labels)):
+        assert labels['image'][i] == action_type + '_' + year + '_' \
+               + str(i + 1) + '.png'
+    print(action_type + ' dataset OK')
+    print()
 
     # Generate (state, action) (i.e. (image, label)) pairs
     X = []
     y = []
 
     for file in image_files:
-        image, label = generate_state_action_pair(file, labels, action_type)
+        image, label = generate_state_action_pair(file, labels, action_type,
+                                                  year)
         X.append(image)
         y.append(label)
 

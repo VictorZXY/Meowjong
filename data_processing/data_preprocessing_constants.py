@@ -77,6 +77,73 @@ MAX_HONBA_YEAR = '2016'
 MAX_DEPOSIT = 7
 MAX_DEPOSIT_YEAR = '2010'
 
+# 2019 - 30000 games
+DISCARD_COUNT_2019 = 885873
+PON_COUNT_2019 = {
+    'total': 101020,
+    'yes': 28462,
+    'no': 72558
+}
+KAN_COUNT_2019 = {
+    'total': 148186,
+    'yes': 3459,
+    'no': 144727
+}
+KITA_COUNT_2019 = {
+    'total': 90866,
+    'yes': 76582,
+    'no': 14284
+}
+RIICHI_COUNT_2019 = {
+    'total': 74411,
+    'yes': 21860,
+    'no': 52551
+}
+
+# 2020 - 3000 games
+DISCARD_COUNT_2020 = 88785
+PON_COUNT_2020 = {
+    'total': 10197,
+    'yes': 2798,
+    'no': 7399
+}
+KAN_COUNT_2020 = {
+    'total': 14335,
+    'yes': 384,
+    'no': 13951
+}
+KITA_COUNT_2020 = {
+    'total': 9299,
+    'yes': 7702,
+    'no': 1597
+}
+RIICHI_COUNT_2020 = {
+    'total': 7320,
+    'yes': 2283,
+    'no': 5037
+}
+
+DISCARD_COUNTS = {
+    '2019': DISCARD_COUNT_2019,
+    '2020': DISCARD_COUNT_2020
+}
+PON_COUNTS = {
+    '2019': PON_COUNT_2019,
+    '2020': PON_COUNT_2020
+}
+KAN_COUNTS = {
+    '2019': KAN_COUNT_2019,
+    '2020': KAN_COUNT_2020
+}
+KITA_COUNTS = {
+    '2019': KITA_COUNT_2019,
+    '2020': KITA_COUNT_2020
+}
+RIICHI_COUNTS = {
+    '2019': RIICHI_COUNT_2019,
+    '2020': RIICHI_COUNT_2020
+}
+
 # Tenhou tiles encoding to Meowjong tiles encoding
 TENHOU_TILE_INDEX = {
     # manzu
