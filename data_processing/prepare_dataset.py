@@ -969,6 +969,7 @@ if __name__ == '__main__':
     # for key, val in max_honba_and_deposit_results.items():
     #     print(key + ':', val)
 
+    # Prepare images dataset for each action and year
     discard_count = 0
     pon_count = {
         'total': 0,
@@ -1058,40 +1059,43 @@ if __name__ == '__main__':
                 print('riichi accepted:', riichi_count['yes'])
                 print('riichi declined:', riichi_count['no'])
 
-    for year in '2019', '2020':
-        with open(os.path.join(DATASET_PATH,
-                               'discard_actions_' + year + '.txt')) as f:
-            assert len(list(map(int, f))) == DISCARD_COUNTS[year]
-        with open(os.path.join(DATASET_PATH,
-                               'pon_actions_' + year + '.txt')) as f:
-            assert len(list(map(int, f))) == PON_COUNTS[year]['total']
-        with open(os.path.join(DATASET_PATH,
-                               'kan_actions_' + year + '.txt')) as f:
-            assert len(list(map(int, f))) == KAN_COUNTS[year]['total']
-        with open(os.path.join(DATASET_PATH,
-                               'kita_actions_' + year + '.txt')) as f:
-            assert len(list(map(int, f))) == KITA_COUNTS[year]['total']
-        with open(os.path.join(DATASET_PATH,
-                               'riichi_actions_' + year + '.txt')) as f:
-            assert len(list(map(int, f))) == RIICHI_COUNTS[year]['total']
-
-    for year in '2019', '2020':
-        for action_type in 'discard', 'pon', 'kan', 'kita', 'riichi':
-            txt_to_csv(year=year, action_type=action_type)
-
-    for year in '2019', '2020':
-        with open(os.path.join(DATASET_PATH,
-                               'discard_actions_' + year + '.csv')) as f:
-            assert sum(1 for line in f) == DISCARD_COUNTS[year] + 1
-        with open(os.path.join(DATASET_PATH,
-                               'pon_actions_' + year + '.csv')) as f:
-            assert sum(1 for line in f) == PON_COUNTS[year]['total'] + 1
-        with open(os.path.join(DATASET_PATH,
-                               'kan_actions_' + year + '.csv')) as f:
-            assert sum(1 for line in f) == KAN_COUNTS[year]['total'] + 1
-        with open(os.path.join(DATASET_PATH,
-                               'kita_actions_' + year + '.csv')) as f:
-            assert sum(1 for line in f) == KITA_COUNTS[year]['total'] + 1
-        with open(os.path.join(DATASET_PATH,
-                               'riichi_actions_' + year + '.csv')) as f:
-            assert sum(1 for line in f) == RIICHI_COUNTS[year]['total'] + 1
+    # # Validate .txt label (action) files
+    # for year in '2019', '2020':
+    #     with open(os.path.join(DATASET_PATH,
+    #                            'discard_actions_' + year + '.txt')) as f:
+    #         assert len(list(map(int, f))) == DISCARD_COUNTS[year]
+    #     with open(os.path.join(DATASET_PATH,
+    #                            'pon_actions_' + year + '.txt')) as f:
+    #         assert len(list(map(int, f))) == PON_COUNTS[year]['total']
+    #     with open(os.path.join(DATASET_PATH,
+    #                            'kan_actions_' + year + '.txt')) as f:
+    #         assert len(list(map(int, f))) == KAN_COUNTS[year]['total']
+    #     with open(os.path.join(DATASET_PATH,
+    #                            'kita_actions_' + year + '.txt')) as f:
+    #         assert len(list(map(int, f))) == KITA_COUNTS[year]['total']
+    #     with open(os.path.join(DATASET_PATH,
+    #                            'riichi_actions_' + year + '.txt')) as f:
+    #         assert len(list(map(int, f))) == RIICHI_COUNTS[year]['total']
+    #
+    # # Convert .txt label (action) files to .csv files
+    # for year in '2019', '2020':
+    #     for action_type in 'discard', 'pon', 'kan', 'kita', 'riichi':
+    #         txt_to_csv(year=year, action_type=action_type)
+    #
+    # # Validate .csv label (action) files
+    # for year in '2019', '2020':
+    #     with open(os.path.join(DATASET_PATH,
+    #                            'discard_actions_' + year + '.csv')) as f:
+    #         assert sum(1 for line in f) == DISCARD_COUNTS[year] + 1
+    #     with open(os.path.join(DATASET_PATH,
+    #                            'pon_actions_' + year + '.csv')) as f:
+    #         assert sum(1 for line in f) == PON_COUNTS[year]['total'] + 1
+    #     with open(os.path.join(DATASET_PATH,
+    #                            'kan_actions_' + year + '.csv')) as f:
+    #         assert sum(1 for line in f) == KAN_COUNTS[year]['total'] + 1
+    #     with open(os.path.join(DATASET_PATH,
+    #                            'kita_actions_' + year + '.csv')) as f:
+    #         assert sum(1 for line in f) == KITA_COUNTS[year]['total'] + 1
+    #     with open(os.path.join(DATASET_PATH,
+    #                            'riichi_actions_' + year + '.csv')) as f:
+    #         assert sum(1 for line in f) == RIICHI_COUNTS[year]['total'] + 1
