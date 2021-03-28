@@ -127,7 +127,7 @@ def generate_state_action_pair(image_file, labels, action_type):
     return image, label
 
 
-def prepare_dataset_tesnors(dataset_path, action_type, scaled=False):
+def prepare_dataset_tensors(dataset_path, action_type, scaled=False):
     image_folder = action_type + '_2019'
     label_file = action_type + '_actions_2019.csv'
 
@@ -210,6 +210,6 @@ if __name__ == '__main__':
     else:
         scaled = False
 
-    prepare_dataset_tesnors(dataset_path, action_type, scaled)
+    prepare_dataset_tensors(dataset_path, action_type, scaled)
 
     print('Success')
