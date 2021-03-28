@@ -127,11 +127,11 @@ def generate_state_action_pair(image_file, labels, action_type):
     return image, label
 
 
-def prepare_dataset_tensors(dataset_path, action_type, scaled=False):
-    image_folder = action_type + '_2019'
-    label_file = action_type + '_actions_2019.csv'
+def prepare_dataset_tensors(dataset_path, action_type, year, scaled=False):
+    image_folder = action_type + '_' + year
+    label_file = action_type + '_actions_' + year + '.csv'
 
-    # validate_dataset(dataset_path, action_type)
+    validate_dataset(dataset_path, action_type)
 
     image_files = tf.data.Dataset.list_files(os.path.join(
         dataset_path, image_folder + '/*.png'))
@@ -168,9 +168,9 @@ def prepare_dataset_tensors(dataset_path, action_type, scaled=False):
     y_dev = tf.stack(y_dev)
 
     if scaled:
-        filename = action_type + '_tensors_2019_scaled'
+        filename = action_type + '_tensors_' + year + '_scaled'
     else:
-        filename = action_type + '_tensors_2019'
+        filename = action_type + '_tensors_' + year
 
     if action_type == 'discard':
         with open(os.path.join(dataset_path, filename + '.joblib'), 'wb') \
@@ -200,16 +200,18 @@ if __name__ == '__main__':
                         required=True)
     parser.add_argument('--action_type', action='store', type=str,
                         required=True)
+    parser.add_argument('--year', action='store', type=str, required=True)
     parser.add_argument('--scaled', action='store', type=bool, required=False)
 
     args = parser.parse_args()
     dataset_path = args.dataset_path
     action_type = args.action_type
+    year = args.year
     if args.scaled:
         scaled = args.scaled
     else:
         scaled = False
 
-    prepare_dataset_tensors(dataset_path, action_type, scaled)
+    prepare_dataset_tensors(dataset_path, action_type, year, scaled)
 
     print('Success')
