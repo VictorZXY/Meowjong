@@ -177,11 +177,15 @@ def prepare_dataset_tensors(dataset_path, action_type, year, scaled=False):
             pickle.dump(y_train, fwrite)
             pickle.dump(y_dev, fwrite)
 
-    print(action_type + ' X_train shape:', X_train.shape)
+    print(action_type + ' X_train.shape:', X_train.shape)
     print(action_type + ' X_dev.shape:', X_dev.shape)
-    print(action_type + ' y_train shape:', y_train.shape)
+    print(action_type + ' y_train.shape:', y_train.shape)
     print(action_type + ' y_dev.shape:', y_dev.shape)
     print()
+    if scaled:
+        print(action_type + ' X_mean:', X_mean)
+        print(action_type + ' X_std:', X_std)
+        print()
 
 
 if __name__ == '__main__':
