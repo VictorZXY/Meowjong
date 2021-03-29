@@ -79,48 +79,49 @@ MAX_DEPOSIT_YEAR = '2010'
 
 # 2019 - 30000 games for discard, 50000 games for the others
 DISCARD_COUNT_2019 = 885873
+DISCARD_COUNT_2019_FULL = 1475532
 PON_COUNT_2019 = {
-    'total': 101020,
-    'yes': 28462,
-    'no': 72558
+    'total': 168165,
+    'yes': 47602,
+    'no': 120563
 }
 KAN_COUNT_2019 = {
-    'total': 148186,
-    'yes': 3459,
-    'no': 144727
+    'total': 38133,
+    'yes': 5797,
+    'no': 32336
 }
 KITA_COUNT_2019 = {
-    'total': 90866,
-    'yes': 76582,
-    'no': 14284
+    'total': 152138,
+    'yes': 127626,
+    'no': 24512
 }
 RIICHI_COUNT_2019 = {
-    'total': 74411,
-    'yes': 21860,
-    'no': 52551
+    'total': 122005,
+    'yes': 36753,
+    'no': 85252
 }
 
 # 2020 - 5000 games
-DISCARD_COUNT_2020 = 88785
+DISCARD_COUNT_2020 = 147444
 PON_COUNT_2020 = {
-    'total': 10197,
-    'yes': 2798,
-    'no': 7399
+    'total': 16887,
+    'yes': 4788,
+    'no': 12099
 }
 KAN_COUNT_2020 = {
-    'total': 14335,
-    'yes': 384,
-    'no': 13951
+    'total': 3548,
+    'yes': 590,
+    'no': 2958
 }
 KITA_COUNT_2020 = {
-    'total': 9299,
-    'yes': 7702,
-    'no': 1597
+    'total': 15498,
+    'yes': 12777,
+    'no': 2721
 }
 RIICHI_COUNT_2020 = {
-    'total': 7320,
-    'yes': 2283,
-    'no': 5037
+    'total': 11944,
+    'yes': 3741,
+    'no': 8203
 }
 
 DISCARD_COUNTS = {
