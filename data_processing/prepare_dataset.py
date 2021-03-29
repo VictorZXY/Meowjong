@@ -249,7 +249,6 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
         endgame_flag = False
 
         if not is_pon:
-            is_open_kan = False
             draw_flag = True
             drawn_tile = player_self.log_draws.popleft()
             action = player_self.log_discards.popleft()
@@ -386,10 +385,10 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
 
                         if player_self.log_draws:
                             draw_flag = True
+                            drawn_tile = player_self.log_draws.popleft()
                             dora_indicator_index += 1
                             encode_dora_indicator(dora_indicators, log[2],
                                                   dora_indicator_index)
-                            drawn_tile = player_self.log_draws.popleft()
                             if remaining_discards > 0:
                                 action = player_self.log_discards.popleft()
                                 if action == 60:
@@ -459,8 +458,10 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
 
                         if player_self.log_draws:
                             draw_flag = True
-                            is_open_kan = True
                             drawn_tile = player_self.log_draws.popleft()
+                            dora_indicator_index += 1
+                            encode_dora_indicator(dora_indicators, log[2],
+                                                  dora_indicator_index)
                             if remaining_discards > 0:
                                 action = player_self.log_discards.popleft()
                                 if action == 60:
@@ -693,10 +694,6 @@ def encode_game_log(year, log, dataset_dir, discard_dir, pon_dir, kan_dir,
                 # update state
                 player_self.add_tile_to_hand(drawn_tile)
                 player_self.add_discard(discarded_tile)
-                if is_open_kan:
-                    dora_indicator_index += 1
-                    encode_dora_indicator(dora_indicators, log[2],
-                                          dora_indicator_index)
 
         else:
             action = player_self.log_discards.popleft()
@@ -995,11 +992,11 @@ if __name__ == '__main__':
     year = '2019'
 
     with tqdm(desc='Encoding', total=6000) as pbar:
-        discard_dir = os.path.join(DATASET_PATH, 'discard_' + year)
-        pon_dir = os.path.join(DATASET_PATH, 'pon_' + year)
-        kan_dir = os.path.join(DATASET_PATH, 'kan_' + year)
-        kita_dir = os.path.join(DATASET_PATH, 'kita_' + year)
-        riichi_dir = os.path.join(DATASET_PATH, 'riichi_' + year)
+        discard_dir = os.path.join(DATASET_PATH, 'discard_' + year + '_1')
+        pon_dir = os.path.join(DATASET_PATH, 'pon_' + year + '_1')
+        kan_dir = os.path.join(DATASET_PATH, 'kan_' + year + '_1')
+        kita_dir = os.path.join(DATASET_PATH, 'kita_' + year + '_1')
+        riichi_dir = os.path.join(DATASET_PATH, 'riichi_' + year + '_1')
 
         with open(os.path.join(EXTRACTED_GAME_LOGS_PATH, year + '.pickle'),
                   'rb') as fread:
