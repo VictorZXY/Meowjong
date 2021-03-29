@@ -992,11 +992,11 @@ if __name__ == '__main__':
     year = '2019'
 
     with tqdm(desc='Encoding', total=6000) as pbar:
-        discard_dir = os.path.join(DATASET_PATH, 'discard_' + year + '_1')
-        pon_dir = os.path.join(DATASET_PATH, 'pon_' + year + '_1')
-        kan_dir = os.path.join(DATASET_PATH, 'kan_' + year + '_1')
-        kita_dir = os.path.join(DATASET_PATH, 'kita_' + year + '_1')
-        riichi_dir = os.path.join(DATASET_PATH, 'riichi_' + year + '_1')
+        discard_dir = os.path.join(DATASET_PATH, 'discard_' + year)
+        pon_dir = os.path.join(DATASET_PATH, 'pon_' + year)
+        kan_dir = os.path.join(DATASET_PATH, 'kan_' + year)
+        kita_dir = os.path.join(DATASET_PATH, 'kita_' + year)
+        riichi_dir = os.path.join(DATASET_PATH, 'riichi_' + year)
 
         with open(os.path.join(EXTRACTED_GAME_LOGS_PATH, year + '.pickle'),
                   'rb') as fread:
