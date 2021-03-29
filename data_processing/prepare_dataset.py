@@ -160,6 +160,9 @@ def encode_dora_indicator(array, dora_indicators, index):
     :param index: index of the dora indicator from Tenhou's log
     :return: updated (34, 4) np.array
     """
+    if index >= len(dora_indicators):
+        return
+
     if TENHOU_TILE_INDEX[dora_indicators[index]] == RED_FIVE_MAN:
         array[FIVE_MAN, index] = 1
     elif TENHOU_TILE_INDEX[dora_indicators[index]] == RED_FIVE_PIN:
