@@ -358,6 +358,9 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                             end_game = True
                             is_ryuukyoku = True
                         else:
+                            update_dora_indicators(
+                                dora_indicators,
+                                possible_dora_indicators[kan_count], kan_count)
                             drawn_tile = wall.pop()
 
                 elif final_action == 'kita':
@@ -433,10 +436,6 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                     round_number, honba_number, deposit_number,
                     dora_indicators)
             player_self.add_discard(discarded_tile)
-            if final_action == 'add_kan':
-                update_dora_indicators(dora_indicators,
-                                       possible_dora_indicators[kan_count],
-                                       kan_count)
 
         else:
             assert not (player_self.riichi_status)
