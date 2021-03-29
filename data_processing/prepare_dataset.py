@@ -160,14 +160,14 @@ def encode_dora_indicator(array, dora_indicators, index):
     :param index: index of the dora indicator from Tenhou's log
     :return: updated (34, 4) np.array
     """
-    if TENHOU_TILE_INDEX[dora_indicators[0]] == RED_FIVE_MAN:
+    if TENHOU_TILE_INDEX[dora_indicators[index]] == RED_FIVE_MAN:
         array[FIVE_MAN, index] = 1
-    elif TENHOU_TILE_INDEX[dora_indicators[0]] == RED_FIVE_PIN:
+    elif TENHOU_TILE_INDEX[dora_indicators[index]] == RED_FIVE_PIN:
         array[FIVE_PIN, index] = 1
-    elif TENHOU_TILE_INDEX[dora_indicators[0]] == RED_FIVE_SOU:
+    elif TENHOU_TILE_INDEX[dora_indicators[index]] == RED_FIVE_SOU:
         array[FIVE_SOU, index] = 1
     else:
-        array[TENHOU_TILE_INDEX[dora_indicators[0]], index] = 1
+        array[TENHOU_TILE_INDEX[dora_indicators[index]], index] = 1
 
 
 def connect_bit(x, y):
