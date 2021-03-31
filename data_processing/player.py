@@ -2,9 +2,9 @@ from itertools import product
 
 import numpy as np
 
-from data_processing_constants import TILES_SIZE, SELF_RED_DORA_SIZE, \
-    MELDS_SIZE, KITA_SIZE, DISCARDS_SIZE, TENHOU_TILE_INDEX, ONE_MELD_SIZE, \
-    TURN_NUMBER_SIZE
+from data_processing.data_processing_constants import TILES_SIZE, \
+    SELF_RED_DORA_SIZE, MELDS_SIZE, KITA_SIZE, DISCARDS_SIZE, \
+    TENHOU_TILE_INDEX, ONE_MELD_SIZE, TURN_NUMBER_SIZE
 from evaluation.hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, \
     NINE_MAN, ONE_PIN, FIVE_PIN, NINE_PIN, ONE_SOU, FIVE_SOU, NINE_SOU, EAST, \
     NORTH, CHUN, RED_FIVE_MAN, RED_FIVE_PIN, RED_FIVE_SOU

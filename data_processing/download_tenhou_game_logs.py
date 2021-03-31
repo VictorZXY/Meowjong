@@ -4,10 +4,10 @@ import re
 import requests
 from tqdm import tqdm
 
-from data_processing_constants import HTML_COUNT, HTML_GAME_LOGS_PATH, \
-    SELECTED_YEARS, GAME_LOG_URLS_PATH, URL_PATTERN, SANMA_EAST_PATTERN, \
-    SANMA_SOUTH_PATTERN, URL_COUNTS_BY_YEAR, RAW_GAME_LOGS_PATH, USER_AGENT, \
-    CPU_COUNT
+from data_processing.data_processing_constants import HTML_COUNT, \
+    HTML_GAME_LOGS_PATH, SELECTED_YEARS, GAME_LOG_URLS_PATH, URL_PATTERN, \
+    SANMA_EAST_PATTERN, SANMA_SOUTH_PATTERN, URL_COUNTS_BY_YEAR, \
+    RAW_GAME_LOGS_PATH, USER_AGENT, CPU_COUNT
 
 
 def extract_urls_from_html_logs():

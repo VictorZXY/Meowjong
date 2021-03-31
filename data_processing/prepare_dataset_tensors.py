@@ -8,8 +8,8 @@ import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
-from data_processing_constants import DISCARD_COUNTS, PON_COUNTS, KAN_COUNTS, \
-    KITA_COUNTS, RIICHI_COUNTS
+from data_processing.data_processing_constants import DISCARD_COUNTS, \
+    PON_COUNTS, KAN_COUNTS, KITA_COUNTS, RIICHI_COUNTS
 
 assert tf.__version__ >= "2.0"
 
