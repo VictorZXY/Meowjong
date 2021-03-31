@@ -3,7 +3,7 @@ import os
 import joblib
 import pickle
 
-import cupy as cp
+import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
@@ -14,7 +14,7 @@ from data_processing.data_processing_constants import DISCARD_COUNTS, \
 assert tf.__version__ >= "2.0"
 
 # To make the output stable across runs
-cp.random.seed(42)
+np.random.seed(42)
 tf.random.set_seed(42)
 
 def validate_dataset(dataset_path, action_type, year):
@@ -147,15 +147,18 @@ def prepare_dataset_tensors(dataset_path, action_type, year, scaled=False):
                                                       stratify=y)
 
     if scaled:
-        X_mean = cp.mean(X_train, axis=0, keepdims=True)
-        X_std = cp.std(X_train, axis=0, keepdims=True) + 1e-7
+        X_train = np.array(X_train)
+        X_dev = np.array(X_dev)
+        X_mean = np.mean(X_train, axis=0, keepdims=True)
+        X_std = np.std(X_train, axis=0, keepdims=True) + 1e-7
         X_train = (X_train - X_mean) / X_std
         X_dev = (X_dev - X_mean) / X_std
 
-    X_train = tf.stack(X_train)
-    X_dev = tf.stack(X_dev)
-    y_train = tf.stack(y_train)
-    y_dev = tf.stack(y_dev)
+    with tf.device('/CPU:0'):
+        X_train = tf.stack(X_train)
+        X_dev = tf.stack(X_dev)
+        y_train = tf.stack(y_train)
+        y_dev = tf.stack(y_dev)
 
     if scaled:
         filename = action_type + '_tensors_' + year + '_scaled'
