@@ -1,6 +1,6 @@
 import numpy as np
 
-from data_processing.data_preprocessing_constants import TILES_SIZE, \
+from data_processing.data_processing_constants import TILES_SIZE, \
     SELF_RED_DORA_SIZE
 from evaluation.hand_calculation.tile_constants import ONE_MAN, FIVE_MAN, \
     SEVEN_MAN, ONE_PIN, FIVE_PIN, SEVEN_PIN, ONE_SOU, FIVE_SOU, SEVEN_SOU, \

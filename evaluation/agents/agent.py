@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from data_processing.data_preprocessing_constants import TILES_SIZE, \
+from data_processing.data_processing_constants import TILES_SIZE, \
     SELF_RED_DORA_SIZE, MELDS_SIZE, KITA_SIZE, DISCARDS_SIZE, ONE_MELD_SIZE, \
     TURN_NUMBER_SIZE, ROUND_NUMBER_SIZE, HONBA_NUMBER_SIZE, DEPOSIT_NUMBER_SIZE
 from evaluation.hand_calculation.han import Han

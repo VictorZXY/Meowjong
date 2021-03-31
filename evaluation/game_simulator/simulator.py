@@ -5,7 +5,7 @@ from typing import List
 
 from tqdm import tqdm
 
-from data_processing.data_preprocessing_constants import SCORES_SIZE, \
+from data_processing.data_processing_constants import SCORES_SIZE, \
     ONE_SCORE_SIZE, \
     DORA_INDICATORS_SIZE
 from evaluation.agents.agent import Agent
