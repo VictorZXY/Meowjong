@@ -25,7 +25,7 @@ def validate_dataset(dataset_path, action_type, year):
 
         with open(os.path.join(dataset_path,
                                'discard_actions_' + year + '.csv')) as f:
-            f.readline()
+            f.readline()  # remove header
             assert sum(1 for line in f) == DISCARD_COUNTS[year]
 
     elif action_type == 'pon':
@@ -35,10 +35,10 @@ def validate_dataset(dataset_path, action_type, year):
 
         with open(os.path.join(dataset_path,
                                'pon_actions_' + year + '.csv')) as f:
-            f.readline()
+            f.readline()  # remove header
             assert sum(1 for line in f) == PON_COUNTS[year]['total']
             f.seek(0)
-            f.readline()
+            f.readline()  # remove header
             assert sum(int(line[-2]) for line in f) == PON_COUNTS[year]['yes']
 
     elif action_type == 'kan':
@@ -48,10 +48,10 @@ def validate_dataset(dataset_path, action_type, year):
 
         with open(os.path.join(dataset_path,
                                'kan_actions_' + year + '.csv')) as f:
-            f.readline()
+            f.readline()  # remove header
             assert sum(1 for line in f) == KAN_COUNTS[year]['total']
             f.seek(0)
-            f.readline()
+            f.readline()  # remove header
             assert sum(int(line[-2]) for line in f) == KAN_COUNTS[year]['yes']
 
     elif action_type == 'kita':
@@ -61,10 +61,10 @@ def validate_dataset(dataset_path, action_type, year):
 
         with open(os.path.join(dataset_path,
                                'kita_actions_' + year + '.csv')) as f:
-            f.readline()
+            f.readline()  # remove header
             assert sum(1 for line in f) == KITA_COUNTS[year]['total']
             f.seek(0)
-            f.readline()
+            f.readline()  # remove header
             assert sum(int(line[-2]) for line in f) == KITA_COUNTS[year]['yes']
 
     else:  # action_type == 'riichi'
@@ -74,10 +74,10 @@ def validate_dataset(dataset_path, action_type, year):
 
         with open(os.path.join(dataset_path,
                                'riichi_actions_' + year + '.csv')) as f:
-            f.readline()
+            f.readline()  # remove header
             assert sum(1 for line in f) == RIICHI_COUNTS[year]['total']
             f.seek(0)
-            f.readline()
+            f.readline()  # remove header
             assert sum(int(line[-2]) for line in f) == \
                    RIICHI_COUNTS[year]['yes']
 
