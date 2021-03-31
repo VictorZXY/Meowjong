@@ -34,11 +34,6 @@ def load_data(dataset_path, filename):
         y_train = pickle.load(fread)
         y_dev = pickle.load(fread)
 
-        X_mean = X_train.numpy().mean(axis=0, keepdims=True)
-        X_std = X_train.numpy().std(axis=0, keepdims=True) + 1e-7
-        X_train = (X_train - X_mean) / X_std
-        X_dev = (X_dev - X_mean) / X_std
-
         return X_train, X_dev, y_train, y_dev
 
 
@@ -119,7 +114,8 @@ if __name__ == '__main__':
         print()
 
     # Train the neural network
-    model_name = 'pon_cnn_' + str(kernel_size[0]) + str(kernel_size[1])
+    model_name = 'pon_cnn_' + str(kernel_size[0]) + str(kernel_size[1]) \
+                 + '_scaled'
     log_dir = os.path.join(logs_path + '/' + model_name + '/tensorboard_logs',
                            datetime.now().strftime("%Y%m%d-%H%M%S"))
     checkpoint_prefix = os.path.join(logs_path + '/' + model_name
@@ -135,7 +131,7 @@ if __name__ == '__main__':
     ]
 
     BATCH_SIZE = BATCH_SIZE_PER_REPLICA * num_of_gpus
-    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=600,
+    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=500,
                         validation_data=(X_dev, y_dev),
                         callbacks=callbacks)
 
