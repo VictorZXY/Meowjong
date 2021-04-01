@@ -87,7 +87,7 @@ def calculate_discard_dataset_std(dataset_path, action_type, year, X_mean):
     X_train = np.square(X_train)
     X2_mean = np.mean(X_train)
     X_std = np.sqrt(X2_mean - X_mean ** 2, dtype=np.float32)
-    if X_std == 0:
+    if X_std == 0.0:
         X_std = 1e-7
     print(action_type + ' X_std:', X_std)
     print()
