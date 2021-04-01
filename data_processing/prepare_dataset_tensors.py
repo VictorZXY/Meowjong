@@ -125,18 +125,19 @@ def prepare_dataset_tensors(dataset_path, action_type, year, scaled=False):
     image_folder = action_type + '_' + year
     label_file = action_type + '_actions_' + year + '.csv'
 
-    validate_dataset(dataset_path, action_type, year)  # Only for the first time
+    # # Only for the first time
+    # validate_dataset(dataset_path, action_type, year)
 
     image_files = tf.data.Dataset.list_files(os.path.join(
         dataset_path, image_folder + '/*.png'))
     labels = load_csv(dataset_path, label_file)
 
-    # Only for the first time
-    for i in range(len(labels)):
-        assert labels['image'][i] == action_type + '_' + year + '_' \
-               + str(i + 1) + '.png'
-    print(action_type + ' dataset OK')
-    print()
+    # # Only for the first time
+    # for i in range(len(labels)):
+    #     assert labels['image'][i] == action_type + '_' + year + '_' \
+    #            + str(i + 1) + '.png'
+    # print(action_type + ' dataset OK')
+    # print()
 
     # Generate (state, action) (i.e. (image, label)) pairs
     X = []
