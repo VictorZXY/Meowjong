@@ -1,7 +1,6 @@
 import argparse
 import os
 import joblib
-import pickle
 
 import numpy as np
 import pandas as pd
@@ -158,6 +157,11 @@ def prepare_dataset_tensors(dataset_path, action_type, year, scaled=False):
     X_dev = tf.stack(X_dev)
     y_train = tf.stack(y_train)
     y_dev = tf.stack(y_dev)
+    print(action_type + ' X_train.shape:', X_train.shape)
+    print(action_type + ' X_dev.shape:', X_dev.shape)
+    print(action_type + ' y_train.shape:', y_train.shape)
+    print(action_type + ' y_dev.shape:', y_dev.shape)
+    print()
 
     if scaled:
         X_mean = np.mean(X_train)
@@ -175,26 +179,11 @@ def prepare_dataset_tensors(dataset_path, action_type, year, scaled=False):
     else:
         filename = action_type + '_tensors_' + year
 
-    if action_type == 'discard':
-        with open(os.path.join(dataset_path, filename + '.joblib'), 'wb') \
-                as fwrite:
-            joblib.dump(X_train, fwrite)
-            joblib.dump(X_dev, fwrite)
-            joblib.dump(y_train, fwrite)
-            joblib.dump(y_dev, fwrite)
-    else:
-        with open(os.path.join(dataset_path, filename + '.pickle'), 'wb') \
-                as fwrite:
-            pickle.dump(X_train, fwrite)
-            pickle.dump(X_dev, fwrite)
-            pickle.dump(y_train, fwrite)
-            pickle.dump(y_dev, fwrite)
-
-    print(action_type + ' X_train.shape:', X_train.shape)
-    print(action_type + ' X_dev.shape:', X_dev.shape)
-    print(action_type + ' y_train.shape:', y_train.shape)
-    print(action_type + ' y_dev.shape:', y_dev.shape)
-    print()
+    with open(os.path.join(dataset_path, filename + '.joblib'), 'wb') as fwrite:
+        joblib.dump(X_train, fwrite)
+        joblib.dump(X_dev, fwrite)
+        joblib.dump(y_train, fwrite)
+        joblib.dump(y_dev, fwrite)
 
 
 if __name__ == '__main__':

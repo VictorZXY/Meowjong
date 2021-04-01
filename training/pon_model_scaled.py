@@ -1,9 +1,9 @@
 import argparse
 import os
-import pickle
 from datetime import datetime
 from functools import partial
 
+import joblib
 import tensorflow as tf
 from tensorflow import keras
 
@@ -29,10 +29,10 @@ def kernel(arg):
 
 def load_data(dataset_path, filename):
     with open(os.path.join(dataset_path, filename), 'rb') as fread:
-        X_train = pickle.load(fread)
-        X_dev = pickle.load(fread)
-        y_train = pickle.load(fread)
-        y_dev = pickle.load(fread)
+        X_train = joblib.load(fread)
+        X_dev = joblib.load(fread)
+        y_train = joblib.load(fread)
+        y_dev = joblib.load(fread)
 
         return X_train, X_dev, y_train, y_dev
 
@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
     # Load the dataset
     X_train, X_dev, y_train, y_dev = load_data(dataset_path,
-                                               'pon_tensors_2019.pickle')
+                                               'pon_tensors_2019.joblib')
     print('X_train shape:', X_train.shape)
     print('X_dev.shape:', X_dev.shape)
     print('y_train shape:', y_train.shape)
