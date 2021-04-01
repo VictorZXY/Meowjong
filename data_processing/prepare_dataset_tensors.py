@@ -17,11 +17,11 @@ assert tf.__version__ >= "2.0"
 np.random.seed(42)
 tf.random.set_seed(42)
 
-# Globally set CPU as the only available physical device
-devices = tf.config.experimental.list_physical_devices(device_type='CPU')
-tf.config.experimental.set_visible_devices(devices=devices, device_type='CPU')
-# Test whether there are GPUs available
-assert len(tf.config.experimental.list_physical_devices('GPU')) == 0
+# Disable all GPUs
+tf.config.set_visible_devices([], 'GPU')
+visible_devices = tf.config.get_visible_devices()
+for device in visible_devices:
+    assert device.device_type != 'GPU'
 
 
 def validate_dataset(dataset_path, action_type, year):
