@@ -51,7 +51,7 @@ def generate_state_action_pair(image_file, labels, action_type, year):
     return image, label
 
 
-def calculate_discard_dataset_std(dataset_path, action_type, year):
+def calculate_discard_dataset_std(dataset_path, action_type, year, X_mean):
     image_folder = action_type + '_' + year
     label_file = action_type + '_actions_' + year + '.csv'
 
@@ -84,7 +84,9 @@ def calculate_discard_dataset_std(dataset_path, action_type, year):
     print(action_type + ' y_dev.shape:', y_dev.shape)
     print()
 
-    X_std = np.std(X_train)
+    X_train = np.square(X_train)
+    X2_mean = np.mean(X_train)
+    X_std = np.sqrt(X2_mean - X_mean ** 2, dtype=np.float32)
     if X_std == 0:
         X_std = 1e-7
     print(action_type + ' X_std:', X_std)
@@ -98,12 +100,14 @@ if __name__ == '__main__':
     parser.add_argument('--action_type', action='store', type=str,
                         required=True)
     parser.add_argument('--year', action='store', type=str, required=True)
+    parser.add_argument('--mean', action='store', type=float, required=True)
 
     args = parser.parse_args()
     dataset_path = args.dataset_path
     action_type = args.action_type
     year = args.year
+    X_mean = args.mean
 
-    calculate_discard_dataset_std(dataset_path, action_type, year)
+    calculate_discard_dataset_std(dataset_path, action_type, year, X_mean)
 
     print('Success')
