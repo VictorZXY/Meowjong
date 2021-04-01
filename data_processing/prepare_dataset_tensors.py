@@ -149,23 +149,26 @@ def prepare_dataset_tensors(dataset_path, action_type, year, scaled=False):
         X.append(image)
         y.append(label)
 
-    X_train, X_dev, y_train, y_dev = train_test_split(X, y, test_size=0.1,
+    X_train, X_dev, y_train, y_dev = train_test_split(X, y,
+                                                      test_size=0.1,
                                                       train_size=0.9,
                                                       random_state=42,
                                                       stratify=y)
-
-    if scaled:
-        X_train = np.array(X_train)
-        X_dev = np.array(X_dev)
-        X_mean = np.mean(X_train, axis=0, keepdims=True)
-        X_std = np.std(X_train, axis=0, keepdims=True) + 1e-7
-        X_train = (X_train - X_mean) / X_std
-        X_dev = (X_dev - X_mean) / X_std
-
     X_train = tf.stack(X_train)
     X_dev = tf.stack(X_dev)
     y_train = tf.stack(y_train)
     y_dev = tf.stack(y_dev)
+
+    if scaled:
+        X_mean = np.mean(X_train)
+        X_std = np.std(X_train)
+        if X_std == 0:
+            X_std = 1e-7
+        print(action_type + ' X_mean:', X_mean)
+        print(action_type + ' X_std:', X_std)
+        print()
+        X_train = (X_train - X_mean) / X_std
+        X_dev = (X_dev - X_mean) / X_std
 
     if scaled:
         filename = action_type + '_tensors_' + year + '_scaled'
@@ -192,10 +195,6 @@ def prepare_dataset_tensors(dataset_path, action_type, year, scaled=False):
     print(action_type + ' y_train.shape:', y_train.shape)
     print(action_type + ' y_dev.shape:', y_dev.shape)
     print()
-    if scaled:
-        print(action_type + ' X_mean:', X_mean)
-        print(action_type + ' X_std:', X_std)
-        print()
 
 
 if __name__ == '__main__':
