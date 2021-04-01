@@ -17,6 +17,13 @@ assert tf.__version__ >= "2.0"
 np.random.seed(42)
 tf.random.set_seed(42)
 
+# Globally set CPU as the only available physical device
+devices = tf.config.experimental.list_physical_devices(device_type='CPU')
+tf.config.experimental.set_visible_devices(devices=devices, device_type='CPU')
+# Test whether there are GPUs available
+assert len(tf.config.experimental.list_physical_devices('GPU')) == 0
+
+
 def validate_dataset(dataset_path, action_type, year):
     if action_type == 'discard':
         path, dirs, files = next(
@@ -154,11 +161,10 @@ def prepare_dataset_tensors(dataset_path, action_type, year, scaled=False):
         X_train = (X_train - X_mean) / X_std
         X_dev = (X_dev - X_mean) / X_std
 
-    with tf.device('/CPU:0'):
-        X_train = tf.stack(X_train)
-        X_dev = tf.stack(X_dev)
-        y_train = tf.stack(y_train)
-        y_dev = tf.stack(y_dev)
+    X_train = tf.stack(X_train)
+    X_dev = tf.stack(X_dev)
+    y_train = tf.stack(y_train)
+    y_dev = tf.stack(y_dev)
 
     if scaled:
         filename = action_type + '_tensors_' + year + '_scaled'
