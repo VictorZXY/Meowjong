@@ -45,10 +45,12 @@ def decode_image(image):
     return image
 
 
-def generate_state_action_pair(image_file, labels, action_type, year):
+def generate_scaled_state_action_pair(image_file, labels, action_type, year,
+                                      X_mean, X_std):
     label = get_label(image_file, labels, action_type, year)
     image = tf.io.read_file(image_file)
     image = decode_image(image)
+    image = (image - X_mean) / X_std
     return image, label
 
 
@@ -62,16 +64,16 @@ def calculate_discard_dataset_std(dataset_path, action_type, year,
     labels = load_csv(dataset_path, label_file)
 
     # Generate (state, action) (i.e. (image, label)) pairs
-    X = []
+    X_scaled = []
     y = []
 
     for file in image_files:
-        image, label = generate_state_action_pair(file, labels, action_type,
-                                                  year)
-        X.append(image)
+        image, label = generate_scaled_state_action_pair(
+            file, labels, action_type, year, X_mean, X_std)
+        X_scaled.append(image)
         y.append(label)
 
-    X_train, X_dev, y_train, y_dev = train_test_split(X, y,
+    X_train, X_dev, y_train, y_dev = train_test_split(X_scaled, y,
                                                       test_size=0.1,
                                                       train_size=0.9,
                                                       random_state=42,
@@ -80,17 +82,15 @@ def calculate_discard_dataset_std(dataset_path, action_type, year,
     X_dev = tf.stack(X_dev)
     y_train = tf.stack(y_train)
     y_dev = tf.stack(y_dev)
+
     print(action_type + ' X_train.shape:', X_train.shape)
     print(action_type + ' X_dev.shape:', X_dev.shape)
     print(action_type + ' y_train.shape:', y_train.shape)
     print(action_type + ' y_dev.shape:', y_dev.shape)
     print()
-
     print(action_type + ' X_mean:', X_mean)
     print(action_type + ' X_std:', X_std)
     print()
-    X_train = (X_train - X_mean) / X_std
-    X_dev = (X_dev - X_mean) / X_std
 
     filename = action_type + '_tensors_' + year + '_scaled'
     with open(os.path.join(dataset_path, filename + '.joblib'), 'wb') as fwrite:
