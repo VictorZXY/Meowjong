@@ -130,7 +130,7 @@ if __name__ == '__main__':
     ]
 
     BATCH_SIZE = BATCH_SIZE_PER_REPLICA * num_of_gpus
-    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=300,
+    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=20,
                         validation_data=(X_dev, y_dev),
                         callbacks=callbacks)
 
