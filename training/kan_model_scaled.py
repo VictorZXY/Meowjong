@@ -89,8 +89,8 @@ if __name__ == '__main__':
     assert len(tf.config.experimental.list_physical_devices('GPU')) > 0
 
     # Load the dataset
-    X_train, X_dev, y_train, y_dev = load_data(dataset_path,
-                                               'kan_tensors_2019.joblib')
+    X_train, X_dev, y_train, y_dev = load_data(
+        dataset_path, 'kan_tensors_2019_scaled.joblib')
     print('X_train shape:', X_train.shape)
     print('X_dev.shape:', X_dev.shape)
     print('y_train shape:', y_train.shape)
