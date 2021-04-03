@@ -43,7 +43,7 @@ def create_model(kernel_size):
                             padding="VALID")
 
     return keras.models.Sequential([
-        DefaultConv2D(filters=64, input_shape=[34, 365, 1]),
+        DefaultConv2D(filters=64, input_shape=[34, 366, 1]),
         keras.layers.BatchNormalization(),
         keras.layers.Dropout(0.5),
 
