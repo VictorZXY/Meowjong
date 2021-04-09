@@ -13,10 +13,7 @@ assert tf.__version__ >= "2.0"
 tf.random.set_seed(42)
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE
-BATCH_SIZE_PER_REPLICA = 256
-
-TOTAL_FEATURES_COUNT = 12410
-TOTAL_COLUMNS_SIZE = 365
+BATCH_SIZE_PER_REPLICA = 64
 
 
 def kernel(arg):
@@ -131,7 +128,7 @@ if __name__ == '__main__':
     ]
 
     BATCH_SIZE = BATCH_SIZE_PER_REPLICA * num_of_gpus
-    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=300,
+    history = model.fit(X_train, y_train, batch_size=BATCH_SIZE, epochs=70,
                         validation_data=(X_dev, y_dev),
                         callbacks=callbacks)
 
