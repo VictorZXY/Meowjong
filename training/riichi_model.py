@@ -15,9 +15,6 @@ tf.random.set_seed(42)
 AUTOTUNE = tf.data.experimental.AUTOTUNE
 BATCH_SIZE_PER_REPLICA = 32
 
-TOTAL_FEATURES_COUNT = 12410
-TOTAL_COLUMNS_SIZE = 365
-
 
 def kernel(arg):
     try:
