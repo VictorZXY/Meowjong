@@ -1,3 +1,5 @@
+import argparse
+
 import numpy as np
 from collections import deque
 
@@ -10,6 +12,7 @@ from data_processing.data_processing_constants import SCORES_SIZE, \
     DORA_INDICATORS_SIZE
 from evaluation.agents.agent import Agent
 from evaluation.agents.random_agent import RandomAgent
+from evaluation.agents.sl_agent import SLAgent
 from evaluation.hand_calculation.hand_config import HandConfig
 from evaluation.hand_calculation.tile_constants import TILES_COUNT, TWO_MAN, \
     FIVE_MAN, NINE_MAN, FIVE_PIN, FIVE_SOU, EAST, SOUTH, WEST, NORTH, \
@@ -634,13 +637,58 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
 
 
 if __name__ == '__main__':
-    with open('test.txt', 'w') as fwrite:
-        with tqdm(desc='Simulating', total=5000) as pbar:
-            for i in range(5000):
-                players = [RandomAgent(), RandomAgent(), RandomAgent()]
-                round_scores = simulate(players, seed=i)
-                fwrite.write(str(i) + ' '
-                             + str(round_scores[0]) + ' '
-                             + str(round_scores[1]) + ' '
-                             + str(round_scores[2]) + ' \n')
-                pbar.update(1)
+    # Parse the args
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--wind', action='store', type=int, required=True)
+    parser.add_argument('--discard_model_path', action='store', type=str,
+                        required=True)
+    parser.add_argument('--pon_model_path', action='store', type=str,
+                        required=True)
+    parser.add_argument('--kan_model_path', action='store', type=str,
+                        required=True)
+    parser.add_argument('--kita_model_path', action='store', type=str,
+                        required=True)
+    parser.add_argument('--riichi_model_path', action='store', type=str,
+                        required=True)
+
+    args = parser.parse_args()
+    wind = args.wind
+    discard_model_path = args.discard_model_path
+    pon_model_path = args.pon_model_path
+    kan_model_path = args.kan_model_path
+    kita_model_path = args.kita_model_path
+    riichi_model_path = args.riichi_model_path
+
+    with open('test', 'w') as fwrite:
+        for i in range(10):
+            sl_agent = SLAgent(
+                wind=wind,
+                discard_model_path=discard_model_path,
+                pon_model_path=pon_model_path,
+                kan_model_path=kan_model_path,
+                kita_model_path=kita_model_path,
+                riichi_model_path=riichi_model_path
+            )
+            if wind == EAST:
+                players = [sl_agent, RandomAgent(), RandomAgent()]
+            elif wind == SOUTH:
+                players = [RandomAgent(), sl_agent, RandomAgent()]
+            elif wind == WEST:
+                players = [RandomAgent(), RandomAgent(), sl_agent]
+            round_scores = simulate(players, seed=i)
+            fwrite.write(str(i) + ' '
+                         + str(round_scores[0]) + ' '
+                         + str(round_scores[1]) + ' '
+                         + str(round_scores[2]) + ' \n')
+
+    # # Random agents
+    # with open('test.txt', 'w') as fwrite:
+    #     with tqdm(desc='Simulating', total=5000) as pbar:
+    #         for i in range(5000):
+    #             players = [RandomAgent(), RandomAgent(), RandomAgent()]
+    #             round_scores = simulate(players, seed=i)
+    #             fwrite.write(str(i) + ' '
+    #                          + str(round_scores[0]) + ' '
+    #                          + str(round_scores[1]) + ' '
+    #                          + str(round_scores[2]) + ' \n')
+    #             pbar.update(1)
