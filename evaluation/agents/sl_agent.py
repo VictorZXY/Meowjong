@@ -45,8 +45,8 @@ class SLAgent(Agent):
             player3.kita,
             player3.discards
         ), axis=1).astype(tf.float32)
-        state = tf.stack(state)
-        return self.discard_model.predict(state)
+        state = tf.stack([state])
+        return tf.argmax(self.discard_model.predict(state)[0]).numpy()
 
     def eval_pon(self, target_tile, player1, player2, player3,
                  scores, round_number, honba_number, deposit_number,
@@ -77,8 +77,8 @@ class SLAgent(Agent):
             player3.kita,
             player3.discards
         ), axis=1).astype(tf.float32)
-        state = tf.stack(state)
-        return self.pon_model.predict(state)
+        state = tf.stack([state])
+        return self.pon_model.predict(state)[0][1]
 
     def eval_kan(self, target_tile, player1, player2, player3,
                  scores, round_number, honba_number, deposit_number,
@@ -109,8 +109,8 @@ class SLAgent(Agent):
             player3.kita,
             player3.discards
         ), axis=1).astype(tf.float32)
-        state = tf.stack(state)
-        return self.kan_model.predict(state)
+        state = tf.stack([state])
+        return self.kan_model.predict(state)[0][1]
 
     def eval_kita(self, target_tile, player1, player2, player3,
                   scores, round_number, honba_number, deposit_number,
@@ -141,8 +141,8 @@ class SLAgent(Agent):
             player3.kita,
             player3.discards
         ), axis=1).astype(tf.float32)
-        state = tf.stack(state)
-        return self.kita_model.predict(state)
+        state = tf.stack([state])
+        return self.kita_model.predict(state)[0][1]
 
     def eval_riichi(self, target_tile, player1, player2, player3,
                     scores, round_number, honba_number, deposit_number,
@@ -173,8 +173,8 @@ class SLAgent(Agent):
             player3.kita,
             player3.discards
         ), axis=1).astype(tf.float32)
-        state = tf.stack(state)
-        return self.riichi_model.predict(state)
+        state = tf.stack([state])
+        return self.riichi_model.predict(state)[0][1]
 
     def eval_kyuushu_kyuuhai(self, target_tile, player1, player2, player3,
                              scores, round_number, honba_number, deposit_number,
