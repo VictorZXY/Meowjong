@@ -344,13 +344,12 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                                 win_hand_config.deposit_counter = deposit_number
                                 win_hand_config.is_chankan = True
 
-                                if player_self.double_riichi_status:
+                                if player.double_riichi_status:
                                     win_hand_config.is_double_riichi = True
-                                elif player_self.riichi_status:
+                                elif player.riichi_status:
                                     win_hand_config.is_riichi = True
 
-                                if not player_self.pon_tiles \
-                                        and not player_self.open_kan:
+                                if not player.pon_tiles and not player.open_kan:
                                     win_hand_config.is_menzen = True
 
                     if not end_game:
@@ -393,13 +392,12 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                                 win_hand_config = hand_configs[i]
                                 win_hand_config.deposit_counter = deposit_number
 
-                                if player_self.double_riichi_status:
+                                if player.double_riichi_status:
                                     win_hand_config.is_double_riichi = True
-                                elif player_self.riichi_status:
+                                elif player.riichi_status:
                                     win_hand_config.is_riichi = True
 
-                                if not player_self.pon_tiles \
-                                        and not player_self.open_kan:
+                                if not player.pon_tiles and not player.open_kan:
                                     win_hand_config.is_menzen = True
 
                     if not end_game:
@@ -473,13 +471,12 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                     win_hand_config = hand_configs[i]
                     win_hand_config.deposit_counter = deposit_number
 
-                    if player_self.double_riichi_status:
+                    if player.double_riichi_status:
                         win_hand_config.is_double_riichi = True
-                    elif player_self.riichi_status:
+                    elif player.riichi_status:
                         win_hand_config.is_riichi = True
 
-                    if not player_self.pon_tiles \
-                            and not player_self.open_kan:
+                    if not player.pon_tiles and not player.open_kan:
                         win_hand_config.is_menzen = True
 
                     if len(wall) == 14:
@@ -524,13 +521,13 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
                                 win_hand_config.deposit_counter = deposit_number
                                 win_hand_config.is_chankan = True
 
-                                if player_self.double_riichi_status:
+                                if chankan_player.double_riichi_status:
                                     win_hand_config.is_double_riichi = True
-                                elif player_self.riichi_status:
+                                elif chankan_player.riichi_status:
                                     win_hand_config.is_riichi = True
 
-                                if not player_self.pon_tiles \
-                                        and not player_self.open_kan:
+                                if not chankan_player.pon_tiles \
+                                        and not chankan_player.open_kan:
                                     win_hand_config.is_menzen = True
 
                     if not end_game:

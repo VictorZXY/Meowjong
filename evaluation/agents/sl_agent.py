@@ -34,7 +34,7 @@ class SLAgent(Agent):
             Agent.encode_round_number(round_number),
             Agent.encode_honba_number(honba_number),
             Agent.encode_deposit_number(deposit_number),
-            self.wind,
+            Agent.encode_tile(self.wind),
             player1.melds,
             player1.kita,
             player1.discards,
@@ -44,8 +44,9 @@ class SLAgent(Agent):
             player3.melds,
             player3.kita,
             player3.discards
-        ), axis=1).astype(tf.float32)
-        state = tf.stack([state])
+        ), axis=1).astype(np.float32)
+        state = tf.stack(state)
+        state = tf.reshape(state, [1, 34, 366, 1])
         return tf.argmax(self.discard_model.predict(state)[0]).numpy()
 
     def eval_pon(self, target_tile, player1, player2, player3,
@@ -66,7 +67,7 @@ class SLAgent(Agent):
             Agent.encode_round_number(round_number),
             Agent.encode_honba_number(honba_number),
             Agent.encode_deposit_number(deposit_number),
-            self.wind,
+            Agent.encode_tile(self.wind),
             player1.melds,
             player1.kita,
             player1.discards,
@@ -76,8 +77,9 @@ class SLAgent(Agent):
             player3.melds,
             player3.kita,
             player3.discards
-        ), axis=1).astype(tf.float32)
-        state = tf.stack([state])
+        ), axis=1).astype(np.float32)
+        state = tf.stack(state)
+        state = tf.reshape(state, [1, 34, 366, 1])
         return self.pon_model.predict(state)[0][1]
 
     def eval_kan(self, target_tile, player1, player2, player3,
@@ -98,7 +100,7 @@ class SLAgent(Agent):
             Agent.encode_round_number(round_number),
             Agent.encode_honba_number(honba_number),
             Agent.encode_deposit_number(deposit_number),
-            self.wind,
+            Agent.encode_tile(self.wind),
             player1.melds,
             player1.kita,
             player1.discards,
@@ -108,8 +110,9 @@ class SLAgent(Agent):
             player3.melds,
             player3.kita,
             player3.discards
-        ), axis=1).astype(tf.float32)
-        state = tf.stack([state])
+        ), axis=1).astype(np.float32)
+        state = tf.stack(state)
+        state = tf.reshape(state, [1, 34, 366, 1])
         return self.kan_model.predict(state)[0][1]
 
     def eval_kita(self, target_tile, player1, player2, player3,
@@ -130,7 +133,7 @@ class SLAgent(Agent):
             Agent.encode_round_number(round_number),
             Agent.encode_honba_number(honba_number),
             Agent.encode_deposit_number(deposit_number),
-            self.wind,
+            Agent.encode_tile(self.wind),
             player1.melds,
             player1.kita,
             player1.discards,
@@ -140,8 +143,9 @@ class SLAgent(Agent):
             player3.melds,
             player3.kita,
             player3.discards
-        ), axis=1).astype(tf.float32)
-        state = tf.stack([state])
+        ), axis=1).astype(np.float32)
+        state = tf.stack(state)
+        state = tf.reshape(state, [1, 34, 366, 1])
         return self.kita_model.predict(state)[0][1]
 
     def eval_riichi(self, target_tile, player1, player2, player3,
@@ -162,7 +166,7 @@ class SLAgent(Agent):
             Agent.encode_round_number(round_number),
             Agent.encode_honba_number(honba_number),
             Agent.encode_deposit_number(deposit_number),
-            self.wind,
+            Agent.encode_tile(self.wind),
             player1.melds,
             player1.kita,
             player1.discards,
@@ -172,8 +176,9 @@ class SLAgent(Agent):
             player3.melds,
             player3.kita,
             player3.discards
-        ), axis=1).astype(tf.float32)
-        state = tf.stack([state])
+        ), axis=1).astype(np.float32)
+        state = tf.stack(state)
+        state = tf.reshape(state, [1, 34, 366, 1])
         return self.riichi_model.predict(state)[0][1]
 
     def eval_kyuushu_kyuuhai(self, target_tile, player1, player2, player3,
