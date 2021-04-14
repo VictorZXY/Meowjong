@@ -657,7 +657,7 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
 
 
 if __name__ == '__main__':
-    # Parse the args
+    # SL vs Random
     parser = argparse.ArgumentParser()
     parser.add_argument('--wind', action='store', type=int, required=True)
     parser.add_argument('--discard_model_path', action='store', type=str,
@@ -700,12 +700,13 @@ if __name__ == '__main__':
               + str(round_scores[1]) + ' '
               + str(round_scores[2]))
 
+        del sl_agent
         del players
         del round_scores
         gc.collect()
 
-    # # Random agents
-    # with open('test.txt', 'w') as fwrite:
+    # # Random vs Random
+    # with open('..\\results\\Random_vs_Random.txt', 'a') as fwrite:
     #     with tqdm(desc='Simulating', total=5000) as pbar:
     #         for i in range(5000):
     #             players = [RandomAgent(), RandomAgent(), RandomAgent()]
