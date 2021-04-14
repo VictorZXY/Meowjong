@@ -8,7 +8,9 @@ import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
 from data_processing.data_processing_constants import DISCARD_COUNTS, \
-    PON_COUNTS, KAN_COUNTS, KITA_COUNTS, RIICHI_COUNTS
+    PON_COUNTS, KAN_COUNTS, KITA_COUNTS, RIICHI_COUNTS, DISCARD_MEAN, \
+    DISCARD_STD, PON_MEAN, PON_STD, KAN_MEAN, KAN_STD, KITA_MEAN, KITA_STD, \
+    RIICHI_MEAN, RIICHI_STD
 
 assert tf.__version__ >= "2.0"
 
@@ -186,6 +188,63 @@ def prepare_dataset_tensors(dataset_path, action_type, year, scaled=False):
         joblib.dump(y_dev, fwrite)
 
 
+def prepare_testset_tensors(dataset_path, action_type, year):
+    image_folder = action_type + '_' + year
+    label_file = action_type + '_actions_' + year + '.csv'
+
+    # Only for the first time
+    validate_dataset(dataset_path, action_type, year)
+
+    image_files = tf.data.Dataset.list_files(os.path.join(
+        dataset_path, image_folder + '/*.png'))
+    labels = load_csv(dataset_path, label_file)
+
+    # Only for the first time
+    for i in range(len(labels)):
+        assert labels['image'][i] == action_type + '_' + year + '_' \
+               + str(i + 1) + '.png'
+    print(action_type + ' dataset OK')
+    print()
+
+    # Generate (state, action) (i.e. (image, label)) pairs
+    X = []
+    y = []
+
+    for file in image_files:
+        image, label = generate_state_action_pair(file, labels, action_type,
+                                                  year)
+        X.append(image)
+        y.append(label)
+
+    X_test = tf.stack(X)
+    y_test = tf.stack(y)
+    print(action_type + ' X_test.shape:', X_test.shape)
+    print(action_type + ' y_test.shape:', y_test.shape)
+    print()
+
+    if action_type == 'discard':
+        X_test_scaled = (X_test - DISCARD_MEAN) / DISCARD_STD
+    elif action_type == 'pon':
+        X_test_scaled = (X_test - PON_MEAN) / PON_STD
+    elif action_type == 'kan':
+        X_test_scaled = (X_test - KAN_MEAN) / KAN_STD
+    elif action_type == 'kita':
+        X_test_scaled = (X_test - KITA_MEAN) / KITA_STD
+    else:  # if action_type == 'riichi':
+        X_test_scaled = (X_test - RIICHI_MEAN) / RIICHI_STD
+
+    unscaled_filename = action_type + '_tensors_' + year + '.joblib'
+    scaled_filename = action_type + '_tensors_' + year + '_scaled.joblib'
+
+    with open(os.path.join(dataset_path, unscaled_filename), 'wb') as fwrite:
+        joblib.dump(X_test, fwrite)
+        joblib.dump(y_test, fwrite)
+
+    with open(os.path.join(dataset_path, scaled_filename), 'wb') as fwrite:
+        joblib.dump(X_test_scaled, fwrite)
+        joblib.dump(y_test, fwrite)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset_path', action='store', type=str,
@@ -204,6 +263,7 @@ if __name__ == '__main__':
     else:
         scaled = False
 
-    prepare_dataset_tensors(dataset_path, action_type, year, scaled)
+    # prepare_dataset_tensors(dataset_path, action_type, year, scaled)
+    prepare_testset_tensors(dataset_path, action_type, year)
 
     print('Success')
