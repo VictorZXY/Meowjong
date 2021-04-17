@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     dataset_path = args.dataset_path
-    models_path = args.model_path
+    model_path = args.model_path
 
     # Test whether there are GPUs available
     assert len(tf.config.experimental.list_physical_devices('GPU')) > 0
@@ -59,7 +59,7 @@ if __name__ == '__main__':
             keras.backend.clear_session()
 
             model_name = action + '_cnn_' + kernel_size[action] + scaled + '.h5'
-            model = keras.models.load_model(os.path.join(dataset_path,
+            model = keras.models.load_model(os.path.join(model_path,
                                                          model_name))
 
             # evaluation on test set
