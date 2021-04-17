@@ -93,7 +93,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     dataset_path = args.dataset_path
     logs_path = args.logs_path
-    model_path = args.
+    model_path = args.model_path
 
     # Test whether there are GPUs available
     assert len(tf.config.experimental.list_physical_devices('GPU')) > 0
