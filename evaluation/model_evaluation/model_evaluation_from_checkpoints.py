@@ -130,6 +130,10 @@ if __name__ == '__main__':
             model.load_weights(tf.train.latest_checkpoint(checkpoint_dir))
 
             # evaluation on test set
+            model.compile(
+                optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+                loss='sparse_categorical_crossentropy',
+                metrics=['accuracy'])
             eval_test = model.evaluate(X_test, y_test)
             print(action + scaled, 'test loss:', eval_test[0])
             print(action + scaled, 'test accuracy:', eval_test[1])
