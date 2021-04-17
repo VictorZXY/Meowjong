@@ -44,7 +44,7 @@ if __name__ == '__main__':
     for action in 'discard', 'pon', 'kan', 'kita', 'riichi':
         for scaled in '', '_scaled':
             print('=================================================================')
-            print(' ' + action + scaled + ' model evaluation')
+            print(action + scaled + ' model evaluation')
             print('=================================================================')
 
             dataset_name = action + '_tensors_2020' + scaled + '.joblib'
