@@ -52,7 +52,7 @@ if __name__ == '__main__':
             # Load dataset
             X_test, y_test = load_data(dataset_path, dataset_name)
             print(action + scaled, 'X_test shape:', X_test.shape)
-            print('y_test.shape:', y_test.shape)
+            print(action + scaled, 'y_test.shape:', y_test.shape)
             print()
 
             # load model
