@@ -24,6 +24,15 @@ if __name__ == '__main__':
     for i, img_name in enumerate(tile_image_names):
         tile_image = Image.open(
             os.path.join('tiles\\transparent', img_name + '.png'))
-        new_image = Image.alpha_composite(background, tile_image)
+
+        margin = (48, 64)
+        original_size = tile_image.size
+        new_size = (original_size[0] - 2 * margin[0],
+                    original_size[1] - 2 * margin[1])
+        tile_image = tile_image.resize(new_size, Image.ANTIALIAS)
+        new_tile_image = Image.new("RGBA", original_size)
+        new_tile_image.paste(tile_image, margin)
+
+        new_image = Image.alpha_composite(background, new_tile_image)
         # new_image.save(os.path.join('tiles\\overlay', img_name + '.png'))
         new_image.save(os.path.join('temp', image_names_encoded[i] + '.png'))
