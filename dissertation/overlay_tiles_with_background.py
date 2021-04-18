@@ -11,10 +11,19 @@ if __name__ == '__main__':
         'Man5-Dora', 'Pin5-Dora', 'Sou5-Dora'
     ]
 
+    image_names_encoded = [
+        '1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m',
+        '1p', '2p', '3p', '4p', '5p', '6p', '7p', '8p', '9p',
+        '1s', '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s',
+        'east', 'south', 'west', 'north', 'haku', 'hatsu', 'chun',
+        '5m-red', '5p-red', '5s-red'
+    ]
+
     background = Image.open('tiles\\transparent\\Front.png')
 
-    for img_name in tile_image_names:
+    for i, img_name in enumerate(tile_image_names):
         tile_image = Image.open(
             os.path.join('tiles\\transparent', img_name + '.png'))
         new_image = Image.alpha_composite(background, tile_image)
-        new_image.save(os.path.join('tiles\\overlay', img_name + '.png'))
+        # new_image.save(os.path.join('tiles\\overlay', img_name + '.png'))
+        new_image.save(os.path.join('temp', image_names_encoded[i] + '.png'))
