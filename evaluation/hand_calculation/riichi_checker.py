@@ -129,9 +129,12 @@ class RiichiChecker:
 
         prolog = Prolog()
         # prolog.consult('riichi_checker.pl')
-        prolog.consult('C:/Users/Victor/Desktop/To-Do List/_CST/Part II'
-                       + '/Part II Project/Source Code/meowjong'
-                       + '/evaluation/hand_calculation/riichi_checker.pl')
+        # prolog.consult('C:/Users/Victor/Desktop/To-Do List/_CST/Part II'
+        #                + '/Part II Project/Source Code/meowjong'
+        #                + '/evaluation/hand_calculation/riichi_checker.pl')
+        prolog.consult(
+            '/home/xz398/meowjong/evaluation/hand_calculation/riichi_checker.pl'
+        )
         for solution in prolog.query(
                 'combination_(' + str(indices) + ', Combination)'):
             combination = sorted(solution['Combination'])
