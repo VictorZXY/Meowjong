@@ -1,5 +1,6 @@
 import argparse
 import gc
+from multiprocessing import Pool
 
 import numpy as np
 from collections import deque
@@ -679,31 +680,30 @@ if __name__ == '__main__':
     kita_model_path = args.kita_model_path
     riichi_model_path = args.riichi_model_path
 
+    sl_agent = SLAgent(
+        wind=wind,
+        discard_model_path=discard_model_path,
+        pon_model_path=pon_model_path,
+        kan_model_path=kan_model_path,
+        kita_model_path=kita_model_path,
+        riichi_model_path=riichi_model_path
+    )
+
+    if wind == EAST:
+        players = [sl_agent, RandomAgent(), RandomAgent()]
+    elif wind == SOUTH:
+        players = [RandomAgent(), sl_agent, RandomAgent()]
+    elif wind == WEST:
+        players = [RandomAgent(), RandomAgent(), sl_agent]
+
     for i in range(1000):
-        sl_agent = SLAgent(
-            wind=wind,
-            discard_model_path=discard_model_path,
-            pon_model_path=pon_model_path,
-            kan_model_path=kan_model_path,
-            kita_model_path=kita_model_path,
-            riichi_model_path=riichi_model_path
-        )
-        if wind == EAST:
-            players = [sl_agent, RandomAgent(), RandomAgent()]
-        elif wind == SOUTH:
-            players = [RandomAgent(), sl_agent, RandomAgent()]
-        elif wind == WEST:
-            players = [RandomAgent(), RandomAgent(), sl_agent]
+        for index, player in enumerate(players):
+            player.reset(wind=EAST + index)
         round_scores = simulate(players, seed=i)
         print(str(i) + ' '
               + str(round_scores[0]) + ' '
               + str(round_scores[1]) + ' '
               + str(round_scores[2]))
-
-        del sl_agent
-        del players
-        del round_scores
-        gc.collect()
 
     # # Random vs Random
     # with open('..\\results\\Random_vs_Random.txt', 'a') as fwrite:

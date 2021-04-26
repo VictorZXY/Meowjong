@@ -40,6 +40,26 @@ class Agent(ABC):
         self.wind = wind
         self.score = score
 
+    def reset(self, wind=None, score=35000):
+        self.hand = np.zeros((34, TILES_SIZE))
+        self.red_dora = np.zeros((34, SELF_RED_DORA_SIZE))
+        self.melds = np.zeros((34, MELDS_SIZE))
+        self.kita = np.zeros((34, KITA_SIZE))
+        self.kita_count = 0
+        self.discards = np.zeros((34, DISCARDS_SIZE))
+        self.discard_index = 0
+        self.discard_tiles = []
+        self.meld_tiles = []
+        self.pon_tiles = []
+        self.open_kan = []
+        self.closed_kan = []
+        self.riichi_status = False
+        self.double_riichi_status = False
+        self.riichi_turn_number = 0
+        self.naki_status = False
+        self.wind = wind
+        self.score = score
+
     def set_wind(self, wind):
         self.wind = wind
 
@@ -404,6 +424,12 @@ class Agent(ABC):
                         melds=meld_objects,
                         hand_config=hand_config
                     )
+
+                    for han_detail in han_details:
+                        if han_detail['reason'] == Han.DORA \
+                                or han_detail['reason'] == Han.RED_DORA \
+                                or han_detail['reason'] == Han.NUKI_DORA:
+                            han -= han_detail['han']
 
                     if han > 0 or is_yakuman:
                         return True

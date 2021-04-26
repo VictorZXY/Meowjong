@@ -169,7 +169,8 @@ class Fu:
         if hand_config.is_tsumo and fu_details:
             fu_details.append({'fu': 2, 'reason': Fu.TSUMO})
 
-        is_open_hand = any([item.is_open for item in melds])
+        is_open_hand = any([item.type != Meld.KITA and item.is_open
+                            for item in melds])
 
         # 2 fu for open pinfu
         if is_open_hand and (not fu_details):
