@@ -397,7 +397,7 @@ class Agent(ABC):
             win_tile=target_tile,
             melds=meld_objects
         )
-        hand_config = HandConfig()
+        hand_config = HandConfig(seat_wind=self.wind)
 
         # Kokushi Musou
         if isinstance(hand_options[0], int):
