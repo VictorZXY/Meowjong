@@ -30,11 +30,12 @@ class North(Yaku):
                     if item[seat_wind] == 3 or item[seat_wind] == 4]) == 1 \
                     and seat_wind == NORTH:
                 return True
-        elif len(hand) == 5 and prevalent_wind is not None:
+
+        if len(hand) == 5 and prevalent_wind is not None:
             if len([item for item in hand
                     if item[prevalent_wind] == 3
                        or item[prevalent_wind] == 4]) == 1 \
                     and prevalent_wind == NORTH:
                 return True
-        else:
-            return False
+
+        return False
