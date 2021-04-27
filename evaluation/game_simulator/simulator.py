@@ -671,6 +671,7 @@ if __name__ == '__main__':
                         required=True)
     parser.add_argument('--riichi_model_path', action='store', type=str,
                         required=True)
+    parser.add_argument('--batch', action='store', type=int, required=True)
 
     args = parser.parse_args()
     wind = args.wind
@@ -679,6 +680,7 @@ if __name__ == '__main__':
     kan_model_path = args.kan_model_path
     kita_model_path = args.kita_model_path
     riichi_model_path = args.riichi_model_path
+    batch = args.batch
 
     sl_agent = SLAgent(
         wind=wind,
@@ -696,7 +698,7 @@ if __name__ == '__main__':
     elif wind == WEST:
         players = [RandomAgent(), RandomAgent(), sl_agent]
 
-    for i in range(1000):
+    for i in range((batch - 1) * 1000, batch * 1000):
         for index, player in enumerate(players):
             player.reset(wind=EAST + index)
         round_scores = simulate(players, seed=i)
