@@ -7,14 +7,25 @@ from evaluation.hand_calculation.tile_constants import YAOCHUUHAI, EAST
 
 
 class SLAgent(Agent):
-    def __init__(self, wind, discard_model_path, pon_model_path, kan_model_path,
-                 kita_model_path, riichi_model_path):
+    def __init__(self, wind, discard_model_path='', pon_model_path='',
+                 kan_model_path='', kita_model_path='', riichi_model_path='',
+                 discard_model=None, pon_model=None, kan_model=None,
+                 kita_model=None, riichi_model=None):
         super().__init__(wind=wind)
-        self.discard_model = keras.models.load_model(discard_model_path)
-        self.pon_model = keras.models.load_model(pon_model_path)
-        self.kan_model = keras.models.load_model(kan_model_path)
-        self.kita_model = keras.models.load_model(kita_model_path)
-        self.riichi_model = keras.models.load_model(riichi_model_path)
+        if discard_model is not None and discard_model_path == '':
+            self.discard_model = discard_model
+            self.pon_model = pon_model
+            self.kan_model = kan_model
+            self.kita_model = kita_model
+            self.riichi_model = riichi_model
+        elif discard_model_path != '' and discard_model is None:
+            self.discard_model = keras.models.load_model(discard_model_path)
+            self.pon_model = keras.models.load_model(pon_model_path)
+            self.kan_model = keras.models.load_model(kan_model_path)
+            self.kita_model = keras.models.load_model(kita_model_path)
+            self.riichi_model = keras.models.load_model(riichi_model_path)
+        else:
+            raise ValueError
 
     def eval_discard(self, target_tile, player1, player2, player3,
                      scores, round_number, honba_number, deposit_number,
