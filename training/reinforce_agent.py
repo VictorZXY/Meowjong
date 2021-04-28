@@ -372,6 +372,7 @@ if __name__ == '__main__':
         all_discounted_returns = [*discounted_returns_east,
                                   *discounted_returns_south,
                                   *discounted_returns_west]
+        print(all_discounted_returns)
 
         REINFORCE_agent_east.train_discard_model(
             all_states=all_states,
