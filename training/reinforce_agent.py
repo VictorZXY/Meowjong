@@ -264,8 +264,7 @@ class REINFORCEAgent(Agent):
         for t in reversed(range(len(discounted_returns) - 1)):
             discounted_returns[t] = self.discount_factor \
                                     * discounted_returns[t + 1]
-        return (discounted_returns - np.mean(discounted_returns)) \
-               / np.std(discounted_returns)
+        return discounted_returns
 
     def train_discard_model(self, all_states, all_actions,
                             all_discounted_returns):
@@ -334,45 +333,36 @@ if __name__ == '__main__':
         riichi_model=riichi_model
     )
 
-    players = [REINFORCE_agent_east,
-               REINFORCE_agent_south,
-               REINFORCE_agent_west]
+    agents = [REINFORCE_agent_east,
+              REINFORCE_agent_south,
+              REINFORCE_agent_west]
 
     episodes = 5
 
     i = 0
     seed = 0
     while i < episodes:
-        for index, player in enumerate(players):
-            player.reset(wind=EAST + index)
+        for index, REINFORCE_agent in enumerate(agents):
+            REINFORCE_agent.reset(wind=EAST + index)
 
-        round_scores = simulate(players, seed=seed)
+        round_scores = simulate(agents, seed=seed)
 
         seed += 1
         if round_scores[0] == round_scores[1] == round_scores[2] == 0:
             continue
 
-        print(str(i) + ' '
-              + str(round_scores[0]) + ' '
-              + str(round_scores[1]) + ' '
-              + str(round_scores[2]))
+        all_states = []
+        all_actions = []
+        all_discounted_returns = []
+        for i, REINFORCE_agent in enumerate(agents):
+            if round_scores[i] != 0:
+                all_states.extend(REINFORCE_agent.states)
+                all_actions.extend(REINFORCE_agent.actions)
+                all_discounted_returns.extend(
+                    REINFORCE_agent.discount_rewards(round_scores[i]))
 
-        all_states = [*REINFORCE_agent_east.states,
-                      *REINFORCE_agent_south.states,
-                      *REINFORCE_agent_west.states]
-        all_actions = [*REINFORCE_agent_east.actions,
-                       *REINFORCE_agent_south.actions,
-                       *REINFORCE_agent_west.actions]
-        discounted_returns_east = REINFORCE_agent_east.discount_rewards(
-            round_scores[0])
-        discounted_returns_south = REINFORCE_agent_east.discount_rewards(
-            round_scores[1])
-        discounted_returns_west = REINFORCE_agent_east.discount_rewards(
-            round_scores[2])
-        all_discounted_returns = [*discounted_returns_east,
-                                  *discounted_returns_south,
-                                  *discounted_returns_west]
-        print(all_discounted_returns)
+        all_discounted_returns -= np.mean(all_discounted_returns)
+        all_discounted_returns /= np.std(all_discounted_returns)
 
         REINFORCE_agent_east.train_discard_model(
             all_states=all_states,
@@ -384,4 +374,5 @@ if __name__ == '__main__':
         REINFORCE_agent_west.update_discard_model(
             REINFORCE_agent_east.discard_model)
 
+        print(i, round_scores[0], round_scores[1], round_scores[2])
         i += 1
