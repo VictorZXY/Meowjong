@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import numpy as np
 import tensorflow as tf
@@ -292,6 +293,8 @@ if __name__ == '__main__':
                         required=True)
     parser.add_argument('--riichi_model_path', action='store', type=str,
                         required=True)
+    parser.add_argument('--reinforce_models_dir', action='store', type=str,
+                        required=True)
 
     args = parser.parse_args()
     discard_model_path = args.discard_model_path
@@ -299,6 +302,7 @@ if __name__ == '__main__':
     kan_model_path = args.kan_model_path
     kita_model_path = args.kita_model_path
     riichi_model_path = args.riichi_model_path
+    reinforce_models_dir = args.reinforce_models_dir
 
     discard_model = keras.models.load_model(discard_model_path, compile=False)
     pon_model = keras.models.load_model(pon_model_path)
@@ -337,7 +341,7 @@ if __name__ == '__main__':
               REINFORCE_agent_south,
               REINFORCE_agent_west]
 
-    episodes = 5
+    episodes = 10
 
     i = 0
     seed = 0
@@ -374,5 +378,7 @@ if __name__ == '__main__':
         REINFORCE_agent_west.update_discard_model(
             REINFORCE_agent_east.discard_model)
 
+        REINFORCE_agent_east.discard_model.save(
+            os.path.join(reinforce_models_dir, str(i) + '.h5'))
         print(i, round_scores[0], round_scores[1], round_scores[2])
         i += 1
