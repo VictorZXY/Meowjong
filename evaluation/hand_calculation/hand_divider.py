@@ -167,12 +167,20 @@ class HandDivider:
         combinations = []
 
         prolog = Prolog()
+
+        # # Relative path
         # prolog.consult('hand_divider.pl')
+
+        # # Personal laptop full path
         # prolog.consult('C:/Users/Victor/Desktop/To-Do List/_CST/Part II'
         #                + '/Part II Project/Source Code/meowjong'
         #                + '/evaluation/hand_calculation/hand_divider.pl')
+
+        # CSD3 full path
         prolog.consult(
-            '/home/xz398/meowjong/evaluation/hand_calculation/hand_divider.pl')
+            '/home/xz398/meowjong/evaluation/hand_calculation/hand_divider.pl'
+        )
+
         for solution in prolog.query(
                 'mentsu_combination(' + str(indices) + ', Combination)'):
             combination = sorted(solution['Combination'])
