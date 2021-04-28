@@ -7,6 +7,7 @@ from collections import deque
 
 from typing import List
 
+from tensorflow import keras
 from tqdm import tqdm
 
 from data_processing.data_processing_constants import SCORES_SIZE, \
@@ -657,23 +658,20 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
     ]
 
 
-if __name__ == '__main__':
-    # SL vs Random
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--wind', action='store', type=int, required=True)
-    parser.add_argument('--discard_model_path', action='store', type=str,
-                        required=True)
-    parser.add_argument('--pon_model_path', action='store', type=str,
-                        required=True)
-    parser.add_argument('--kan_model_path', action='store', type=str,
-                        required=True)
-    parser.add_argument('--kita_model_path', action='store', type=str,
-                        required=True)
-    parser.add_argument('--riichi_model_path', action='store', type=str,
-                        required=True)
-    parser.add_argument('--batch', action='store', type=int, required=True)
+def random_vs_random():
+    with open('..\\results\\Random_vs_Random.txt', 'a') as fwrite:
+        with tqdm(desc='Simulating', total=5000) as pbar:
+            for i in range(5000):
+                players = [RandomAgent(), RandomAgent(), RandomAgent()]
+                round_scores = simulate(players, seed=i)
+                fwrite.write(str(i) + ' '
+                             + str(round_scores[0]) + ' '
+                             + str(round_scores[1]) + ' '
+                             + str(round_scores[2]) + ' \n')
+                pbar.update(1)
 
-    args = parser.parse_args()
+
+def sl_vs_random(args):
     wind = args.wind
     discard_model_path = args.discard_model_path
     pon_model_path = args.pon_model_path
@@ -707,14 +705,81 @@ if __name__ == '__main__':
               + str(round_scores[1]) + ' '
               + str(round_scores[2]))
 
+
+def sl_vs_sl(args):
+    discard_model_path = args.discard_model_path
+    pon_model_path = args.pon_model_path
+    kan_model_path = args.kan_model_path
+    kita_model_path = args.kita_model_path
+    riichi_model_path = args.riichi_model_path
+    batch = args.batch
+
+    discard_model = keras.models.load_model(discard_model_path)
+    pon_model = keras.models.load_model(pon_model_path)
+    kan_model = keras.models.load_model(kan_model_path)
+    kita_model = keras.models.load_model(kita_model_path)
+    riichi_model = keras.models.load_model(riichi_model_path)
+
+    sl_agent_east = SLAgent(
+        wind=EAST,
+        discard_model=discard_model,
+        pon_model=pon_model,
+        kan_model=kan_model,
+        kita_model=kita_model,
+        riichi_model=riichi_model
+    )
+
+    sl_agent_south = SLAgent(
+        wind=SOUTH,
+        discard_model=discard_model,
+        pon_model=pon_model,
+        kan_model=kan_model,
+        kita_model=kita_model,
+        riichi_model=riichi_model
+    )
+
+    sl_agent_west = SLAgent(
+        wind=WEST,
+        discard_model=discard_model,
+        pon_model=pon_model,
+        kan_model=kan_model,
+        kita_model=kita_model,
+        riichi_model=riichi_model
+    )
+
+    players = [sl_agent_east, sl_agent_south, sl_agent_west]
+
+    for i in range((batch - 1) * 1000, batch * 1000):
+        for index, player in enumerate(players):
+            player.reset(wind=EAST + index)
+        round_scores = simulate(players, seed=i)
+        print(str(i) + ' '
+              + str(round_scores[0]) + ' '
+              + str(round_scores[1]) + ' '
+              + str(round_scores[2]))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--wind', action='store', type=int, required=True)
+    parser.add_argument('--discard_model_path', action='store', type=str,
+                        required=True)
+    parser.add_argument('--pon_model_path', action='store', type=str,
+                        required=True)
+    parser.add_argument('--kan_model_path', action='store', type=str,
+                        required=True)
+    parser.add_argument('--kita_model_path', action='store', type=str,
+                        required=True)
+    parser.add_argument('--riichi_model_path', action='store', type=str,
+                        required=True)
+    parser.add_argument('--batch', action='store', type=int, required=True)
+    args = parser.parse_args()
+
     # # Random vs Random
-    # with open('..\\results\\Random_vs_Random.txt', 'a') as fwrite:
-    #     with tqdm(desc='Simulating', total=5000) as pbar:
-    #         for i in range(5000):
-    #             players = [RandomAgent(), RandomAgent(), RandomAgent()]
-    #             round_scores = simulate(players, seed=i)
-    #             fwrite.write(str(i) + ' '
-    #                          + str(round_scores[0]) + ' '
-    #                          + str(round_scores[1]) + ' '
-    #                          + str(round_scores[2]) + ' \n')
-    #             pbar.update(1)
+    # random_vs_random()
+    #
+    # # SL vs Random
+    # sl_vs_random(args)
+
+    # SL vs SL
+    sl_vs_sl(args)
