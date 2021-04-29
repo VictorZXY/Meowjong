@@ -1,5 +1,6 @@
 import argparse
 import os
+import traceback
 
 import numpy as np
 import tensorflow as tf
@@ -100,6 +101,8 @@ class REINFORCEAgent(Agent):
         # Using the output of the policy network, pick action stochastically
         policy = self.discard_model.predict(state).flatten()
         action = np.random.choice(TILES_COUNT, p=policy)
+        while self.hand[action, 0] == 0:
+            action = np.random.choice(TILES_COUNT, p=policy)
 
         # Save the state and action
         self.states.append(state[0])
@@ -346,45 +349,48 @@ if __name__ == '__main__':
     eps = 0
     seed = 0
     while eps < episodes:
-        for index, REINFORCE_agent in enumerate(agents):
-            REINFORCE_agent.reset(wind=EAST + index)
+        try:
+            for index, REINFORCE_agent in enumerate(agents):
+                REINFORCE_agent.reset(wind=EAST + index)
 
-        round_scores = simulate(agents, seed=seed)
+            round_scores = simulate(agents, seed=seed)
 
-        seed += 1
-        if round_scores[0] == round_scores[1] == round_scores[2] == 0:
-            continue
+            seed += 1
+            if round_scores[0] == round_scores[1] == round_scores[2] == 0:
+                continue
 
-        print(seed)
+            all_states = []
+            all_actions = []
+            all_discounted_returns = []
+            for i, REINFORCE_agent in enumerate(agents):
+                if round_scores[i] != 0:
+                    all_states.extend(REINFORCE_agent.states)
+                    all_actions.extend(REINFORCE_agent.actions)
+                    all_discounted_returns.extend(
+                        REINFORCE_agent.discount_rewards(round_scores[i]))
 
-        all_states = []
-        all_actions = []
-        all_discounted_returns = []
-        for i, REINFORCE_agent in enumerate(agents):
-            if round_scores[i] != 0:
-                all_states.extend(REINFORCE_agent.states)
-                all_actions.extend(REINFORCE_agent.actions)
-                all_discounted_returns.extend(
-                    REINFORCE_agent.discount_rewards(round_scores[i]))
+            all_discounted_returns -= np.mean(all_discounted_returns)
+            all_discounted_returns /= np.std(all_discounted_returns)
 
-        all_discounted_returns -= np.mean(all_discounted_returns)
-        all_discounted_returns /= np.std(all_discounted_returns)
+            REINFORCE_agent_east.train_discard_model(
+                all_states=all_states,
+                all_actions=all_actions,
+                all_discounted_returns=all_discounted_returns
+            )
+            REINFORCE_agent_south.update_discard_model(
+                REINFORCE_agent_east.discard_model)
+            REINFORCE_agent_west.update_discard_model(
+                REINFORCE_agent_east.discard_model)
 
-        REINFORCE_agent_east.train_discard_model(
-            all_states=all_states,
-            all_actions=all_actions,
-            all_discounted_returns=all_discounted_returns
-        )
-        REINFORCE_agent_south.update_discard_model(
-            REINFORCE_agent_east.discard_model)
-        REINFORCE_agent_west.update_discard_model(
-            REINFORCE_agent_east.discard_model)
-
-        print(eps, seed, round_scores[0], round_scores[1], round_scores[2])
-        eps += 1
-        if eps > 0 and eps % 20 == 0:
-            REINFORCE_agent_east.discard_model.save(
-                os.path.join(reinforce_models_dir, str(eps) + '.h5'))
+            print(eps, seed, round_scores[0], round_scores[1], round_scores[2])
+            eps += 1
+            if eps > 0 and eps % 20 == 0:
+                REINFORCE_agent_east.discard_model.save(
+                    os.path.join(reinforce_models_dir, str(eps) + '.h5'))
+        except:
+            print('In seed = ' + str(seed) + ':')
+            print(traceback.format_exc())
+            seed += 1
 
     REINFORCE_agent_east.discard_model.save(
         os.path.join(reinforce_models_dir, 'discard_rl.h5'))
