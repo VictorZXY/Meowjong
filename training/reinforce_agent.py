@@ -378,8 +378,11 @@ if __name__ == '__main__':
         REINFORCE_agent_west.update_discard_model(
             REINFORCE_agent_east.discard_model)
 
-        if eps > 0 and eps % 10 == 0:
-            REINFORCE_agent_east.discard_model.save(
-                os.path.join(reinforce_models_dir, str(eps) + '.h5'))
         print(eps, round_scores[0], round_scores[1], round_scores[2])
         eps += 1
+        if eps > 0 and eps % 20 == 0:
+            REINFORCE_agent_east.discard_model.save(
+                os.path.join(reinforce_models_dir, str(eps) + '.h5'))
+
+    REINFORCE_agent_east.discard_model.save(
+        os.path.join(reinforce_models_dir, 'discard_rl.h5'))
