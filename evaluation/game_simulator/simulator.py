@@ -16,6 +16,7 @@ from data_processing.data_processing_constants import SCORES_SIZE, \
 from evaluation.agents.agent import Agent
 from evaluation.agents.random_agent import RandomAgent
 from evaluation.agents.sl_agent import SLAgent
+from evaluation.agents.sl_scaled_agent import SLScaledAgent
 from evaluation.hand_calculation.hand_config import HandConfig
 from evaluation.hand_calculation.tile_constants import TILES_COUNT, TWO_MAN, \
     FIVE_MAN, NINE_MAN, FIVE_PIN, FIVE_SOU, EAST, SOUTH, WEST, NORTH, \
@@ -706,6 +707,41 @@ def sl_vs_random(args):
               + str(round_scores[2]))
 
 
+def sl_scaled_vs_random(args):
+    wind = args.wind
+    discard_model_path = args.discard_model_path
+    pon_model_path = args.pon_model_path
+    kan_model_path = args.kan_model_path
+    kita_model_path = args.kita_model_path
+    riichi_model_path = args.riichi_model_path
+    batch = args.batch
+
+    sl_scaled_agent = SLScaledAgent(
+        wind=wind,
+        discard_model_path=discard_model_path,
+        pon_model_path=pon_model_path,
+        kan_model_path=kan_model_path,
+        kita_model_path=kita_model_path,
+        riichi_model_path=riichi_model_path
+    )
+
+    if wind == EAST:
+        players = [sl_scaled_agent, RandomAgent(), RandomAgent()]
+    elif wind == SOUTH:
+        players = [RandomAgent(), sl_scaled_agent, RandomAgent()]
+    elif wind == WEST:
+        players = [RandomAgent(), RandomAgent(), sl_scaled_agent]
+
+    for i in range((batch - 1) * 1000, batch * 1000):
+        for index, player in enumerate(players):
+            player.reset(wind=EAST + index)
+        round_scores = simulate(players, seed=i)
+        print(str(i) + ' '
+              + str(round_scores[0]) + ' '
+              + str(round_scores[1]) + ' '
+              + str(round_scores[2]))
+
+
 def sl_vs_sl(args):
     discard_model_path = args.discard_model_path
     pon_model_path = args.pon_model_path
@@ -761,18 +797,18 @@ def sl_vs_sl(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--wind', action='store', type=int, required=True)
+    parser.add_argument('--wind', action='store', type=int, required=False)
     parser.add_argument('--discard_model_path', action='store', type=str,
-                        required=True)
+                        required=False)
     parser.add_argument('--pon_model_path', action='store', type=str,
-                        required=True)
+                        required=False)
     parser.add_argument('--kan_model_path', action='store', type=str,
-                        required=True)
+                        required=False)
     parser.add_argument('--kita_model_path', action='store', type=str,
-                        required=True)
+                        required=False)
     parser.add_argument('--riichi_model_path', action='store', type=str,
-                        required=True)
-    parser.add_argument('--batch', action='store', type=int, required=True)
+                        required=False)
+    parser.add_argument('--batch', action='store', type=int, required=False)
     args = parser.parse_args()
 
     # # Random vs Random
@@ -781,5 +817,8 @@ if __name__ == '__main__':
     # # SL vs Random
     # sl_vs_random(args)
 
-    # SL vs SL
-    sl_vs_sl(args)
+    # SL (scaled) vs Random
+    sl_scaled_vs_random(args)
+
+    # # SL vs SL
+    # sl_vs_sl(args)
