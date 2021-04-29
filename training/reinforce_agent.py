@@ -341,11 +341,11 @@ if __name__ == '__main__':
               REINFORCE_agent_south,
               REINFORCE_agent_west]
 
-    episodes = 10
+    episodes = 1000
 
-    i = 0
+    eps = 0
     seed = 0
-    while i < episodes:
+    while eps < episodes:
         for index, REINFORCE_agent in enumerate(agents):
             REINFORCE_agent.reset(wind=EAST + index)
 
@@ -378,7 +378,8 @@ if __name__ == '__main__':
         REINFORCE_agent_west.update_discard_model(
             REINFORCE_agent_east.discard_model)
 
-        REINFORCE_agent_east.discard_model.save(
-            os.path.join(reinforce_models_dir, str(i) + '.h5'))
-        print(i, round_scores[0], round_scores[1], round_scores[2])
-        i += 1
+        if eps > 0 and eps % 10 == 0:
+            REINFORCE_agent_east.discard_model.save(
+                os.path.join(reinforce_models_dir, str(eps) + '.h5'))
+        print(eps, round_scores[0], round_scores[1], round_scores[2])
+        eps += 1
