@@ -355,6 +355,8 @@ if __name__ == '__main__':
         if round_scores[0] == round_scores[1] == round_scores[2] == 0:
             continue
 
+        print(seed)
+
         all_states = []
         all_actions = []
         all_discounted_returns = []
@@ -378,7 +380,7 @@ if __name__ == '__main__':
         REINFORCE_agent_west.update_discard_model(
             REINFORCE_agent_east.discard_model)
 
-        print(eps, round_scores[0], round_scores[1], round_scores[2])
+        print(eps, seed, round_scores[0], round_scores[1], round_scores[2])
         eps += 1
         if eps > 0 and eps % 20 == 0:
             REINFORCE_agent_east.discard_model.save(
