@@ -100,9 +100,15 @@ class REINFORCEAgent(Agent):
 
         # Using the output of the policy network, pick action stochastically
         policy = self.discard_model.predict(state).flatten()
+
+        # Remove illegal discards
+        available_discards = self.hand[:, 0]
+        available_discards[target_tile] = 1
+        policy *= available_discards
+        policy /= np.sum(policy)
+
+        # Choose an action under the policy
         action = np.random.choice(TILES_COUNT, p=policy)
-        while self.hand[action, 0] == 0:
-            action = np.random.choice(TILES_COUNT, p=policy)
 
         # Save the state and action
         self.states.append(state[0])
