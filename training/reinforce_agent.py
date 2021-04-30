@@ -1,6 +1,6 @@
 import argparse
 import os
-import traceback
+from copy import deepcopy
 
 import numpy as np
 import tensorflow as tf
@@ -9,7 +9,8 @@ from tensorflow import keras
 from evaluation.agents.agent import Agent
 from evaluation.game_simulator.simulator import simulate
 from evaluation.hand_calculation.tile_constants import YAOCHUUHAI, EAST, SOUTH, \
-    WEST, TILES_COUNT
+    WEST, TILES_COUNT, FIVE_MAN, FIVE_PIN, FIVE_SOU, RED_FIVE_MAN, RED_FIVE_PIN, \
+    RED_FIVE_SOU
 
 assert tf.__version__ >= "2.0"
 
@@ -102,9 +103,16 @@ class REINFORCEAgent(Agent):
         policy = self.discard_model.predict(state).flatten()
 
         # Remove illegal discards
-        available_discards = self.hand[:, 0]
-        available_discards[target_tile] = 1
-        policy *= available_discards
+        legal_discards = deepcopy(self.hand[:, 0])
+        if target_tile == RED_FIVE_MAN:
+            legal_discards[FIVE_MAN] = 1
+        elif target_tile == RED_FIVE_PIN:
+            legal_discards[FIVE_PIN] = 1
+        elif target_tile == RED_FIVE_SOU:
+            legal_discards[FIVE_SOU] = 1
+        else:
+            legal_discards[target_tile] = 1
+        policy *= legal_discards
         policy /= np.sum(policy)
 
         # Choose an action under the policy
@@ -393,10 +401,9 @@ if __name__ == '__main__':
             if eps > 0 and eps % 20 == 0:
                 REINFORCE_agent_east.discard_model.save(
                     os.path.join(reinforce_models_dir, str(eps) + '.h5'))
-        except:
+        except Exception as e:
             print('In seed = ' + str(seed) + ':')
-            print(traceback.format_exc())
-            seed += 1
+            raise e
 
     REINFORCE_agent_east.discard_model.save(
         os.path.join(reinforce_models_dir, 'discard_rl.h5'))
