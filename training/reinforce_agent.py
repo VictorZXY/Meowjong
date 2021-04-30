@@ -358,7 +358,7 @@ if __name__ == '__main__':
               REINFORCE_agent_south,
               REINFORCE_agent_west]
 
-    episodes = 1000
+    episodes = 10
 
     eps = 0
     seed = 0
