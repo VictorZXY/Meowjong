@@ -358,7 +358,7 @@ if __name__ == '__main__':
               REINFORCE_agent_south,
               REINFORCE_agent_west]
 
-    episodes = 10
+    episodes = 500
 
     eps = 0
     seed = 0
@@ -398,7 +398,7 @@ if __name__ == '__main__':
 
             print(eps, seed, round_scores[0], round_scores[1], round_scores[2])
             eps += 1
-            if eps > 0 and eps % 20 == 0:
+            if eps > 0 and eps % 10 == 0:
                 REINFORCE_agent_east.discard_model.save(
                     os.path.join(reinforce_models_dir, str(eps) + '.h5'))
         except Exception as e:
