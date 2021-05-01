@@ -347,13 +347,17 @@ if __name__ == '__main__':
     seed = 0
     while eps < episodes:
         try:
+            if seed == 341:
+                seed += 1
+                continue
+
             for index, REINFORCE_agent in enumerate(agents):
                 REINFORCE_agent.reset(wind=EAST + index)
 
             round_scores = simulate(agents, seed=seed)
 
-            seed += 1
             if round_scores[0] == round_scores[1] == round_scores[2] == 0:
+                seed += 1
                 continue
 
             all_states = []
@@ -380,6 +384,7 @@ if __name__ == '__main__':
                 REINFORCE_agent_east.discard_model)
 
             print(eps, seed, round_scores[0], round_scores[1], round_scores[2])
+            seed += 1
             eps += 1
             if eps > 0 and eps % 10 == 0:
                 REINFORCE_agent_east.discard_model.save(
