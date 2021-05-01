@@ -341,13 +341,13 @@ if __name__ == '__main__':
               REINFORCE_agent_south,
               REINFORCE_agent_west]
 
-    episodes = 500
+    episodes = 400
 
     eps = 0
     seed = 0
     while eps < episodes:
         try:
-            if seed == 341 or seed == 484 or seed == 635:
+            if seed == 341 or seed == 484 or seed == 635 or seed == 664:
                 seed += 1
                 continue
 
