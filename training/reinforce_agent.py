@@ -347,7 +347,7 @@ if __name__ == '__main__':
     seed = 0
     while eps < episodes:
         try:
-            if seed == 341:
+            if seed == 341 or seed == 484:
                 seed += 1
                 continue
 
