@@ -1,6 +1,5 @@
 import argparse
 import os
-from copy import deepcopy
 
 import numpy as np
 import tensorflow as tf
@@ -9,8 +8,7 @@ from tensorflow import keras
 from evaluation.agents.agent import Agent
 from evaluation.game_simulator.simulator import simulate
 from evaluation.hand_calculation.tile_constants import YAOCHUUHAI, EAST, SOUTH, \
-    WEST, TILES_COUNT, FIVE_MAN, FIVE_PIN, FIVE_SOU, RED_FIVE_MAN, RED_FIVE_PIN, \
-    RED_FIVE_SOU
+    WEST, TILES_COUNT
 
 assert tf.__version__ >= "2.0"
 
@@ -101,21 +99,6 @@ class REINFORCEAgent(Agent):
 
         # Using the output of the policy network, pick action stochastically
         policy = self.discard_model.predict(state).flatten()
-
-        # Remove illegal discards
-        legal_discards = deepcopy(self.hand[:, 0])
-        if target_tile == RED_FIVE_MAN:
-            legal_discards[FIVE_MAN] = 1
-        elif target_tile == RED_FIVE_PIN:
-            legal_discards[FIVE_PIN] = 1
-        elif target_tile == RED_FIVE_SOU:
-            legal_discards[FIVE_SOU] = 1
-        else:
-            legal_discards[target_tile] = 1
-        policy *= legal_discards
-        policy /= np.sum(policy)
-
-        # Choose an action under the policy
         action = np.random.choice(TILES_COUNT, p=policy)
 
         # Save the state and action
@@ -358,7 +341,7 @@ if __name__ == '__main__':
               REINFORCE_agent_south,
               REINFORCE_agent_west]
 
-    episodes = 200
+    episodes = 500
 
     eps = 0
     seed = 0
