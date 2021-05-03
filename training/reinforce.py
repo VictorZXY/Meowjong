@@ -6,7 +6,7 @@ import tensorflow as tf
 from tensorflow import keras
 
 from evaluation.agents.agent import Agent
-from evaluation.game_simulator.simulator import simulate
+from evaluation.agent_evaluation.simulator import simulate
 from evaluation.hand_calculation.tile_constants import YAOCHUUHAI, EAST, SOUTH, \
     WEST, TILES_COUNT
 

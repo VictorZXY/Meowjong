@@ -1,23 +1,12 @@
-import argparse
-import gc
-from multiprocessing import Pool
-
-import numpy as np
 from collections import deque
-
 from typing import List
 
-from tensorflow import keras
-from tqdm import tqdm
+import numpy as np
 
 from data_processing.data_processing_constants import SCORES_SIZE, \
-    ONE_SCORE_SIZE, \
-    DORA_INDICATORS_SIZE
+    ONE_SCORE_SIZE, DORA_INDICATORS_SIZE
 from evaluation.agents.agent import Agent
 from evaluation.agents.random_agent import RandomAgent
-from evaluation.agents.rl_agent import RLAgent
-from evaluation.agents.sl_agent import SLAgent
-from evaluation.agents.sl_scaled_agent import SLScaledAgent
 from evaluation.hand_calculation.hand_config import HandConfig
 from evaluation.hand_calculation.tile_constants import TILES_COUNT, TWO_MAN, \
     FIVE_MAN, NINE_MAN, FIVE_PIN, FIVE_SOU, EAST, SOUTH, WEST, NORTH, \
@@ -26,7 +15,7 @@ from evaluation.hand_calculation.tile_constants import TILES_COUNT, TWO_MAN, \
 
 def encode_tile(tile):
     """
-    :param tenhou_encoded_tile: integer index of a tile
+    :param tile: integer index of a tile
     :return: (34, 1) np.array
     """
     output = np.zeros((34, 1))
@@ -658,211 +647,3 @@ def simulate(players: List[Agent], round_number=0, honba_number=0,
         round_scores[players[1]],
         round_scores[players[2]]
     ]
-
-
-def random_vs_random():
-    with open('..\\results\\Random_vs_Random.txt', 'a') as fwrite:
-        with tqdm(desc='Simulating', total=5000) as pbar:
-            for i in range(5000):
-                players = [RandomAgent(), RandomAgent(), RandomAgent()]
-                round_scores = simulate(players, seed=i)
-                fwrite.write(str(i) + ' '
-                             + str(round_scores[0]) + ' '
-                             + str(round_scores[1]) + ' '
-                             + str(round_scores[2]) + ' \n')
-                pbar.update(1)
-
-
-def sl_vs_random(args):
-    wind = args.wind
-    discard_model_path = args.discard_model_path
-    pon_model_path = args.pon_model_path
-    kan_model_path = args.kan_model_path
-    kita_model_path = args.kita_model_path
-    riichi_model_path = args.riichi_model_path
-    batch = args.batch
-
-    sl_agent = SLAgent(
-        wind=wind,
-        discard_model_path=discard_model_path,
-        pon_model_path=pon_model_path,
-        kan_model_path=kan_model_path,
-        kita_model_path=kita_model_path,
-        riichi_model_path=riichi_model_path
-    )
-
-    if wind == EAST:
-        players = [sl_agent, RandomAgent(), RandomAgent()]
-    elif wind == SOUTH:
-        players = [RandomAgent(), sl_agent, RandomAgent()]
-    elif wind == WEST:
-        players = [RandomAgent(), RandomAgent(), sl_agent]
-
-    for i in range((batch - 1) * 1000, batch * 1000):
-        for index, player in enumerate(players):
-            player.reset(wind=EAST + index)
-        round_scores = simulate(players, seed=i)
-        print(str(i) + ' '
-              + str(round_scores[0]) + ' '
-              + str(round_scores[1]) + ' '
-              + str(round_scores[2]))
-
-
-def sl_scaled_vs_random(args):
-    wind = args.wind
-    discard_model_path = args.discard_model_path
-    pon_model_path = args.pon_model_path
-    kan_model_path = args.kan_model_path
-    kita_model_path = args.kita_model_path
-    riichi_model_path = args.riichi_model_path
-    batch = args.batch
-
-    sl_scaled_agent = SLScaledAgent(
-        wind=wind,
-        discard_model_path=discard_model_path,
-        pon_model_path=pon_model_path,
-        kan_model_path=kan_model_path,
-        kita_model_path=kita_model_path,
-        riichi_model_path=riichi_model_path
-    )
-
-    if wind == EAST:
-        players = [sl_scaled_agent, RandomAgent(), RandomAgent()]
-    elif wind == SOUTH:
-        players = [RandomAgent(), sl_scaled_agent, RandomAgent()]
-    elif wind == WEST:
-        players = [RandomAgent(), RandomAgent(), sl_scaled_agent]
-
-    for i in range((batch - 1) * 1000, batch * 1000):
-        for index, player in enumerate(players):
-            player.reset(wind=EAST + index)
-        round_scores = simulate(players, seed=i)
-        print(str(i) + ' '
-              + str(round_scores[0]) + ' '
-              + str(round_scores[1]) + ' '
-              + str(round_scores[2]))
-
-
-def sl_vs_sl(args):
-    discard_model_path = args.discard_model_path
-    pon_model_path = args.pon_model_path
-    kan_model_path = args.kan_model_path
-    kita_model_path = args.kita_model_path
-    riichi_model_path = args.riichi_model_path
-    batch = args.batch
-
-    discard_model = keras.models.load_model(discard_model_path)
-    pon_model = keras.models.load_model(pon_model_path)
-    kan_model = keras.models.load_model(kan_model_path)
-    kita_model = keras.models.load_model(kita_model_path)
-    riichi_model = keras.models.load_model(riichi_model_path)
-
-    sl_agent_east = SLAgent(
-        wind=EAST,
-        discard_model=discard_model,
-        pon_model=pon_model,
-        kan_model=kan_model,
-        kita_model=kita_model,
-        riichi_model=riichi_model
-    )
-
-    sl_agent_south = SLAgent(
-        wind=SOUTH,
-        discard_model=discard_model,
-        pon_model=pon_model,
-        kan_model=kan_model,
-        kita_model=kita_model,
-        riichi_model=riichi_model
-    )
-
-    sl_agent_west = SLAgent(
-        wind=WEST,
-        discard_model=discard_model,
-        pon_model=pon_model,
-        kan_model=kan_model,
-        kita_model=kita_model,
-        riichi_model=riichi_model
-    )
-
-    players = [sl_agent_east, sl_agent_south, sl_agent_west]
-
-    for i in range((batch - 1) * 1000, batch * 1000):
-        for index, player in enumerate(players):
-            player.reset(wind=EAST + index)
-        round_scores = simulate(players, seed=i)
-        print(str(i) + ' '
-              + str(round_scores[0]) + ' '
-              + str(round_scores[1]) + ' '
-              + str(round_scores[2]))
-
-
-def rl_evaluation(args):
-    discard_model_path = args.discard_model_path
-    pon_model_path = args.pon_model_path
-    kan_model_path = args.kan_model_path
-    kita_model_path = args.kita_model_path
-    riichi_model_path = args.riichi_model_path
-
-    rl_agent = RLAgent(
-        wind=EAST,
-        discard_model_path=discard_model_path,
-        pon_model_path=pon_model_path,
-        kan_model_path=kan_model_path,
-        kita_model_path=kita_model_path,
-        riichi_model_path=riichi_model_path
-    )
-
-    for wind in EAST, SOUTH, WEST:
-        if wind == EAST:
-            print('wind = East:')
-            players = [rl_agent, RandomAgent(), RandomAgent()]
-        elif wind == SOUTH:
-            print('wind = South:')
-            players = [RandomAgent(), rl_agent, RandomAgent()]
-        else:  # if wind == WEST:
-            print('wind = West:')
-            players = [RandomAgent(), RandomAgent(), rl_agent]
-
-        for i in range(500):
-            try:
-                for index, player in enumerate(players):
-                    player.reset(wind=EAST + index)
-                round_scores = simulate(players, seed=i)
-                print(str(i) + ' '
-                      + str(round_scores[0]) + ' '
-                      + str(round_scores[1]) + ' '
-                      + str(round_scores[2]))
-            except:
-                print(i, 'ILLEGAL DISCARDS')
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--wind', action='store', type=int, required=False)
-    parser.add_argument('--discard_model_path', action='store', type=str,
-                        required=False)
-    parser.add_argument('--pon_model_path', action='store', type=str,
-                        required=False)
-    parser.add_argument('--kan_model_path', action='store', type=str,
-                        required=False)
-    parser.add_argument('--kita_model_path', action='store', type=str,
-                        required=False)
-    parser.add_argument('--riichi_model_path', action='store', type=str,
-                        required=False)
-    parser.add_argument('--batch', action='store', type=int, required=False)
-    args = parser.parse_args()
-
-    # # Random vs Random
-    # random_vs_random()
-    #
-    # # SL vs Random
-    # sl_vs_random(args)
-
-    # SL (scaled) vs Random
-    # sl_scaled_vs_random(args)
-
-    # # SL vs SL
-    # sl_vs_sl(args)
-
-    # REINFORCE evaluation
-    rl_evaluation(args)
