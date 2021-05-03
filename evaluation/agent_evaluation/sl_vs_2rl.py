@@ -66,13 +66,16 @@ def sl_vs_2rl(args):
         players = [rl_agent_1, rl_agent_2, sl_agent]
 
     for i in range((batch - 1) * 1000, batch * 1000):
-        for index, player in enumerate(players):
-            player.reset(wind=EAST + index)
-        round_scores = simulate(players, seed=i)
-        print(str(i) + ' '
-              + str(round_scores[0]) + ' '
-              + str(round_scores[1]) + ' '
-              + str(round_scores[2]))
+        try:
+            for index, player in enumerate(players):
+                player.reset(wind=EAST + index)
+            round_scores = simulate(players, seed=i)
+            print(str(i) + ' '
+                  + str(round_scores[0]) + ' '
+                  + str(round_scores[1]) + ' '
+                  + str(round_scores[2]))
+        except:
+            print(i, 'ILLEGAL DISCARDS')
 
 
 if __name__ == '__main__':
