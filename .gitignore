@@ -135,6 +135,7 @@ dmypy.json
 # Meowjong-specific (game logs, training data, etc.)
 playground.*
 test.*
+test/
 dataset
 dataset/
 dataset.tar.gz
