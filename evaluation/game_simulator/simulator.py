@@ -824,13 +824,16 @@ def rl_evaluation(args):
             players = [RandomAgent(), RandomAgent(), rl_agent]
 
         for i in range(500):
-            for index, player in enumerate(players):
-                player.reset(wind=EAST + index)
-            round_scores = simulate(players, seed=i)
-            print(str(i) + ' '
-                  + str(round_scores[0]) + ' '
-                  + str(round_scores[1]) + ' '
-                  + str(round_scores[2]))
+            try:
+                for index, player in enumerate(players):
+                    player.reset(wind=EAST + index)
+                round_scores = simulate(players, seed=i)
+                print(str(i) + ' '
+                      + str(round_scores[0]) + ' '
+                      + str(round_scores[1]) + ' '
+                      + str(round_scores[2]))
+            except:
+                print(i, 'ILLEGAL DISCARDS')
 
 
 if __name__ == '__main__':
