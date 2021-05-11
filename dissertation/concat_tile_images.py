@@ -11,7 +11,7 @@ def concat_tile_images_horizontally(tile_images, filename):
     margin = 60
     triplet_width = (width + margin) * 3
 
-    output_image = Image.new('RGB', (total_width + 15 * margin,
+    output_image = Image.new('RGB', (total_width + (len(tile_images) + 1) * margin,
                                      max_height + 2 * margin))
 
     for x in range(output_image.size[0]):  # for every pixel:
