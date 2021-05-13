@@ -1,14 +1,13 @@
 from PIL import Image
 
 
-def concat_tile_images_horizontally(tile_images, filename):
+def concat_tile_images_horizontally(tile_images, filename, margin=60):
     widths, heights = zip(*(i.size for i in tile_images))
 
     width = max(widths)
     total_width = sum(widths)
     max_height = max(heights)
     boarder_width = 20
-    margin = 60
     triplet_width = (width + margin) * 3
 
     output_image = Image.new('RGB', (total_width + (len(tile_images) + 1) * margin,
@@ -16,6 +15,7 @@ def concat_tile_images_horizontally(tile_images, filename):
 
     for x in range(output_image.size[0]):  # for every pixel:
         for y in range(output_image.size[1]):
+            # output_image.putpixel((x, y), (255, 255, 255))
             if boarder_width <= x < output_image.size[0] - boarder_width \
                     and boarder_width <= y < output_image.size[1] - boarder_width:
                 if not (triplet_width + 20 <= x < triplet_width + 40
