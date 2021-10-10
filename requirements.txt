@@ -2,7 +2,7 @@ joblib==1.0.0
 numpy>=1.18.5
 pandas>=1.2.0
 pyswip==0.2.10
-Pillow==8.1.0
+Pillow>=8.3.2
 requests==2.25.1
 scikit-learn>=0.24.0
 tensorflow>=2.3.0
