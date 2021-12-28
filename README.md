@@ -2,9 +2,8 @@
 
 Project Title: **Deep Reinforcement Learning for Mahjong**  
 Examination: **Computer Science Tripos – Part II, June 2021**  
-Word Count: **10,557**  
 Line Count: **14,571**  
-Project Originator: **2376D**  
+Project Originator: **Xiangyu Zhao**  
 Supervisor: **Dr Sean Holden**
 
 ### Original Aims of the Project
