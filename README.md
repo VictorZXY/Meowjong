@@ -1,5 +1,7 @@
 # Towards a Competitive 3-Player Mahjong AI using Deep Reinforcement Learning
 
+*2022 IEEE Conference on Games (CoG)*
+
 [Paper](https://victorzxy.github.io/publication/2022-meowjong-auxiliary/Towards_a_Competitive_3-Player_Mahjong_AI_using_Deep_Reinforcement_Learning.pdf) | [Dissertation](https://victorzxy.github.io/project/meowjong/BA-Dissertation-Meowjong.pdf)
 
 ## Abstract
